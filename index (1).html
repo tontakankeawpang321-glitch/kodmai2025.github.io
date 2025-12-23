@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>กฎหมายไทยฉบับล่าสุด (Thai Law Lite)</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Icons (Material Symbols) -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+<style>
+  :root {
+    /* 🎨 Official Law Palette */
+    --primary: #1e3a8a;      /* Deep Navy Blue */
+    --primary-dark: #172554; /* Darker Navy */
+    --accent: #d97706;       /* Official Gold */
+    --bg-app: #f3f4f6;       /* Light Gray Background */
+    --bg-card: #ffffff;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    
+    --radius-card: 16px;
+    --radius-btn: 12px;
+    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    font-family: "Sarabun", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 80px; /* Space for FAB */
+  }
+
+  /* --- App Header --- */
+  .app-header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+    color: white;
+    padding: 20px 16px 30px;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.2);
+    margin-bottom: -20px;
+    position: relative;
+    z-index: 10;
+  }
+  .app-title {
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .app-subtitle {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* --- Container & Sections --- */
+  .wrap {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .section {
+    margin-bottom: 24px;
+  }
+
+  /* --- Search Bar (Floating) --- */
+  .search-container {
+    background: white;
+    border-radius: 16px;
+    padding: 6px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 8px;
+    margin-top: 0;
+    position: relative;
+    z-index: 20;
+    border: 1px solid rgba(0,0,0,0.03);
+  }
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0 16px;
+    font-family: "Sarabun";
+    font-size: 16px;
+    color: var(--text-main);
+    background: transparent;
+  }
+  .search-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .search-btn:active { transform: scale(0.95); }
+
+  /* --- Latest Slider (Card Style) --- */
+  .slider-card {
+    background: white;
+    border-radius: var(--radius-card);
+    padding: 16px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .slider-title {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .latest-viewport { overflow: hidden; }
+  .latest-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+  .latest-slide {
+    min-width: 100%;
+    padding: 4px;
+  }
+  .slide-title {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #e5e7eb; transition: 0.3s; }
+  .dot.active { background: var(--primary); width: 18px; border-radius: 4px; }
+
+  /* --- Category Chips (Scrollable) --- */
+  .catbar-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 4px 4px 12px 4px; /* Space for shadow */
+    margin: 0 -16px; /* Bleed to edge on mobile */
+    padding-left: 16px;
+    padding-right: 16px;
+    scrollbar-width: none;
+  }
+  .catbar-scroll::-webkit-scrollbar { display: none; }
+  
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 50px; /* Pill shape */
+    margin-right: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .chip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+  }
+  .chip:active { transform: scale(0.96); }
+
+  /* --- List Cards --- */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .law-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    padding: 16px;
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    box-shadow: var(--shadow-soft);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .law-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary);
+  }
+  .law-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--primary);
+    opacity: 0;
+    transition: 0.2s;
+  }
+  .law-card:hover::before { opacity: 1; }
+
+  .law-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .law-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .tag {
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    display: inline-flex;
+    align-items: center;
+  }
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: #eff6ff;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.2s;
+  }
+  .action-btn:hover { background: #dbeafe; }
+
+  /* --- Pagination --- */
+  .loadbar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .btn-nav {
+    padding: 10px 20px;
+    border-radius: var(--radius-btn);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+  }
+  .btn-nav.next { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(30,58,138,0.2); }
+  .btn-nav.prev { background: white; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-nav:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* --- Chat FAB & Modal --- */
+  #fab-chat-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--accent), #b45309);
+    color: white;
+    border: none;
+    border-radius: 20px; /* Squircle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.4);
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  #fab-chat-toggle:hover { transform: scale(1.1) rotate(-5deg); }
+  #fab-chat-toggle .material-symbols-rounded { font-size: 28px; }
+
+  #chatbot-modal {
+    background: rgba(0,0,0,0.5); /* Dim background */
+    backdrop-filter: blur(2px);
+  }
+  .chat-window {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    font-family: "Sarabun", sans-serif;
+  }
+  @media (min-width: 640px) {
+    .chat-window {
+      height: 600px;
+      width: 400px;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+  }
+
+  .chat-header {
+    background: var(--primary);
+    padding: 16px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-bubble { font-size: 15px; line-height: 1.5; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  .chat-bubble-user { background: var(--primary); color: white; border-radius: 16px 16px 2px 16px; }
+  .chat-bubble-model { background: #f3f4f6; color: #1f2937; border-radius: 16px 16px 16px 2px; }
+
+  /* Gemini Animation Bar */
+  .gemini-thinking-bar {
+    height: 3px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    width: 60px;
+  }
+  .gemini-thinking-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; height: 100%; width: 50%;
+    background: var(--accent);
+    animation: thinking 1.5s infinite ease-in-out;
+  }
+  @keyframes thinking {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
+  }
+
+  /* Utilities */
+  .empty { padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px; border: 1px dashed var(--border); }
+  .material-symbols-rounded { vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<!-- Header ส่วนหัวแอพ -->
+<header class="app-header">
+  <div class="wrap">
+    <div class="app-title">
+      <span class="material-symbols-rounded" style="font-size: 32px;">balance</span>
+      <span>Thai Law Lite</span>
+    </div>
+    <div class="app-subtitle">คลังกฎหมายไทยฉบับพกพา อัพเดทล่าสุด</div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="wrap" style="position: relative;">
+  
+  <!-- Search Bar (Lifts up into header space slightly) -->
+  <section class="section" style="margin-top: -24px;">
+    <div class="search-container" role="search">
+      <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย, มาตรา, หรือคำสำคัญ..." aria-label="ค้นหากฎหมาย">
+      <button id="btnSearch" class="search-btn" type="button">
+        <span class="material-symbols-rounded">search</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Slider -->
+  <section class="section">
+    <div class="slider-card">
+      <div class="slider-header">
+        <div class="slider-title">
+          <span class="material-symbols-rounded" style="color:var(--accent)">campaign</span>
+          ประกาศล่าสุด
+        </div>
+        <span class="text-xs text-gray-400">Auto Slide</span>
+      </div>
+      <div class="latest-viewport" id="latestViewport">
+        <div id="latestTrack" class="latest-track" aria-live="polite"></div>
+      </div>
+      <div id="dots" class="dots" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- Categories (Scrollable Pills) -->
+  <section class="section">
+    <div class="catbar-scroll" id="catbar" role="tablist" aria-label="เลือกหมวดกฎหมาย">
+      <!-- Generated via JS -->
+    </div>
+  </section>
+
+  <!-- List Data -->
+  <section class="section">
+    <div class="section-title">
+      <span id="panelTitle">รายการกฎหมาย</span>
+      <span id="panelNote" class="text-xs font-normal text-gray-500">แสดงผล</span>
+    </div>
+    
+    <div id="list" class="list-container">
+      <!-- Cards go here -->
+    </div>
+
+    <div class="loadbar">
+      <button id="btnPrev" class="btn-nav prev" type="button" style="display:none">
+        <span class="material-symbols-rounded">arrow_back</span> ย้อนกลับ
+      </button>
+      <button id="btnNext" class="btn-nav next" type="button" style="display:none">
+        ถัดไป <span class="material-symbols-rounded">arrow_forward</span>
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<!-- Floating Action Button for AI -->
+<button id="fab-chat-toggle" title="ปรึกษา Thai Law AI">
+  <span class="material-symbols-rounded">smart_toy</span>
+</button>
+
+<!-- Chat Modal -->
+<div id="chatbot-modal" class="chatbot-hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+  <div class="chat-window w-full bg-gray-50 flex flex-col transform transition-transform duration-300 translate-y-full sm:translate-y-0 sm:scale-95" id="chat-window-inner">
+    
+    <!-- Chat Header -->
+    <header class="chat-header shadow-md shrink-0">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-rounded">smart_toy</span>
+        <div>
+          <h1 class="text-lg font-bold">Thai Law AI</h1>
+          <p class="text-xs opacity-80">ผู้ช่วยค้นหากฎหมายอัจฉริยะ</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button id="new-chat-btn" class="text-xs bg-white/20 hover:bg-white/30 text-white py-1 px-3 rounded-lg transition">
+          ล้างแชท
+        </button>
+        <button id="chatbot-close-btn" class="text-white hover:text-red-200 transition">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat History -->
+    <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div class="flex items-start space-x-2">
+        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+          <span class="material-symbols-rounded text-blue-600 text-lg">smart_toy</span>
+        </div>
+        <div class="chat-bubble chat-bubble-model p-3 max-w-[85%] relative bg-white border border-gray-100 shadow-sm">
+          <p>สวัสดีครับ! ผมคือ AI ผู้ช่วยด้านกฎหมาย ยินดีให้ความช่วยเหลือครับ สอบถามเรื่องข้อกฎหมายหรือการสืบค้นได้เลยครับ</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Thinking Indicator -->
+    <div id="thinking-indicator" class="px-4 pb-2 hidden">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+          <span class="material-symbols-rounded text-blue-600 text-lg">smart_toy</span>
+        </div>
+        <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+          <div class="gemini-thinking-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <footer class="p-3 bg-white border-t border-gray-200 shrink-0">
+      <div class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+        <input id="user-input" type="text" placeholder="พิมพ์คำถามที่นี่..." class="flex-1 bg-transparent outline-none text-sm py-1">
+        <button id="send-btn" class="text-blue-600 hover:text-blue-800 transition p-1">
+          <span class="material-symbols-rounded">send</span>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+</div>
+
+<!-- ========================================================================================= -->
+<!-- JAVASCRIPT LOGIC (KEPT EXACTLY AS ORIGINAL LOGIC, ONLY RENDER FUNCTIONS UPDATED FOR UI) -->
+<!-- ========================================================================================= -->
+
+<script>
+/* ===== ค่าคงที่/ตั้งค่า ===== */
+const PAGE_SIZE = 5;
+let lawsData = [];
+async function loadJsonAndStart() {
+  try {
+    const res = await fetch("./lawsData.json", { cache: "no-store" });
+    lawsData = await res.json();
+    renderChips();
+    loadAllData();
+    const u = new URL(location.href);
+    const initQ = u.searchParams.get("q") || "";
+    if (initQ) { document.querySelector("#q").value = initQ; doSearch(); }
+  } catch (e) {
+    console.error("โหลด lawsData.json ไม่สำเร็จ", e);
+    document.getElementById("list").innerHTML =
+      `<div class="empty">ไม่สามารถโหลดข้อมูลได้</div>`;
+  }
+}
+
+const COLS = { 
+  category: "หมวด", 
+  title: "ชื่อกฎหมาย", 
+  date: "วันที่", 
+  volume: "เล่มตอน", 
+  url: "URL_PD"
+};
+const col = k => COLS[k];
+
+const FIXED_CATS = [
+  {key:"ประมวลกฎหมาย",     label:"ประมวลกฎหมาย",     emoji:"book_2"},
+  {key:"รัฐธรรมนูญ",        label:"รัฐธรรมนูญ",        emoji:"gavel"},
+  {key:"พระราชกฤษฎีกา",   label:"พระราชกฤษฎีกา",   emoji:"account_balance"},
+  {key:"พระราชกำหนด",      label:"พระราชกำหนด",      emoji:"assignment_late"},
+  {key:"พระราชบัญญัติ",    label:"พระราชบัญญัติ",    emoji:"menu_book"},
+  {key:"ระเบียบคณะกรรมการ",      label:"กฎกระทรวง",        emoji:"policy"}
+];
+
+function normalizeCatName(raw=""){
+  const s = (raw||"").trim();
+  const map = new Map([
+    ["ประมวลกฎหมาย","ประมวลกฎหมาย"], ["ประมวลกฏหมาย","ประมวลกฎหมาย"],
+    ["รัฐธรรมนูญ","รัฐธรรมนูญ"],
+    ["พระราชกฤษฎีกา","พระราชกฤษฎีกา"], ["พระรากฎีกา","พระราชกฤษฎีกา"], ["พระราชกฎีกา","พระราชกฤษฎีกา"],
+    ["พระราชกำหนด","พระราชกำหนด"],
+    ["พระราชบัญญัติ","พระราชบัญญัติ"],
+    ["ระเบียบคณะกรรมการ","ระเบียบคณะกรรมการ"], ["ระเบียบคณะกรรมการ","ระเบียบคณะกรรมการ"]
+  ]);
+  return map.get(s) || s;
+}
+const $ = (s,el=document)=>el.querySelector(s);
+
+function sanitizeUrl(u=''){
+  try{ 
+    const url=new URL(u, location.origin); 
+    if(url.protocol==='http:'||url.protocol==='https:') return url.href; 
+  }catch{}
+  return '';
+}
+
+const TH_MONTHS={'ม.ค.':1,'ก.พ.':2,'มี.ค.':3,'เม.ย.':4,'พ.ค.':5,'มิ.ย.':6,'ก.ค.':7,'ส.ค.':8,'ก.ย.':9,'ต.ค.':10,'พ.ย.':11,'ธ.ค.':12,'มกราคม':1,'กุมภาพันธ์':2,'มีนาคม':3,'เมษายน':4,'พฤษภาคม':5,'มิถุนายน':6,'กรกฎาคม':7,'สิงหาคม':8,'กันยายน':9,'ตุลาคม':10,'พฤศจิกายน':11,'ธันวาคม':12};
+function thDigitsToArabic(s=''){const m={'๐':'0','๑':'1','๒':'2','๓':'3','๔':'4','๕':'5','๖':'6','๗':'7','๘':'8','๙':'9'}; return s.replace(/[๐-๙]/g,ch=>m[ch]??ch);}
+function parseDateTS(s){
+  if(!s) return 0; s=s.trim();
+  const onlyBuddhist = s.match(/^พ\.ศ\.?\s*([0-9๐-๙]{4})$/);
+  if(onlyBuddhist){ let y=parseInt(thDigitsToArabic(onlyBuddhist[1]),10)-543; return new Date(y,0,1).getTime(); }
+  const th = s.match(/^([0-9๐-๙]{1,2})\s+([ก-๙\.]+)\s+([0-๙0-9]{4})$/);
+  if(th){
+    const d=parseInt(thDigitsToArabic(th[1]),10);
+    const m=TH_MONTHS[th[2]]||0;
+    let y=parseInt(thDigitsToArabic(th[3]),10);
+    if(y>2400) y-=543;
+    return (m&&d&&y)? new Date(y,m-1,d).getTime():0;
+  }
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)){ let [y,m,d]=s.split('-').map(n=>+n); if(y>2400) y-=543; return new Date(y,(m||1)-1,(d||1)).getTime(); }
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){ let [d,m,y]=s.split('/').map(n=>+n); if(y>2400) y-=543; return new Date(y,(m||1)-1,(d||1)).getTime(); }
+  return 0;
+}
+function fmtDateThai(s){
+  if(!s) return '';
+  if(/^[0-9]{4}-/.test(s)||/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){
+    let y,m,d;
+    if(s.includes('-')){[y,m,d]=s.split('-').map(n=>+n);} else{[d,m,y]=s.split('/').map(n=>+n);}
+    if(y<2400) y+=543;
+    const mm=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return `${d} ${mm[(m||1)-1]} ${y}`;
+  }
+  return s;
+}
+
+const catbar = $("#catbar");
+const listEl = $("#list");
+const btnNext = $("#btnNext");
+const btnPrev = $("#btnPrev");
+const panelTitle = $("#panelTitle");
+const panelNote = $("#panelNote");
+const CatState = {};
+let selectedCat = null;
+const allIndex = [];
+let LatestData = [];
+
+function escapeHtml(s){return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Updated Render Card function for new UI
+function renderCard(r){
+  const t=r[col('title')]||'', d=r[col('date')]||'', v=r[col('volume')]||'', c=r[col('category')]||'', u=r[col('url')]||'';
+  const safe = sanitizeUrl(u);
+  // UI Design: Card like a Law Document
+  return `<article class="law-card">
+    <div class="law-title">${escapeHtml(t)||'(ไม่มีชื่อเรื่อง)'}</div>
+    <div class="law-meta">
+      ${c?`<span class="tag"><span class="material-symbols-rounded" style="font-size:14px;margin-right:2px">folder</span> ${escapeHtml(c)}</span>`:''}
+      ${d?`<span class="tag"><span class="material-symbols-rounded" style="font-size:14px;margin-right:2px">calendar_today</span> ${escapeHtml(fmtDateThai(d))}</span>`:''}
+      ${v?`<span class="tag"><span class="material-symbols-rounded" style="font-size:14px;margin-right:2px">book</span> ${escapeHtml(v)}</span>`:''}
+    </div>
+    <div class="actions">
+      ${safe?`<a class="action-btn" href="${safe}" target="_blank" rel="noopener noreferrer">
+        <span class="material-symbols-rounded" style="font-size:18px">visibility</span> อ่านฉบับเต็ม
+      </a>`:`<span class="text-xs text-gray-400">ไม่มีไฟล์แนบ</span>`}
+    </div>
+  </article>`;
+}
+
+// Updated Render Chips
+function renderChips(){
+  catbar.innerHTML = FIXED_CATS.map(c => `
+    <button class="chip" type="button" role="tab" aria-selected="false" data-cat="${c.key}">
+      <span class="material-symbols-rounded" style="font-size:18px">${c.emoji}</span><span>${c.label}</span>
+    </button>
+  `).join('');
+}
+
+function loadAllData(){
+  listEl.innerHTML=`<div class="empty">กำลังโหลดฐานข้อมูลกฎหมาย...</div>`;
+  try {
+    FIXED_CATS.forEach(({key}) => {
+        CatState[key] = {rows: [], page: 0, loaded: true};
+    });
+    lawsData.forEach(item => {
+        const normCat = normalizeCatName(item[col('category')]);
+        if (CatState[normCat]) {
+            const processedItem = {...item, _ts: parseDateTS(item[col('date')])};
+            CatState[normCat].rows.push(processedItem);
+            allIndex.push(processedItem);
+        }
+    });
+    FIXED_CATS.forEach(({key}) => {
+        if (CatState[key].rows.length > 0) {
+            CatState[key].rows.sort((a, b) => (b._ts || 0) - (a._ts || 0));
+            LatestData.push({cat: key, row: CatState[key].rows[0]});
+        }
+    });
+    catbar.addEventListener('click', e=>{
+      const b=e.target.closest('button[data-cat]'); if(!b) return;
+      selectCategory(b.dataset.cat); 
+      // Scroll chip into view
+      b.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'});
+    });
+    selectCategory(FIXED_CATS[0].key);
+    buildLatestSlider();
+  } catch(e) {
+    listEl.innerHTML=`<div class="empty">เกิดข้อผิดพลาดในการประมวลผล</div>`;
+    console.error(e);
+  }
+}
+
+function renderPage(cat){
+  const st=CatState[cat]; if(!st) return;
+  const start=st.page*PAGE_SIZE, end=start+PAGE_SIZE;
+  const slice=st.rows.slice(start,end);
+  listEl.innerHTML = slice.length? slice.map(renderCard).join('') : `<div class="empty">ไม่พบรายการในหมวดนี้</div>`;
+  btnPrev.style.display = (st.page>0)? 'inline-flex':'none';
+  btnNext.style.display = (end < st.rows.length)? 'inline-flex':'none';
+  panelTitle.textContent = `${cat}`;
+  panelNote.textContent  = `แสดง ${start+1}-${Math.min(end, st.rows.length)} จาก ${st.rows.length}`;
+}
+
+function selectCategory(cat){
+  if(selectedCat===cat) return;
+  selectedCat=cat;
+  [...catbar.querySelectorAll('.chip')].forEach(b=>{
+    const on = b.dataset.cat===cat;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on?'true':'false');
+  });
+  if(CatState[cat]){
+    CatState[cat].page=0;
+    renderPage(cat);
+  } else {
+    listEl.innerHTML = `<div class="empty">ไม่พบหมวดหมู่ "${cat}"</div>`;
+  }
+}
+
+btnNext.addEventListener('click', ()=>{
+  if(!selectedCat) return;
+  const st=CatState[selectedCat]; if(!st) return;
+  st.page+=1; renderPage(selectedCat);
+  listEl.scrollIntoView({behavior:'smooth', block:'start'});
+});
+btnPrev.addEventListener('click', ()=>{
+  if(!selectedCat) return;
+  const st=CatState[selectedCat]; if(!st) return;
+  if(st.page>0){ st.page-=1; renderPage(selectedCat); }
+  listEl.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+const elQ = $("#q"), elBtnSearch=$("#btnSearch");
+elBtnSearch.addEventListener('click', doSearch);
+elQ.addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+
+function normalizeThai(s){ return (s||'').toLowerCase().replace(/\s+/g,' ').trim().normalize('NFC').replace(/[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g,''); }
+function doSearch(){
+  const q=(elQ.value||'').trim();
+  if(!q){ if(selectedCat) renderPage(selectedCat); return; }
+  const nq=normalizeThai(q);
+  const results = allIndex.filter(o=>{
+    const t=normalizeThai(o[col('title')]||''),
+          v=normalizeThai(o[col('volume')]||''),
+          c=normalizeThai(o[col('category')]||'');
+    return t.includes(nq)||v.includes(nq)||c.includes(nq);
+  }).sort((a,b)=>(b._ts||0)-(a._ts||0));
+  
+  listEl.innerHTML = results.slice(0,50).map(renderCard).join('') || `<div class="empty">ไม่พบข้อมูลที่ค้นหา</div>`;
+  btnNext.style.display='none';
+  btnPrev.style.display='none';
+  panelTitle.textContent = `ผลการค้นหา: “${q}”`;
+  panelNote.textContent  = `พบ ${results.length} รายการ`;
+}
+
+const latestViewport = $("#latestViewport");
+const latestTrack = $("#latestTrack");
+const dotsEl = $("#dots");
+let latestSlides=[]; let latestIndex=0; let autoTimer=null;
+
+function updateLatestSlider(){
+  const w = latestViewport.getBoundingClientRect().width;
+  latestTrack.style.transform = `translateX(${-latestIndex*w}px)`;
+  [...dotsEl.children].forEach((d,i)=>d.classList.toggle('active', i===latestIndex));
+}
+function nextLatest(){ if(!latestSlides.length) return; latestIndex = (latestIndex + 1) % latestSlides.length; updateLatestSlider(); }
+function startAuto(){ stopAuto(); autoTimer = setInterval(nextLatest, 5000); }
+function stopAuto(){ if(autoTimer){ clearInterval(autoTimer); autoTimer=null; } }
+
+document.addEventListener('visibilitychange', ()=>{ document.hidden ? stopAuto() : startAuto(); });
+latestViewport.addEventListener('mouseenter', stopAuto);
+latestViewport.addEventListener('mouseleave', startAuto);
+window.addEventListener('resize', updateLatestSlider);
+
+function buildLatestSlider(){
+  latestTrack.innerHTML=''; dotsEl.innerHTML='';
+  latestSlides = LatestData.filter(Boolean).sort((a,b)=>(b.row._ts||0) - (a.row._ts||0));
+  if(!latestSlides.length){
+    latestTrack.innerHTML = `<div class="latest-slide"><div class="text-gray-400 text-center py-4">ยังไม่มีข้อมูลอัปเดต</div></div>`;
+    return;
+  }
+  latestTrack.innerHTML = latestSlides.map(({cat,row})=>{
+    const t=row[col('title')]||'', d=row[col('date')]||'', u=row[col('url')]||'#';
+    const safe = sanitizeUrl(u);
+    return `<div class="latest-slide">
+      <div class="slide-title">${escapeHtml(t)}</div>
+      <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100">${escapeHtml(cat)}</span>
+        <span>${escapeHtml(fmtDateThai(d))}</span>
+      </div>
+      ${safe?`<a class="text-sm font-semibold text-blue-700 hover:underline flex items-center gap-1" href="${safe}" target="_blank">อ่านต่อ <span class="material-symbols-rounded" style="font-size:14px">arrow_forward</span></a>`:''}
+    </div>`;
+  }).join('');
+  dotsEl.innerHTML = latestSlides.map((_,i)=>`<span class="dot ${i===0?'active':''}"></span>`).join('');
+  latestIndex=0; updateLatestSlider(); startAuto();
+}
+
+loadJsonAndStart();
+</script>
+
+
+<script type="module">
+/* =========================================
+   CHATBOT LOGIC (Keep Functional)
+   ========================================= */
+const BACKEND_URL = 'https://us-central1-law-ai-14740.cloudfunctions.net/api/chat';
+let chatHistory = [];
+
+const chatHistoryEl = document.getElementById('chat-history');
+const userInput   = document.getElementById('user-input');
+const sendBtn     = document.getElementById('send-btn');
+const newChatBtn  = document.getElementById('new-chat-btn');
+const thinkingIndicator = document.getElementById('thinking-indicator');
+
+function addChatBubble(message, isUser = true) {
+  const bubbleType = isUser ? 'user' : 'model';
+  const iconBg = isUser ? 'bg-blue-600' : 'bg-blue-100';
+  const iconColor = isUser ? 'text-white' : 'text-blue-600';
+  const iconName = isUser ? 'person' : 'smart_toy';
+  
+  const wrap = document.createElement('div');
+  wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+  
+  const iconDiv = document.createElement('div');
+  iconDiv.className = `w-8 h-8 rounded-full ${iconBg} flex items-center justify-center shrink-0`;
+  iconDiv.innerHTML = `<span class="material-symbols-rounded ${iconColor} text-lg">${iconName}</span>`;
+  
+  const bubble = document.createElement('div');
+  bubble.className = `chat-bubble chat-bubble-${bubbleType} p-3 max-w-[85%] relative ${isUser ? '' : 'bg-white border border-gray-100 shadow-sm'}`;
+  bubble.innerHTML = `<p></p>`;
+  bubble.querySelector('p').innerText = message; 
+  
+  wrap.appendChild(iconDiv);
+  wrap.appendChild(bubble);
+  chatHistoryEl.appendChild(wrap);
+  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+}
+
+function addChatError(message) {
+  const w = document.createElement('div');
+  w.className = 'flex justify-center my-2';
+  w.innerHTML = `<span class="bg-red-50 text-red-600 text-xs px-3 py-1 rounded-full border border-red-100">${message}</span>`;
+  chatHistoryEl.appendChild(w);
+  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+}
+
+function setThinking(on) {
+  thinkingIndicator.classList.toggle('hidden', !on);
+  if (on) chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+}
+
+async function handleSend() {
+  const message = (userInput.value || '').trim();
+  if (!message) return;
+
+  addChatBubble(message, true);
+  userInput.value = '';
+  setThinking(true);
+  sendBtn.disabled = true;
+
+  chatHistory.push({ role: "user", parts: [{ text: message }] });
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ history: chatHistory }) 
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error || `Server error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const aiReply = data.reply;
+
+    chatHistory.push({ role: "model", parts: [{ text: aiReply }] });
+    setThinking(false);
+    addChatBubble(aiReply, false);
+
+  } catch (err) {
+    console.error("Fetch Error:", err);
+    setThinking(false);
+    addChatError(`ขออภัย ระบบขัดข้อง: ${err.message}`);
+  } finally {
+    sendBtn.disabled = false;
+  }
+}
+
+sendBtn.addEventListener('click', handleSend);
+userInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleSend();
+  }
+});
+
+newChatBtn.addEventListener('click', async () => {
+  chatHistoryEl.innerHTML = `
+    <div class="flex items-start space-x-2">
+      <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+        <span class="material-symbols-rounded text-blue-600 text-lg">smart_toy</span>
+      </div>
+      <div class="chat-bubble chat-bubble-model p-3 max-w-[85%] relative bg-white border border-gray-100 shadow-sm">
+        <p>เริ่มสนทนาใหม่เรียบร้อยครับ ถามผมได้เลย!</p>
+      </div>
+    </div>`;
+  userInput.value = '';
+  setThinking(false);
+  chatHistory = []; 
+});
+
+/* Modal Logic */
+const fabToggle = document.getElementById('fab-chat-toggle');
+const chatModal = document.getElementById('chatbot-modal');
+const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
+const chatWindowInner = document.getElementById('chat-window-inner');
+
+if (fabToggle && chatModal && chatbotCloseBtn) {
+  fabToggle.addEventListener('click', () => {
+    chatModal.classList.remove('chatbot-hidden');
+    chatModal.classList.remove('opacity-0', 'pointer-events-none');
+    
+    // Animation in
+    chatWindowInner.classList.remove('translate-y-full', 'scale-95');
+    
+    fabToggle.style.transform = 'scale(0)';
+    setTimeout(() => { document.getElementById('user-input').focus(); }, 300);
+  });
+  
+  chatbotCloseBtn.addEventListener('click', () => {
+    // Animation out
+    chatWindowInner.classList.add('translate-y-full', 'scale-95');
+    
+    setTimeout(() => {
+        chatModal.classList.add('opacity-0', 'pointer-events-none');
+        chatModal.classList.add('chatbot-hidden');
+        fabToggle.style.transform = 'scale(1)';
+    }, 300);
+  });
+}
+</script>
+</body>
+</html>
