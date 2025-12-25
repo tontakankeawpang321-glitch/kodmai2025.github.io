@@ -6,12 +6,12 @@ let lawsData = [];
 // 1. รายชื่อไฟล์ JSON ทั้งหมดที่คุณแยกไว้ (เพิ่มลดได้ที่นี่)
 // --------------------------------------------------------
 const DATA_SOURCES = [
-  "./data_codes.json",        // ประมวลกฎหมาย
-  "./data_constitution.json", // รัฐธรรมนูญ
-  "./data_decree.json",       // พระราชกฤษฎีกา
-  "./data_emergency.json",    // พระราชกำหนด
-  "./data_act.json",          // พระราชบัญญัติ
-  "./data_ministerial.json"   // กฎกระทรวง/ระเบียบ
+  "./pamon.json",        // ประมวลกฎหมาย
+  "./ratathammanoon.json", // รัฐธรรมนูญ
+  "./teka.json",       // พระราชกฤษฎีกา
+  "./ ",    // พระราชกำหนด
+  "./pharaschabunyad.json",          // พระราชบัญญัติ
+  "./kodkasong.json"   // กฎกระทรวง/ระเบียบ
 ];
 
 async function loadJsonAndStart() {
