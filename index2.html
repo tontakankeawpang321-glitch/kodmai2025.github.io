@@ -15,12 +15,14 @@ header{background:linear-gradient(135deg,#172554,#1e3a8a);color:#fff;padding:20p
 .search,.toolbar{background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:10px}
 .search input{width:100%;border:none;outline:none;font-size:15px}
 
-.toolbar{display:flex;gap:10px;flex-wrap:wrap}
-select{padding:6px 10px;border-radius:8px;border:1px solid #e5e7eb}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select,button.ai-btn{
+  padding:6px 12px;border-radius:8px;border:1px solid #e5e7eb;
+  background:#fff;cursor:pointer;font-size:14px
+}
 
-.breadcrumb{font-size:13px;margin:8px 0 14px;color:#374151}
-.breadcrumb span{cursor:pointer;color:#1e3a8a}
-.breadcrumb span.home{font-weight:700}
+.breadcrumb{font-size:13px;margin:8px 0 14px;color:#374151;display:flex;gap:10px;align-items:center}
+.breadcrumb span{cursor:pointer;color:#1e3a8a;font-weight:600}
 
 .card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;
 border:1px solid #e5e7eb;display:flex;justify-content:space-between;gap:12px}
@@ -33,17 +35,12 @@ border:none;font-size:13px;font-weight:600;cursor:pointer}
 
 .loading{text-align:center;padding:40px;color:#6b7280}
 
-/* Slider */
-.slider{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px}
-.slider-item{min-width:220px;background:#fff;border:1px solid #e5e7eb;
-border-radius:12px;padding:12px;cursor:pointer}
-
-/* Modal Preview */
-#viewer{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:1000}
-#viewerBox{position:absolute;inset:5%;background:#fff;border-radius:12px;overflow:hidden}
-#viewerClose{position:absolute;top:10px;right:10px;background:#111;color:#fff;
-border:none;border-radius:999px;padding:6px 10px;cursor:pointer;z-index:10}
-#viewerFrame{width:100%;height:100%;border:none}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:1000}
+.modal-box{background:#fff;max-width:700px;margin:8% auto;border-radius:14px;
+padding:16px;max-height:80vh;overflow:auto}
+.modal-box h3{margin-top:0}
+.modal-close{float:right;cursor:pointer;font-weight:700}
 </style>
 </head>
 
@@ -51,7 +48,7 @@ border:none;border-radius:999px;padding:6px 10px;cursor:pointer;z-index:10}
 
 <header>
   <h1>📁 Thai Law Lite</h1>
-  <p>คลังเอกสารกฎหมาย (Google Drive)</p>
+  <p>คลังเอกสารกฎหมาย + AI</p>
 </header>
 
 <div class="container">
@@ -67,161 +64,166 @@ border:none;border-radius:999px;padding:6px 10px;cursor:pointer;z-index:10}
       <option value="az">ชื่อ A–Z</option>
       <option value="za">ชื่อ Z–A</option>
     </select>
+
+    <select id="categorySelect">
+      <option value="all">ทุกหมวด</option>
+    </select>
+
+    <button class="ai-btn" onclick="summarizeCategory()">
+      🤖 AI สรุปไฟล์ในหมวดนี้
+    </button>
   </div>
 
-  <h3>🆕 ไฟล์อัปโหลดใหม่</h3>
-  <div id="slider" class="slider"></div>
+  <div class="breadcrumb">
+    <span onclick="goHome()">🏠 หน้าแรก</span>
+    <span onclick="goBack()">⬅️ ย้อนกลับ</span>
+    <span id="currentPath"></span>
+  </div>
 
-  <div id="breadcrumb" class="breadcrumb"></div>
   <div id="list"></div>
   <div id="loading" class="loading">กำลังโหลด...</div>
 </div>
 
-<!-- Modal Preview -->
-<div id="viewer">
-  <div id="viewerBox">
-    <button id="viewerClose" onclick="closeViewer()">✕</button>
-    <iframe id="viewerFrame"></iframe>
+<!-- AI Modal -->
+<div id="aiModal" class="modal">
+  <div class="modal-box">
+    <span class="modal-close" onclick="closeAI()">✕</span>
+    <h3>🤖 AI สรุปไฟล์</h3>
+    <div id="aiResult">กำลังประมวลผล...</div>
   </div>
 </div>
 
 <script>
 /* ================= CONFIG ================= */
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyngJX9yx-QZgwA6wCTiCwJcVB5xmpXwBTgpZWk_duN8OlYfB3lcn1XGBCig5dqyW7d/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyngJX9yx-QZgwA6wCTiCwJcVB5xmpXwBTgpZWk_duN8OlYfB3lcn1XGBCig5dqyW7d/exec";
 const ROOT_FOLDER_ID = "1zY7CDFyad6PQn-FzM9hVFn_CTIEb-fbO";
+const BACKEND_URL = "https://us-central1-law-ai-14740.cloudfunctions.net/api/chat";
 /* ========================================= */
 
-/* ===== State ===== */
-let stack = [{ id: ROOT_FOLDER_ID, name: "หน้าแรก" }];
-let items = [];
+let stack=[{id:ROOT_FOLDER_ID,name:"หน้าแรก"}];
+let items=[];
+let currentCategory="all";
 
-const listEl = document.getElementById("list");
-const sliderEl = document.getElementById("slider");
-const loadingEl = document.getElementById("loading");
-const breadcrumbEl = document.getElementById("breadcrumb");
-const searchInput = document.getElementById("searchInput");
-const sortSelect = document.getElementById("sortSelect");
+const listEl=document.getElementById("list");
+const loadingEl=document.getElementById("loading");
+const searchInput=document.getElementById("searchInput");
+const sortSelect=document.getElementById("sortSelect");
+const categorySelect=document.getElementById("categorySelect");
+const currentPath=document.getElementById("currentPath");
 
-/* ===== Helpers ===== */
+/* ===== Utils ===== */
 function extractBEYear(name){
-  const m = name.match(/25\d{2}/);
-  return m ? parseInt(m[0]) : null;
+  const m=name.match(/25\d{2}/);
+  return m?parseInt(m[0]):0;
 }
 
 /* ===== Navigation ===== */
-function loadFolder(id, name){
-  loadingEl.style.display = "block";
-
-  if(name){
-    stack.push({ id, name });
-  }
-
-  breadcrumbEl.innerHTML = stack
-    .map((s,i)=>`
-      <span class="${i===0?'home':''}" onclick="go(${i})">
-        ${i===0?'🏠 ':''}${s.name}
-      </span>
-    `)
-    .join(" / ");
+function loadFolder(id,name){
+  loadingEl.style.display="block";
+  if(name) stack.push({id,name});
+  currentPath.textContent = stack.map(s=>s.name).join(" / ");
 
   fetch(`${SCRIPT_URL}?folder=${id}`)
     .then(r=>r.json())
     .then(d=>{
-      items = d;
+      items=d;
       render();
-      renderSlider();
-      loadingEl.style.display = "none";
+      if(stack.length===1){
+        categorySelect.innerHTML=`<option value="all">ทุกหมวด</option>`;
+        d.filter(i=>i.isFolder).forEach(f=>{
+          const o=document.createElement("option");
+          o.value=f.name;o.textContent=f.name;
+          categorySelect.appendChild(o);
+        });
+      }
+      loadingEl.style.display="none";
     });
 }
 
-function go(index){
-  stack = stack.slice(0, index + 1);
-  loadFolder(stack[index].id);
+function goHome(){
+  stack=[{id:ROOT_FOLDER_ID,name:"หน้าแรก"}];
+  loadFolder(ROOT_FOLDER_ID);
+}
+function goBack(){
+  if(stack.length>1){
+    stack.pop();
+    loadFolder(stack[stack.length-1].id);
+  }
 }
 
-/* ===== Sorting ===== */
+/* ===== Sorting + Render ===== */
 function sortItems(arr){
-  const mode = sortSelect.value;
+  const m=sortSelect.value;
   return [...arr].sort((a,b)=>{
-    if(mode==="az") return a.name.localeCompare(b.name,"th");
-    if(mode==="za") return b.name.localeCompare(a.name,"th");
-    const ya = extractBEYear(a.name) || 0;
-    const yb = extractBEYear(b.name) || 0;
-    return mode==="new" ? yb - ya : ya - yb;
+    if(m==="az") return a.name.localeCompare(b.name,"th");
+    if(m==="za") return b.name.localeCompare(a.name,"th");
+    return extractBEYear(b.name)-extractBEYear(a.name);
   });
 }
 
-/* ===== Render ===== */
 function render(){
-  listEl.innerHTML = "";
-  const q = searchInput.value.toLowerCase();
+  listEl.innerHTML="";
+  let filtered=items.filter(i=>i.name.toLowerCase().includes(searchInput.value.toLowerCase()));
+  if(currentCategory!=="all"){
+    filtered=filtered.filter(i=>i.name===currentCategory||i.parentName===currentCategory);
+  }
+  filtered=sortItems(filtered);
 
-  const filtered = sortItems(
-    items.filter(i => i.name.toLowerCase().includes(q))
-  );
-
-  if(filtered.length === 0){
-    listEl.innerHTML = `<div class="loading">ไม่พบไฟล์</div>`;
+  if(filtered.length===0){
+    listEl.innerHTML=`<div class="loading">ไม่พบไฟล์</div>`;
     return;
   }
 
   filtered.forEach(it=>{
-    const year = extractBEYear(it.name);
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
       <div class="info">
-        <h3>${it.isFolder ? "📁" : "📄"} ${it.name}</h3>
-        <div class="meta">
-          ${it.isFolder ? "โฟลเดอร์" : year ? `พ.ศ. ${year}` : "ไม่ระบุปี"}
-        </div>
+        <h3>${it.isFolder?"📁":"📄"} ${it.name}</h3>
+        <div class="meta">${it.isFolder?"โฟลเดอร์":`พ.ศ. ${extractBEYear(it.name)||"ไม่ระบุ"}`}</div>
       </div>
     `;
-    const btn = document.createElement("button");
-    btn.className = "btn";
-
-    if(it.isFolder){
-      btn.textContent = "เปิดโฟลเดอร์";
-      btn.onclick = () => loadFolder(it.id, it.name);
-    } else {
-      btn.textContent = "เปิดไฟล์";
-      btn.onclick = () => openFile(it.id);
-    }
-
+    const btn=document.createElement("button");
+    btn.className="btn";
+    btn.textContent=it.isFolder?"เปิดโฟลเดอร์":"เปิดไฟล์";
+    btn.onclick=()=>it.isFolder?loadFolder(it.id,it.name):window.open(it.url,"_blank");
     card.appendChild(btn);
     listEl.appendChild(card);
   });
 }
 
-/* ===== Slider ===== */
-function renderSlider(){
-  sliderEl.innerHTML = "";
-  const latest = sortItems(items.filter(i => !i.isFolder)).slice(0,5);
+/* ===== AI Summary ===== */
+function summarizeCategory(){
+  const files=items.filter(i=>!i.isFolder).map(f=>f.name).join(", ");
+  document.getElementById("aiModal").style.display="block";
+  document.getElementById("aiResult").textContent="กำลังสรุป...";
 
-  latest.forEach(f=>{
-    const box = document.createElement("div");
-    box.className = "slider-item";
-    box.innerHTML = `<strong>📄 ${f.name}</strong>`;
-    box.onclick = () => openFile(f.id);
-    sliderEl.appendChild(box);
+  fetch(BACKEND_URL,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      history:[{
+        role:"user",
+        parts:[{text:`ช่วยสรุปภาพรวมไฟล์ในหมวด "${currentCategory}" จากรายการต่อไปนี้: ${files}`}]
+      }]
+    })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    document.getElementById("aiResult").textContent=d.reply||"ไม่สามารถสรุปได้";
   });
 }
-
-/* ===== Preview ===== */
-function openFile(id){
-  document.getElementById("viewer").style.display = "block";
-  document.getElementById("viewerFrame").src =
-    `https://drive.google.com/file/d/${id}/preview`;
-}
-function closeViewer(){
-  document.getElementById("viewer").style.display = "none";
-  document.getElementById("viewerFrame").src = "";
+function closeAI(){
+  document.getElementById("aiModal").style.display="none";
 }
 
 /* ===== Events ===== */
-searchInput.oninput = render;
-sortSelect.onchange = render;
+searchInput.oninput=render;
+sortSelect.onchange=render;
+categorySelect.onchange=()=>{
+  currentCategory=categorySelect.value;
+  render();
+};
 
 /* ===== Init ===== */
 loadFolder(ROOT_FOLDER_ID);
