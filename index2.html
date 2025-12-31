@@ -2,14 +2,10 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <title>Thai Law Lite – คลังเอกสาร</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>คลังไฟล์ Google Drive</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Icons -->
-  <link href="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" rel="stylesheet">
 
   <style>
     body {
@@ -18,94 +14,64 @@
       margin: 0;
       color: #1f2937;
     }
-
     header {
-      background: linear-gradient(135deg, #172554, #1e3a8a);
-      color: white;
-      padding: 24px;
-      border-radius: 0 0 24px 24px;
+      background: linear-gradient(135deg,#172554,#1e3a8a);
+      color: #fff;
+      padding: 20px;
     }
-
     .container {
       max-width: 900px;
       margin: -20px auto 40px;
       padding: 0 16px;
     }
-
     .search {
-      background: white;
-      border-radius: 16px;
-      padding: 12px;
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
     }
-
     .search input {
-      flex: 1;
+      width: 100%;
       border: none;
       outline: none;
       font-size: 15px;
     }
-
-    .categories {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      margin-bottom: 16px;
-    }
-
-    .categories button {
-      border: 1px solid #ddd;
-      background: white;
-      padding: 6px 14px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .categories button.active {
-      background: #1e3a8a;
-      color: white;
-      border-color: #1e3a8a;
-    }
-
     .card {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px;
       margin-bottom: 12px;
-      border: 1px solid #eee;
+      border: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
     }
-
+    .info {
+      flex: 1;
+      min-width: 0;
+    }
     .card h3 {
       margin: 0 0 6px;
       font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
     .meta {
       font-size: 12px;
       color: #6b7280;
-      margin-bottom: 8px;
     }
-
-    .desc {
-      font-size: 14px;
-      color: #4b5563;
-      margin-bottom: 10px;
-    }
-
     .open {
-      display: block;
-      text-align: center;
       background: #e0ecff;
       color: #1e3a8a;
-      padding: 8px;
-      border-radius: 10px;
+      padding: 6px 14px;
+      border-radius: 999px;
       text-decoration: none;
+      font-size: 13px;
       font-weight: 600;
+      white-space: nowrap;
     }
-
     .loading {
       text-align: center;
       padding: 40px;
@@ -116,17 +82,15 @@
 <body>
 
 <header>
-  <h1>📁 Thai Law Lite</h1>
-  <p>คลังเอกสารกฎหมาย (ข้อมูลจาก Google Drive)</p>
+  <h1>📁 คลังไฟล์ Google Drive</h1>
+  <p>เปิดไฟล์ / โฟลเดอร์ โดยไม่ต้องเข้าสู่ระบบ</p>
 </header>
 
 <div class="container">
 
   <div class="search">
-    <input type="text" id="searchInput" placeholder="ค้นหาชื่อเอกสาร..." />
+    <input id="searchInput" type="text" placeholder="พิมพ์เพื่อค้นหาชื่อไฟล์หรือโฟลเดอร์..." />
   </div>
-
-  <div class="categories" id="categoryBar"></div>
 
   <div id="list"></div>
   <div id="loading" class="loading">กำลังโหลดข้อมูล...</div>
@@ -135,27 +99,24 @@
 
 <script>
 /* ================================
-   🔧 แก้ตรงนี้จุดเดียว
+   🔧 แก้ 2 จุดนี้เท่านั้น
 ================================ */
-const SHEET_ID = "1D4fJ_o1YFW7cmA351i-JawvZJL8ljbi98KADxXc6bhU";
-const SHEET_NAME = "ชีต1";
-const DATA_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbyngJX9yx-QZgwA6wCTiCwJcVB5xmpXwBTgpZWk_duN8OlYfB3lcn1XGBCig5dqyW7d/exec";
 
+const FOLDER_ID = "17v37WB5l-UaTTNzPw17phSH5oIOqMANo";
 /* ================================ */
 
-let allFiles = [];
-let currentCategory = "All";
+let allItems = [];
 
 const listEl = document.getElementById("list");
 const loadingEl = document.getElementById("loading");
-const categoryBar = document.getElementById("categoryBar");
 const searchInput = document.getElementById("searchInput");
 
-fetch(DATA_URL)
+fetch(`${SCRIPT_URL}?folder=${FOLDER_ID}`)
   .then(res => res.json())
   .then(data => {
-    allFiles = data;
-    renderCategories();
+    allItems = data;
     renderList();
     loadingEl.style.display = "none";
   })
@@ -164,50 +125,40 @@ fetch(DATA_URL)
     console.error(err);
   });
 
-function renderCategories() {
-  const folders = ["All", ...new Set(allFiles.map(f => f.folder || "ทั่วไป"))];
-  categoryBar.innerHTML = "";
-
-  folders.forEach(cat => {
-    const btn = document.createElement("button");
-    btn.textContent = cat === "All" ? "ทั้งหมด" : cat;
-    btn.className = cat === currentCategory ? "active" : "";
-    btn.onclick = () => {
-      currentCategory = cat;
-      renderCategories();
-      renderList();
-    };
-    categoryBar.appendChild(btn);
-  });
-}
-
 function renderList() {
   const keyword = searchInput.value.toLowerCase();
   listEl.innerHTML = "";
 
-  const filtered = allFiles.filter(f => {
-    const matchText =
-      f.name.toLowerCase().includes(keyword) ||
-      (f.description && f.description.toLowerCase().includes(keyword));
-    const matchCat =
-      currentCategory === "All" || f.folder === currentCategory;
-    return matchText && matchCat;
-  });
+  const filtered = allItems.filter(item =>
+    item.name.toLowerCase().includes(keyword)
+  );
 
   if (filtered.length === 0) {
-    listEl.innerHTML = `<div class="loading">ไม่พบเอกสาร</div>`;
+    listEl.innerHTML = `<div class="loading">ไม่พบข้อมูล</div>`;
     return;
   }
 
-  filtered.forEach(f => {
+  filtered.forEach(item => {
     const card = document.createElement("div");
     card.className = "card";
+
+    // ✅ ใช้ลิงก์ Google Drive มาตรฐาน (ไม่ถาม login)
+    const link = item.isFolder
+      ? `https://drive.google.com/drive/folders/${item.id}`
+      : `https://drive.google.com/file/d/${item.id}/view`;
+
     card.innerHTML = `
-      <h3>${f.name}</h3>
-      <div class="meta">หมวด: ${f.folder || "ทั่วไป"}</div>
-      <div class="desc">${f.description || ""}</div>
-      <a class="open" href="${f.url}" target="_blank">เปิดดูเอกสาร</a>
+      <div class="info">
+        <h3>${item.isFolder ? "📁 " : "📄 "}${item.name}</h3>
+        <div class="meta">
+          ${item.isFolder ? "โฟลเดอร์" : "ไฟล์"}
+        </div>
+      </div>
+      <a class="open" href="${link}" target="_blank">
+        ${item.isFolder ? "เปิดโฟลเดอร์" : "เปิดไฟล์"}
+      </a>
     `;
+
     listEl.appendChild(card);
   });
 }
