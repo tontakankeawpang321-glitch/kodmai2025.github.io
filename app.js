@@ -8,10 +8,7 @@ let lawsData = [];
 const DATA_SOURCES = [
   "./pamon.json",        // ประมวลกฎหมาย
   "./ratathammanoon.json", // รัฐธรรมนูญ
-  "./teka.json",       // พระราชกฤษฎีกา
-  "./ ",    // พระราชกำหนด
-  "./pharaschabunyad.json",          // พระราชบัญญัติ
-  "./kodkasong.json"   // กฎกระทรวง/ระเบียบ
+  "./pharaschabunyad.json",  // พระราชบัญญัติ
 ];
 
 async function loadJsonAndStart() {
