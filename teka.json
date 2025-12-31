@@ -1,9 +1,0 @@
- ✅ โหลดไฟล์ล่วงหน้า (preload)
-
-✅ decode เป็น AudioBuffer ก่อนใช้งาน
-
-✅ เล่นด้วย AudioBufferSourceNode
-
-✅ ปิดเสียงอากาศ (trim silence)
-
-✅ fade in/out ระดับ ms
