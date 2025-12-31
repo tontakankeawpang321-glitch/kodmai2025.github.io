@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Thai Law Lite – Google Drive File Manager</title>
+<title>Thai Law Lite – คลังเอกสาร</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@ body{font-family:Sarabun,sans-serif;margin:0;background:#f3f4f6;color:#1f2937}
 header{background:linear-gradient(135deg,#172554,#1e3a8a);color:#fff;padding:20px}
 .container{max-width:960px;margin:-20px auto 60px;padding:0 16px}
 
-.search, .toolbar{background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:10px}
+.search,.toolbar{background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:10px}
 .search input{width:100%;border:none;outline:none;font-size:15px}
 
 .toolbar{display:flex;gap:10px;flex-wrap:wrap}
@@ -20,6 +20,7 @@ select{padding:6px 10px;border-radius:8px;border:1px solid #e5e7eb}
 
 .breadcrumb{font-size:13px;margin:8px 0 14px;color:#374151}
 .breadcrumb span{cursor:pointer;color:#1e3a8a}
+.breadcrumb span.home{font-weight:700}
 
 .card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;
 border:1px solid #e5e7eb;display:flex;justify-content:space-between;gap:12px}
@@ -86,115 +87,144 @@ border:none;border-radius:999px;padding:6px 10px;cursor:pointer;z-index:10}
 
 <script>
 /* ================= CONFIG ================= */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyngJX9yx-QZgwA6wCTiCwJcVB5xmpXwBTgpZWk_duN8OlYfB3lcn1XGBCig5dqyW7d/exec";
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbyngJX9yx-QZgwA6wCTiCwJcVB5xmpXwBTgpZWk_duN8OlYfB3lcn1XGBCig5dqyW7d/exec";
 const ROOT_FOLDER_ID = "1zY7CDFyad6PQn-FzM9hVFn_CTIEb-fbO";
 /* ========================================= */
 
-let stack=[{id:ROOT_FOLDER_ID,name:"Root"}];
-let items=[];
-const listEl=document.getElementById("list");
-const sliderEl=document.getElementById("slider");
-const loadingEl=document.getElementById("loading");
-const breadcrumbEl=document.getElementById("breadcrumb");
-const searchInput=document.getElementById("searchInput");
-const sortSelect=document.getElementById("sortSelect");
+/* ===== State ===== */
+let stack = [{ id: ROOT_FOLDER_ID, name: "หน้าแรก" }];
+let items = [];
 
+const listEl = document.getElementById("list");
+const sliderEl = document.getElementById("slider");
+const loadingEl = document.getElementById("loading");
+const breadcrumbEl = document.getElementById("breadcrumb");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+
+/* ===== Helpers ===== */
 function extractBEYear(name){
-  const m=name.match(/25\d{2}/);
-  return m?parseInt(m[0]):null;
+  const m = name.match(/25\d{2}/);
+  return m ? parseInt(m[0]) : null;
 }
 
-function loadFolder(id,name){
-  loadingEl.style.display="block";
-  if(name) stack.push({id,name});
-  breadcrumbEl.innerHTML=stack.map((s,i)=>`<span onclick="go(${i})">${s.name}</span>`).join(" / ");
+/* ===== Navigation ===== */
+function loadFolder(id, name){
+  loadingEl.style.display = "block";
+
+  if(name){
+    stack.push({ id, name });
+  }
+
+  breadcrumbEl.innerHTML = stack
+    .map((s,i)=>`
+      <span class="${i===0?'home':''}" onclick="go(${i})">
+        ${i===0?'🏠 ':''}${s.name}
+      </span>
+    `)
+    .join(" / ");
+
   fetch(`${SCRIPT_URL}?folder=${id}`)
     .then(r=>r.json())
     .then(d=>{
-      items=d;
+      items = d;
       render();
       renderSlider();
-      loadingEl.style.display="none";
+      loadingEl.style.display = "none";
     });
 }
 
-function go(i){
-  stack=stack.slice(0,i+1);
-  loadFolder(stack[i].id);
+function go(index){
+  stack = stack.slice(0, index + 1);
+  loadFolder(stack[index].id);
 }
 
+/* ===== Sorting ===== */
 function sortItems(arr){
-  const mode=sortSelect.value;
+  const mode = sortSelect.value;
   return [...arr].sort((a,b)=>{
     if(mode==="az") return a.name.localeCompare(b.name,"th");
     if(mode==="za") return b.name.localeCompare(a.name,"th");
-    const ya=extractBEYear(a.name)||0;
-    const yb=extractBEYear(b.name)||0;
-    return mode==="new"?yb-ya:ya-yb;
+    const ya = extractBEYear(a.name) || 0;
+    const yb = extractBEYear(b.name) || 0;
+    return mode==="new" ? yb - ya : ya - yb;
   });
 }
 
+/* ===== Render ===== */
 function render(){
-  listEl.innerHTML="";
-  const q=searchInput.value.toLowerCase();
-  const filtered=sortItems(items.filter(i=>i.name.toLowerCase().includes(q)));
+  listEl.innerHTML = "";
+  const q = searchInput.value.toLowerCase();
 
-  if(filtered.length===0){
-    listEl.innerHTML=`<div class="loading">ไม่พบไฟล์</div>`;
+  const filtered = sortItems(
+    items.filter(i => i.name.toLowerCase().includes(q))
+  );
+
+  if(filtered.length === 0){
+    listEl.innerHTML = `<div class="loading">ไม่พบไฟล์</div>`;
     return;
   }
 
   filtered.forEach(it=>{
-    const year=extractBEYear(it.name);
-    const card=document.createElement("div");
-    card.className="card";
-    card.innerHTML=`
+    const year = extractBEYear(it.name);
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
       <div class="info">
-        <h3>${it.isFolder?"📁":"📄"} ${it.name}</h3>
+        <h3>${it.isFolder ? "📁" : "📄"} ${it.name}</h3>
         <div class="meta">
-          ${it.isFolder?"โฟลเดอร์":year?`พ.ศ. ${year}`:"ไม่ระบุปี"}
+          ${it.isFolder ? "โฟลเดอร์" : year ? `พ.ศ. ${year}` : "ไม่ระบุปี"}
         </div>
       </div>
     `;
-    const btn=document.createElement("button");
-    btn.className="btn";
+    const btn = document.createElement("button");
+    btn.className = "btn";
+
     if(it.isFolder){
-      btn.textContent="เปิดโฟลเดอร์";
-      btn.onclick=()=>loadFolder(it.id,it.name);
-    }else{
-      btn.textContent="เปิดไฟล์";
-      btn.onclick=()=>openFile(it.id);
+      btn.textContent = "เปิดโฟลเดอร์";
+      btn.onclick = () => loadFolder(it.id, it.name);
+    } else {
+      btn.textContent = "เปิดไฟล์";
+      btn.onclick = () => openFile(it.id);
     }
+
     card.appendChild(btn);
     listEl.appendChild(card);
   });
 }
 
+/* ===== Slider ===== */
 function renderSlider(){
-  sliderEl.innerHTML="";
-  const latest=sortItems(items.filter(i=>!i.isFolder)).slice(0,5);
+  sliderEl.innerHTML = "";
+  const latest = sortItems(items.filter(i => !i.isFolder)).slice(0,5);
+
   latest.forEach(f=>{
-    const box=document.createElement("div");
-    box.className="slider-item";
-    box.innerHTML=`<strong>📄 ${f.name}</strong>`;
-    box.onclick=()=>openFile(f.id);
+    const box = document.createElement("div");
+    box.className = "slider-item";
+    box.innerHTML = `<strong>📄 ${f.name}</strong>`;
+    box.onclick = () => openFile(f.id);
     sliderEl.appendChild(box);
   });
 }
 
+/* ===== Preview ===== */
 function openFile(id){
-  document.getElementById("viewer").style.display="block";
-  document.getElementById("viewerFrame").src=`https://drive.google.com/file/d/${id}/preview`;
+  document.getElementById("viewer").style.display = "block";
+  document.getElementById("viewerFrame").src =
+    `https://drive.google.com/file/d/${id}/preview`;
 }
 function closeViewer(){
-  document.getElementById("viewer").style.display="none";
-  document.getElementById("viewerFrame").src="";
+  document.getElementById("viewer").style.display = "none";
+  document.getElementById("viewerFrame").src = "";
 }
 
-searchInput.oninput=render;
-sortSelect.onchange=render;
+/* ===== Events ===== */
+searchInput.oninput = render;
+sortSelect.onchange = render;
 
-loadFolder(ROOT_FOLDER_ID,"Root");
+/* ===== Init ===== */
+loadFolder(ROOT_FOLDER_ID);
 </script>
 
 </body>
