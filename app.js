@@ -75,7 +75,6 @@ const FIXED_CATS = [
   {key:"ประมวลกฎหมาย",      label:"ประมวลกฎหมาย",      emoji:"book_2"},
   {key:"รัฐธรรมนูญ",         label:"รัฐธรรมนูญ",         emoji:"gavel"},
   {key:"พระราชบัญญัติ",     label:"พระราชบัญญัติ",     emoji:"menu_book"},
-  {key:"ระเบียบคณะกรรมการ",      label:"กฎกระทรวง",         emoji:"policy"}
 ];
 
 function normalizeCatName(raw=""){
