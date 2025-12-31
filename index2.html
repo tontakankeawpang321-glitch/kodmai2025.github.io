@@ -1,169 +1,205 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <title>คลังไฟล์ Google Drive</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Google Drive File Manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      font-family: "Sarabun", sans-serif;
-      background: #f3f4f6;
-      margin: 0;
-      color: #1f2937;
-    }
-    header {
-      background: linear-gradient(135deg,#172554,#1e3a8a);
-      color: #fff;
-      padding: 20px;
-    }
-    .container {
-      max-width: 900px;
-      margin: -20px auto 40px;
-      padding: 0 16px;
-    }
-    .search {
-      background: #fff;
-      border-radius: 14px;
-      padding: 10px 14px;
-      margin-bottom: 16px;
-    }
-    .search input {
-      width: 100%;
-      border: none;
-      outline: none;
-      font-size: 15px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
-      border: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-    .info {
-      flex: 1;
-      min-width: 0;
-    }
-    .card h3 {
-      margin: 0 0 6px;
-      font-size: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .meta {
-      font-size: 12px;
-      color: #6b7280;
-    }
-    .open {
-      background: #e0ecff;
-      color: #1e3a8a;
-      padding: 6px 14px;
-      border-radius: 999px;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #6b7280;
-    }
-  </style>
+<style>
+body{
+  font-family:Sarabun,sans-serif;
+  margin:0;
+  background:#f3f4f6;
+  color:#1f2937;
+}
+header{
+  background:linear-gradient(135deg,#172554,#1e3a8a);
+  color:#fff;
+  padding:20px;
+}
+.container{
+  max-width:900px;
+  margin:-20px auto 40px;
+  padding:0 16px;
+}
+.search{
+  background:#fff;
+  border-radius:14px;
+  padding:10px 14px;
+  margin-bottom:10px;
+}
+.search input{
+  width:100%;
+  border:none;
+  outline:none;
+  font-size:15px;
+}
+.breadcrumb{
+  font-size:13px;
+  margin:8px 0 14px;
+  color:#374151;
+}
+.breadcrumb span{
+  cursor:pointer;
+  color:#1e3a8a;
+}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:10px;
+  border:1px solid #e5e7eb;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.info{
+  min-width:0;
+  flex:1;
+}
+.info h3{
+  margin:0 0 6px;
+  font-size:16px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.meta{
+  font-size:12px;
+  color:#6b7280;
+}
+.btn{
+  background:#e0ecff;
+  color:#1e3a8a;
+  padding:6px 14px;
+  border-radius:999px;
+  border:none;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.loading{
+  text-align:center;
+  padding:40px;
+  color:#6b7280;
+}
+</style>
 </head>
 <body>
 
 <header>
   <h1>📁 คลังไฟล์ Google Drive</h1>
-  <p>เปิดไฟล์ / โฟลเดอร์ โดยไม่ต้องเข้าสู่ระบบ</p>
+  <p>เปิดโฟลเดอร์ในเว็บ • เปิดไฟล์ไป Google</p>
 </header>
 
 <div class="container">
-
   <div class="search">
-    <input id="searchInput" type="text" placeholder="พิมพ์เพื่อค้นหาชื่อไฟล์หรือโฟลเดอร์..." />
+    <input id="searchInput" placeholder="ค้นหาไฟล์หรือโฟลเดอร์..." />
   </div>
 
+  <div class="breadcrumb" id="breadcrumb"></div>
   <div id="list"></div>
-  <div id="loading" class="loading">กำลังโหลดข้อมูล...</div>
-
+  <div id="loading" class="loading">กำลังโหลด...</div>
 </div>
 
 <script>
-/* ================================
-   🔧 แก้ 2 จุดนี้เท่านั้น
-================================ */
+/* ================== CONFIG ================== */
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyngJX9yx-QZgwA6wCTiCwJcVB5xmpXwBTgpZWk_duN8OlYfB3lcn1XGBCig5dqyW7d/exec";
+"https://script.google.com/macros/s/AKfycbyngJX9yx-QZgwA6wCTiCwJcVB5xmpXwBTgpZWk_duN8OlYfB3lcn1XGBCig5dqyW7d/exec";
 
-const FOLDER_ID = "17v37WB5l-UaTTNzPw17phSH5oIOqMANo";
-/* ================================ */
+const ROOT_FOLDER_ID = "1zY7CDFyad6PQn-FzM9hVFn_CTIEb-fbO";
+/* ============================================ */
 
-let allItems = [];
+let currentFolder = ROOT_FOLDER_ID;
+let stack = [{ id: ROOT_FOLDER_ID, name: "Root" }];
+let items = [];
 
 const listEl = document.getElementById("list");
 const loadingEl = document.getElementById("loading");
 const searchInput = document.getElementById("searchInput");
+const breadcrumbEl = document.getElementById("breadcrumb");
 
-fetch(`${SCRIPT_URL}?folder=${FOLDER_ID}`)
-  .then(res => res.json())
-  .then(data => {
-    allItems = data;
-    renderList();
-    loadingEl.style.display = "none";
-  })
-  .catch(err => {
-    loadingEl.innerText = "โหลดข้อมูลไม่สำเร็จ";
-    console.error(err);
-  });
+function loadFolder(folderId, name=null){
+  loadingEl.style.display="block";
+  listEl.innerHTML="";
+  currentFolder = folderId;
 
-function renderList() {
-  const keyword = searchInput.value.toLowerCase();
-  listEl.innerHTML = "";
+  if(name){
+    stack.push({id:folderId,name});
+  }
 
-  const filtered = allItems.filter(item =>
-    item.name.toLowerCase().includes(keyword)
-  );
+  renderBreadcrumb();
 
-  if (filtered.length === 0) {
-    listEl.innerHTML = `<div class="loading">ไม่พบข้อมูล</div>`;
+  fetch(`${SCRIPT_URL}?folder=${folderId}`)
+    .then(r=>r.json())
+    .then(data=>{
+      items=data;
+      render();
+      loadingEl.style.display="none";
+    });
+}
+
+function renderBreadcrumb(){
+  breadcrumbEl.innerHTML = stack.map((f,i)=>
+    `<span onclick="goIndex(${i})">${f.name}</span>`
+  ).join(" / ");
+}
+
+function goIndex(i){
+  stack = stack.slice(0,i+1);
+  loadFolder(stack[i].id);
+}
+
+function render(){
+  const q = searchInput.value.toLowerCase();
+  listEl.innerHTML="";
+
+  const filtered = items.filter(i=>i.name.toLowerCase().includes(q));
+
+  if(!filtered.length){
+    listEl.innerHTML='<div class="loading">ไม่พบข้อมูล</div>';
     return;
   }
 
-  filtered.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "card";
+  filtered.forEach(item=>{
+    const card=document.createElement("div");
+    card.className="card";
 
-    // ✅ ใช้ลิงก์ Google Drive มาตรฐาน (ไม่ถาม login)
-    const link = item.isFolder
-      ? `https://drive.google.com/drive/folders/${item.id}`
-      : `https://drive.google.com/file/d/${item.id}/view`;
-
-    card.innerHTML = `
-      <div class="info">
-        <h3>${item.isFolder ? "📁 " : "📄 "}${item.name}</h3>
-        <div class="meta">
-          ${item.isFolder ? "โฟลเดอร์" : "ไฟล์"}
-        </div>
-      </div>
-      <a class="open" href="${link}" target="_blank">
-        ${item.isFolder ? "เปิดโฟลเดอร์" : "เปิดไฟล์"}
-      </a>
+    const info=document.createElement("div");
+    info.className="info";
+    info.innerHTML=`
+      <h3>${item.isFolder?"📁":"📄"} ${item.name}</h3>
+      <div class="meta">${item.isFolder?"โฟลเดอร์":"ไฟล์"}</div>
     `;
 
+    const btn=document.createElement("button");
+    btn.className="btn";
+
+    if(item.isFolder){
+      btn.textContent="เปิดโฟลเดอร์";
+      btn.onclick=()=>loadFolder(item.id,item.name);
+    }else{
+      btn.textContent="เปิดไฟล์";
+      btn.onclick=()=>window.open(
+        `https://drive.google.com/file/d/${item.id}/view`,
+        "_blank"
+      );
+    }
+
+    card.appendChild(info);
+    card.appendChild(btn);
     listEl.appendChild(card);
   });
 }
 
-searchInput.addEventListener("input", renderList);
+searchInput.addEventListener("input",render);
+
+// เริ่มต้น
+loadFolder(ROOT_FOLDER_ID,"Root");
 </script>
 
 </body>
