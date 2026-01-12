@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   try {
     const { history } = req.body;
     // ใช้ Model flash เพื่อความเร็วและประหยัด
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(GEMINI_URL, {
       method: 'POST',
@@ -47,3 +47,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
