@@ -18,8 +18,8 @@ export default async function handler(req, res) {
   try {
     const { history } = req.body;
     
-    // ✅ เปลี่ยนมาใช้ 'gemini-2.0-flash' ให้ตรงกับบัญชีคุณ
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+    // ✅ ใช้รุ่นล่าสุดที่คุณมี: gemini-2.5-flash
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(GEMINI_URL, {
       method: 'POST',
