@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
 <title>กฎหมายไทยฉบับล่าสุด (Thai Law Lite)</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,505 +10,674 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <script src="https://cdn.tailwindcss.com"></script>
-
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
-  :root {
-    /* 🎨 Official Law Palette */
-    --primary: #1e3a8a;       /* Deep Navy Blue */
-    --primary-dark: #172554; /* Darker Navy */
-    --accent: #d97706;       /* Official Gold */
-    --bg-app: #f3f4f6;       /* Light Gray Background */
-    --bg-card: #ffffff;
-    --text-main: #1f2937;
-    --text-muted: #6b7280;
-    --border: #e5e7eb;
-    
-    --radius-card: 16px;
-    --radius-btn: 12px;
-    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-    --shadow-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  }
+  :root {
+    /* 🎨 Modern Law Palette */
+    --primary: #1e3a8a;       /* Deep Navy */
+    --primary-light: #3b82f6; /* Bright Blue */
+    --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    
+    --accent: #d97706;        /* Amber */
+    --accent-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    
+    --bg-app: #f8fafc;        /* Slate 50 - Cool White */
+    --bg-card: #ffffff;
+    
+    --text-main: #1e293b;     /* Slate 800 */
+    --text-muted: #64748b;    /* Slate 500 */
+    --border: #e2e8f0;        /* Slate 200 */
+    
+    --radius-card: 20px;
+    --radius-btn: 14px;
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-float: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 15px rgba(37, 99, 235, 0.2);
+  }
 
-  body {
-    background-color: var(--bg-app);
-    color: var(--text-main);
-    font-family: "Sarabun", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    padding-bottom: 80px; /* Space for FAB */
-  }
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    font-family: "Sarabun", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 100px; /* Space for FAB */
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 24px 24px; /* Subtle pattern */
+  }
 
-  /* --- App Header --- */
-  .app-header {
-    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-    color: white;
-    padding: 20px 16px 30px;
-    border-radius: 0 0 24px 24px;
-    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.2);
-    margin-bottom: -20px;
-    position: relative;
-    z-index: 10;
-  }
-  .app-title {
-    font-size: 22px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .app-subtitle {
-    font-size: 14px;
-    opacity: 0.85;
-    margin-top: 4px;
-    font-weight: 300;
-  }
+  /* --- App Header --- */
+  .app-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 20px 16px 50px; /* Extra padding for search overlap */
+    border-radius: 0 0 32px 32px;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 10px 30px -10px rgba(30, 58, 138, 0.4);
+    overflow: hidden;
+  }
+  
+  /* Decorative circles in header */
+  .app-header::before, .app-header::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    opacity: 0.05;
+  }
+  .app-header::before { width: 150px; height: 150px; top: -50px; right: -20px; }
+  .app-header::after { width: 100px; height: 100px; bottom: 10px; left: 10%; }
 
-  /* --- Container & Sections --- */
-  .wrap {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 16px;
-  }
-  .section {
-    margin-bottom: 24px;
-  }
+  .app-title {
+    font-size: 26px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .app-subtitle {
+    font-size: 15px;
+    opacity: 0.9;
+    margin-top: 6px;
+    font-weight: 300;
+    margin-left: 44px; /* Align with text start */
+  }
 
-  /* --- Search Bar (Floating) --- */
-  .search-container {
-    background: white;
-    border-radius: 16px;
-    padding: 6px;
-    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
-    display: flex;
-    gap: 8px;
-    margin-top: 0;
-    position: relative;
-    z-index: 20;
-    border: 1px solid rgba(0,0,0,0.03);
-  }
-  .search-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    padding: 0 16px;
-    font-family: "Sarabun";
-    font-size: 16px;
-    color: var(--text-main);
-    background: transparent;
-  }
-  .search-btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .search-btn:active { transform: scale(0.95); }
+  /* --- Container & Sections --- */
+  .wrap {
+    max-width: 700px; /* Slimmer for better reading */
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+  }
+  .section {
+    margin-bottom: 32px;
+  }
 
-  /* --- Latest Slider (Card Style) --- */
-  .slider-card {
-    background: white;
-    border-radius: var(--radius-card);
-    padding: 16px;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .slider-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .slider-title {
-    font-weight: 700;
-    color: var(--primary);
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .latest-viewport { overflow: hidden; }
-  .latest-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
-  .latest-slide {
-    min-width: 100%;
-    padding: 4px;
-  }
-  .slide-title {
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 1.5;
-    margin-bottom: 8px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: #e5e7eb; transition: 0.3s; }
-  .dot.active { background: var(--primary); width: 18px; border-radius: 4px; }
+  /* --- Search Bar (Floating) --- */
+  .search-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 8px;
+    box-shadow: var(--shadow-float);
+    display: flex;
+    gap: 10px;
+    margin-top: -30px; /* Pull up into header */
+    position: relative;
+    z-index: 20;
+    border: 1px solid rgba(255,255,255,0.5);
+    transition: transform 0.3s ease;
+  }
+  .search-container:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 30px -5px rgba(0,0,0,0.15);
+  }
+  
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0 16px;
+    font-family: "Sarabun";
+    font-size: 16px;
+    color: var(--text-main);
+    background: transparent;
+    font-weight: 500;
+  }
+  .search-input::placeholder { color: #94a3b8; font-weight: 400; }
+  
+  .search-btn {
+    background: var(--accent-gradient);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+  }
+  .search-btn:hover { transform: scale(1.05); }
+  .search-btn:active { transform: scale(0.95); }
 
-  /* --- Category Chips (Scrollable) --- */
-  .catbar-scroll {
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 4px 4px 12px 4px; /* Space for shadow */
-    margin: 0 -16px; /* Bleed to edge on mobile */
-    padding-left: 16px;
-    padding-right: 16px;
-    scrollbar-width: none;
-  }
-  .catbar-scroll::-webkit-scrollbar { display: none; }
-  
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 50px; /* Pill shape */
-    margin-right: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-muted);
-    transition: all 0.2s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-  }
-  .chip.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
-  }
-  .chip:active { transform: scale(0.96); }
+  /* --- Latest Slider (Card Style) --- */
+  .slider-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .slider-title {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .icon-pulse {
+    animation: pulse-orange 2s infinite;
+  }
+  @keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  }
 
-  /* --- List Cards --- */
-  .section-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-  .list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .law-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-card);
-    padding: 16px;
-    border: 1px solid rgba(229, 231, 235, 0.5);
-    box-shadow: var(--shadow-soft);
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .law-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--primary);
-  }
-  .law-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: var(--primary);
-    opacity: 0;
-    transition: 0.2s;
-  }
-  .law-card:hover::before { opacity: 1; }
+  .latest-viewport { overflow: hidden; }
+  .latest-track { display: flex; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  .latest-slide {
+    min-width: 100%;
+    padding: 4px;
+  }
+  .slide-title {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+    color: var(--text-main);
+  }
+  .dots { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #e2e8f0; transition: all 0.3s; cursor: pointer; }
+  .dot.active { background: var(--primary); width: 24px; border-radius: 4px; }
 
-  .law-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 8px;
-    line-height: 1.5;
-  }
-  .law-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-  }
-  .tag {
-    background: #f3f4f6;
-    padding: 2px 8px;
-    border-radius: 4px;
-    border: 1px solid #e5e7eb;
-    display: inline-flex;
-    align-items: center;
-  }
-  .action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 16px;
-    background: #eff6ff;
-    color: var(--primary);
-    font-weight: 600;
-    font-size: 13px;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: 0.2s;
-  }
-  .action-btn:hover { background: #dbeafe; }
+  /* --- Category Chips (Scrollable) --- */
+  .catbar-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 8px 4px 20px 4px;
+    margin: 0 -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .catbar-scroll::-webkit-scrollbar { display: none; }
+  
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px; /* Soft square */
+    margin-right: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+  .chip:hover {
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
+  }
+  .chip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 8px 16px -4px rgba(30, 58, 138, 0.4);
+    transform: translateY(-1px);
+  }
 
-  /* --- Pagination --- */
-  .loadbar {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 20px;
-  }
-  .btn-nav {
-    padding: 10px 20px;
-    border-radius: var(--radius-btn);
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    transition: 0.2s;
-  }
-  .btn-nav.next { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(30,58,138,0.2); }
-  .btn-nav.prev { background: white; color: var(--text-muted); border: 1px solid var(--border); }
-  .btn-nav:disabled { opacity: 0.5; cursor: not-allowed; }
+  /* --- List Cards --- */
+  .section-title {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    letter-spacing: -0.3px;
+  }
+  .list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .law-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    padding: 20px;
+    border: 1px solid transparent;
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+  }
+  .law-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-float);
+    border-color: rgba(30, 58, 138, 0.1);
+  }
+  /* Decorative left bar */
+  .law-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: var(--primary-gradient);
+    opacity: 0;
+    transition: 0.3s;
+  }
+  .law-card:hover::before { opacity: 1; }
 
-  /* --- Chat FAB & Modal --- */
-  #fab-chat-toggle {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, var(--accent), #b45309);
-    color: white;
-    border: none;
-    border-radius: 20px; /* Squircle */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.4);
-    cursor: pointer;
-    z-index: 100;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  #fab-chat-toggle:hover { transform: scale(1.1) rotate(-5deg); }
-  #fab-chat-toggle .material-symbols-rounded { font-size: 28px; }
+  .law-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .law-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .tag {
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: #475569;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: #eff6ff; /* Blue 50 */
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .action-btn:hover { 
+    background: #dbeafe; 
+    transform: translateX(4px);
+  }
 
-  #chatbot-modal {
-    background: rgba(0,0,0,0.5); /* Dim background */
-    backdrop-filter: blur(2px);
-  }
-  .chat-window {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: white;
-    font-family: "Sarabun", sans-serif;
-  }
-  @media (min-width: 640px) {
-    .chat-window {
-      height: 600px;
-      width: 400px;
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-    }
-  }
+  /* --- Pagination --- */
+  .loadbar {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .btn-nav {
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-nav.next { 
+    background: var(--primary); 
+    color: white; 
+    box-shadow: 0 4px 12px rgba(30,58,138,0.3); 
+  }
+  .btn-nav.next:hover {
+    background: #1e40af;
+    transform: translateY(-2px);
+  }
+  .btn-nav.prev { 
+    background: white; 
+    color: var(--text-muted); 
+    border: 1px solid var(--border); 
+  }
+  .btn-nav.prev:hover {
+    background: #f8fafc;
+  }
+  .btn-nav:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-  .chat-header {
-    background: var(--primary);
-    padding: 16px;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .chat-bubble { font-size: 15px; line-height: 1.5; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-  .chat-bubble-user { background: var(--primary); color: white; border-radius: 16px 16px 2px 16px; }
-  .chat-bubble-model { background: #f3f4f6; color: #1f2937; border-radius: 16px 16px 16px 2px; }
+  /* --- Chat FAB & Modal --- */
+  #fab-chat-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 24px;
+    width: 64px;
+    height: 64px;
+    background: var(--accent-gradient);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(217, 119, 6, 0.5);
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  #fab-chat-toggle:hover { 
+    transform: scale(1.1) rotate(-5deg); 
+    box-shadow: 0 15px 35px rgba(217, 119, 6, 0.6);
+  }
+  #fab-chat-toggle .material-symbols-rounded { font-size: 32px; }
+  
+  /* Pulse effect for FAB */
+  #fab-chat-toggle::after {
+    content: '';
+    position: absolute;
+    width: 100%; height: 100%;
+    border-radius: inherit;
+    border: 2px solid #f59e0b;
+    animation: fab-ping 2s infinite;
+    z-index: -1;
+  }
+  @keyframes fab-ping {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
 
-  /* Gemini Animation Bar */
-  .gemini-thinking-bar {
-    height: 3px;
-    background: #e5e7eb;
-    border-radius: 2px;
-    overflow: hidden;
-    position: relative;
-    width: 60px;
-  }
-  .gemini-thinking-bar::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; height: 100%; width: 50%;
-    background: var(--accent);
-    animation: thinking 1.5s infinite ease-in-out;
-  }
-  @keyframes thinking {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(250%); }
-  }
+  #chatbot-modal {
+    background: rgba(15, 23, 42, 0.6); /* Slate 900 fade */
+    backdrop-filter: blur(4px);
+  }
+  
+  .chat-window {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    font-family: "Sarabun", sans-serif;
+  }
+  @media (min-width: 640px) {
+    .chat-window {
+      height: 650px;
+      width: 420px;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+  }
 
-  /* Utilities */
-  .empty { padding: 40px; text-align: center; color: var(--text-muted); background: white; border-radius: 16px; border: 1px dashed var(--border); }
-  .material-symbols-rounded { vertical-align: middle; }
+  .chat-header {
+    background: white;
+    padding: 18px 20px;
+    color: var(--text-main);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .chat-header h1 {
+    font-size: 18px;
+    color: var(--primary);
+  }
+
+  /* Chat Bubbles Modern */
+  .chat-bubble { 
+    font-size: 15px; 
+    line-height: 1.6; 
+    position: relative;
+    padding: 12px 16px;
+  }
+  .chat-bubble-user { 
+    background: var(--primary-gradient); 
+    color: white; 
+    border-radius: 18px 18px 4px 18px; 
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+  }
+  .chat-bubble-model { 
+    background: #f1f5f9; 
+    color: var(--text-main); 
+    border-radius: 18px 18px 18px 4px; 
+    border: 1px solid #e2e8f0;
+  }
+
+  /* Gemini Animation Bar */
+  .gemini-thinking-bar {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    max-width: 80px;
+  }
+  .gemini-thinking-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; height: 100%; width: 40%;
+    background: var(--accent);
+    animation: thinking 1.2s infinite ease-in-out;
+    border-radius: 2px;
+  }
+  @keyframes thinking {
+    0% { transform: translateX(-150%); }
+    100% { transform: translateX(350%); }
+  }
+
+  /* Utilities */
+  .empty { 
+    padding: 60px 20px; 
+    text-align: center; 
+    color: var(--text-muted); 
+    background: white; 
+    border-radius: 20px; 
+    border: 2px dashed #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .material-symbols-rounded { vertical-align: middle; }
+  
+  /* Facebook Page Container */
+  .fb-container {
+    background: white;
+    border-radius: var(--radius-card);
+    padding: 16px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
 </style>
 </head>
 <body>
 
 <header class="app-header">
-  <div class="wrap">
-    <div class="app-title">
-      <span class="material-symbols-rounded" style="font-size: 32px;">balance</span>
-      <span>Thai Law Lite</span>
-    </div>
-    <div class="app-subtitle">คลังกฎหมายไทยฉบับพกพา อัพเดทล่าสุด</div>
-  </div>
+  <div class="wrap">
+    <div class="app-title">
+      <div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
+        <span class="material-symbols-rounded" style="font-size: 32px;">balance</span>
+      </div>
+      <span>Thai Law Lite</span>
+    </div>
+    <div class="app-subtitle">คลังกฎหมายไทยฉบับพกพา อัพเดทล่าสุด</div>
+  </div>
 </header>
 
+<main class="wrap">
+  
+  <section class="section">
+    <div class="search-container" role="search">
+      <button class="w-10 h-10 flex items-center justify-center text-gray-400 cursor-default">
+         <span class="material-symbols-rounded">search</span>
+      </button>
+      <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย, มาตรา, หรือคำสำคัญ..." aria-label="ค้นหากฎหมาย">
+      <button id="btnSearch" class="search-btn" type="button">
+        <span class="material-symbols-rounded">arrow_forward</span>
+      </button>
+    </div>
+  </section>
 
-<main class="wrap" style="position: relative;">
-  
-  <section class="section" style="margin-top: -24px;">
-    <div class="search-container" role="search">
-      <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย, มาตรา, หรือคำสำคัญ..." aria-label="ค้นหากฎหมาย">
-      <button id="btnSearch" class="search-btn" type="button">
-        <span class="material-symbols-rounded">search</span>
-      </button>
-    </div>
-  </section>
-<!-- โหลด SDK ของ Facebook -->
-<div id="fb-root"></div>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script async defer crossorigin="anonymous" 
-  src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0" nonce="abc123">
-</script>
+  <!-- โหลด SDK ของ Facebook -->
+  <div id="fb-root"></div>
+  <script async defer crossorigin="anonymous" 
+    src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0" nonce="abc123">
+  </script>
 
-<!-- ตัวอย่างแสดงเพจ -->
-<div class="fb-page" 
-  data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
-  data-tabs="timeline" 
-  data-width="500" 
-  data-height="" 
-  data-small-header="false" 
-  data-adapt-container-width="true" 
-  data-hide-cover="false" 
-  data-show-facepile="true">
-</div>
-  <section class="section">
-    <div class="slider-card">
-      <div class="slider-header">
-        <div class="slider-title">
-          <span class="material-symbols-rounded" style="color:var(--accent)">campaign</span>
-          ประกาศล่าสุด
-        </div>
-        <span class="text-xs text-gray-400">Auto Slide</span>
-      </div>
-      <div class="latest-viewport" id="latestViewport">
-        <div id="latestTrack" class="latest-track" aria-live="polite"></div>
-      </div>
-      <div id="dots" class="dots" aria-hidden="true"></div>
-    </div>
-  </section>
+  <!-- Facebook Page Container -->
+  <div class="fb-container">
+    <div class="fb-page" 
+      data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
+      data-tabs="timeline" 
+      data-width="500" 
+      data-height="" 
+      data-small-header="false" 
+      data-adapt-container-width="true" 
+      data-hide-cover="false" 
+      data-show-facepile="true">
+    </div>
+  </div>
 
-  <section class="section">
-    <div class="catbar-scroll" id="catbar" role="tablist" aria-label="เลือกหมวดกฎหมาย">
-      </div>
-  </section>
+  <section class="section">
+    <div class="slider-card">
+      <div class="slider-header">
+        <div class="slider-title">
+          <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 icon-pulse">
+             <span class="material-symbols-rounded">campaign</span>
+          </div>
+          <span>ประกาศล่าสุด</span>
+        </div>
+        <span class="text-xs text-gray-400 font-medium bg-gray-50 px-2 py-1 rounded-md">Auto Slide</span>
+      </div>
+      <div class="latest-viewport" id="latestViewport">
+        <div id="latestTrack" class="latest-track" aria-live="polite"></div>
+      </div>
+      <div id="dots" class="dots" aria-hidden="true"></div>
+    </div>
+  </section>
 
-  <section class="section">
-    <div class="section-title">
-      <span id="panelTitle">รายการกฎหมาย</span>
-      <span id="panelNote" class="text-xs font-normal text-gray-500">แสดงผล</span>
-    </div>
-    
-    <div id="list" class="list-container">
-      </div>
+  <section class="section">
+    <div class="catbar-scroll" id="catbar" role="tablist" aria-label="เลือกหมวดกฎหมาย">
+      <!-- Chips will be inserted here by app.js -->
+    </div>
+  </section>
 
-    <div class="loadbar">
-      <button id="btnPrev" class="btn-nav prev" type="button" style="display:none">
-        <span class="material-symbols-rounded">arrow_back</span> ย้อนกลับ
-      </button>
-      <button id="btnNext" class="btn-nav next" type="button" style="display:none">
-        ถัดไป <span class="material-symbols-rounded">arrow_forward</span>
-      </button>
-    </div>
-  </section>
+  <section class="section">
+    <div class="section-title">
+      <div class="flex items-center gap-2">
+        <span class="w-1 h-6 bg-blue-600 rounded-full"></span>
+        <span id="panelTitle">รายการกฎหมาย</span>
+      </div>
+      <span id="panelNote" class="text-xs font-medium text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">แสดงผล</span>
+    </div>
+    
+    <div id="list" class="list-container">
+      <!-- Law Cards will be inserted here by app.js -->
+    </div>
+
+    <div class="loadbar">
+      <button id="btnPrev" class="btn-nav prev" type="button" style="display:none">
+        <span class="material-symbols-rounded">arrow_back</span> ย้อนกลับ
+      </button>
+      <button id="btnNext" class="btn-nav next" type="button" style="display:none">
+        ถัดไป <span class="material-symbols-rounded">arrow_forward</span>
+      </button>
+    </div>
+  </section>
 
 </main>
 
 <button id="fab-chat-toggle" title="ปรึกษา Thai Law AI">
-  <span class="material-symbols-rounded">smart_toy</span>
+  <span class="material-symbols-rounded">smart_toy</span>
 </button>
 
 <div id="chatbot-modal" class="chatbot-hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-  <div class="chat-window w-full bg-gray-50 flex flex-col transform transition-transform duration-300 translate-y-full sm:translate-y-0 sm:scale-95" id="chat-window-inner">
-    <header class="chat-header shadow-md shrink-0">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-rounded">smart_toy</span>
-        <div>
-          <h1 class="text-lg font-bold">Thai Law AI</h1>
-          <p class="text-xs opacity-80">ผู้ช่วยค้นหากฎหมายอัจฉริยะ</p>
-        </div>
-      </div>
-      <div class="flex gap-2">
-        <button id="new-chat-btn" class="text-xs bg-white/20 hover:bg-white/30 text-white py-1 px-3 rounded-lg transition">ล้างแชท</button>
-        <button id="chatbot-close-btn" class="text-white hover:text-red-200 transition"><span class="material-symbols-rounded">close</span></button>
-      </div>
-    </header>
-    <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-      <div class="flex items-start space-x-2">
-        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-          <span class="material-symbols-rounded text-blue-600 text-lg">smart_toy</span>
-        </div>
-        <div class="chat-bubble chat-bubble-model p-3 max-w-[85%] relative bg-white border border-gray-100 shadow-sm">
-          <p>สวัสดีครับ! ผมคือ AI ผู้ช่วยด้านกฎหมาย ยินดีให้ความช่วยเหลือครับ สอบถามเรื่องข้อกฎหมายหรือการสืบค้นได้เลยครับ</p>
-        </div>
-      </div>
-    </main>
-    <div id="thinking-indicator" class="px-4 pb-2 hidden">
-      <div class="flex items-center space-x-2">
-        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-          <span class="material-symbols-rounded text-blue-600 text-lg">smart_toy</span>
-        </div>
-        <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm"><div class="gemini-thinking-bar"></div></div>
-      </div>
-    </div>
-    <footer class="p-3 bg-white border-t border-gray-200 shrink-0">
-      <div class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-        <input id="user-input" type="text" placeholder="พิมพ์คำถามที่นี่..." class="flex-1 bg-transparent outline-none text-sm py-1">
-        <button id="send-btn" class="text-blue-600 hover:text-blue-800 transition p-1"><span class="material-symbols-rounded">send</span></button>
-      </div>
-    </footer>
-  </div>
+  <div class="chat-window w-full flex flex-col transform transition-transform duration-300 translate-y-full sm:translate-y-0 sm:scale-95" id="chat-window-inner">
+    <header class="chat-header shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
+           <span class="material-symbols-rounded">smart_toy</span>
+        </div>
+        <div>
+          <h1 class="font-bold text-gray-800">Thai Law AI</h1>
+          <div class="flex items-center gap-1">
+             <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+             <p class="text-xs text-gray-500">พร้อมให้บริการ</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button id="new-chat-btn" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 py-1.5 px-3 rounded-lg transition font-medium">ล้างแชท</button>
+        <button id="chatbot-close-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 hover:text-red-500 text-gray-400 transition">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+    </header>
+    
+    <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+      <div class="flex items-start space-x-2">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 shadow-sm text-white">
+          <span class="material-symbols-rounded text-sm">smart_toy</span>
+        </div>
+        <div class="chat-bubble chat-bubble-model">
+          <p>สวัสดีครับ! ผมคือ AI ผู้ช่วยด้านกฎหมาย ยินดีให้ความช่วยเหลือครับ สอบถามเรื่องข้อกฎหมายหรือการสืบค้นได้เลยครับ</p>
+        </div>
+      </div>
+    </main>
+    
+    <div id="thinking-indicator" class="px-4 pb-2 hidden">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+           <span class="material-symbols-rounded text-gray-400 text-sm">smart_toy</span>
+        </div>
+        <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+           <div class="gemini-thinking-bar"></div>
+        </div>
+      </div>
+    </div>
+    
+    <footer class="p-3 bg-white border-t border-gray-100 shrink-0">
+      <div class="flex items-center gap-2 bg-gray-50 rounded-2xl px-4 py-3 border border-gray-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+        <input id="user-input" type="text" placeholder="พิมพ์คำถามข้อกฎหมาย..." class="flex-1 bg-transparent outline-none text-sm text-gray-700 placeholder-gray-400">
+        <button id="send-btn" class="text-blue-600 hover:text-blue-700 transition p-1 transform active:scale-90">
+          <span class="material-symbols-rounded">send</span>
+        </button>
+      </div>
+    </footer>
+  </div>
 </div>
 
 <script src="app.js"></script>
 
 <script type="module">
-/* ส่วนของ Chatbot Backend Logic */
+/* ส่วนของ Chatbot Backend Logic (เหมือนเดิม) */
 
 // ⚠️ แก้ตรงนี้: เปลี่ยนจาก URL ยาวๆ เป็น '/api/chat' เพื่อเรียกใช้ Backend ของ Vercel
 const BACKEND_URL = '/api/chat'; 
@@ -522,34 +691,37 @@ const thinkingIndicator = document.getElementById('thinking-indicator');
 
 function addChatBubble(message, isUser = true) {
   const bubbleType = isUser ? 'user' : 'model';
-  const iconBg = isUser ? 'bg-blue-600' : 'bg-blue-100';
-  const iconColor = isUser ? 'text-white' : 'text-blue-600';
-  const iconName = isUser ? 'person' : 'smart_toy';
+  // Updated Styles for JS generated bubbles
+  const iconContent = isUser 
+    ? `<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0"><span class="material-symbols-rounded text-gray-500 text-sm">person</span></div>` 
+    : `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 shadow-sm text-white"><span class="material-symbols-rounded text-sm">smart_toy</span></div>`;
   
   const wrap = document.createElement('div');
   wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
   
-  const iconDiv = document.createElement('div');
-  iconDiv.className = `w-8 h-8 rounded-full ${iconBg} flex items-center justify-center shrink-0`;
-  iconDiv.innerHTML = `<span class="material-symbols-rounded ${iconColor} text-lg">${iconName}</span>`;
-  
   const bubble = document.createElement('div');
-  bubble.className = `chat-bubble chat-bubble-${bubbleType} p-3 max-w-[85%] relative ${isUser ? '' : 'bg-white border border-gray-100 shadow-sm'}`;
+  bubble.className = `chat-bubble chat-bubble-${bubbleType}`;
   
   // รองรับการเว้นบรรทัดจาก AI
   const formattedMessage = message.replace(/\n/g, '<br>');
   bubble.innerHTML = `<p>${formattedMessage}</p>`; 
   
-  wrap.appendChild(iconDiv);
-  wrap.appendChild(bubble);
+  if (isUser) {
+     wrap.innerHTML = iconContent; 
+     wrap.appendChild(bubble);
+  } else {
+     wrap.innerHTML = iconContent;
+     wrap.appendChild(bubble);
+  }
+
   chatHistoryEl.appendChild(wrap);
   chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
 
 function addChatError(message) {
   const w = document.createElement('div');
-  w.className = 'flex justify-center my-2';
-  w.innerHTML = `<span class="bg-red-50 text-red-600 text-xs px-3 py-1 rounded-full border border-red-100">${message}</span>`;
+  w.className = 'flex justify-center my-4';
+  w.innerHTML = `<span class="bg-red-50 text-red-600 text-xs px-4 py-2 rounded-full border border-red-100 flex items-center gap-1"><span class="material-symbols-rounded text-sm">error</span> ${message}</span>`;
   chatHistoryEl.appendChild(w);
   chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
@@ -597,6 +769,7 @@ async function handleSend() {
     chatHistory.pop();
   } finally {
     sendBtn.disabled = false;
+    setTimeout(() => userInput.focus(), 100);
   }
 }
 
@@ -611,10 +784,10 @@ userInput.addEventListener('keydown', e => {
 newChatBtn.addEventListener('click', async () => {
   chatHistoryEl.innerHTML = `
     <div class="flex items-start space-x-2">
-      <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-        <span class="material-symbols-rounded text-blue-600 text-lg">smart_toy</span>
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 shadow-sm text-white">
+        <span class="material-symbols-rounded text-sm">smart_toy</span>
       </div>
-      <div class="chat-bubble chat-bubble-model p-3 max-w-[85%] relative bg-white border border-gray-100 shadow-sm">
+      <div class="chat-bubble chat-bubble-model">
         <p>เริ่มสนทนาใหม่เรียบร้อยครับ ถามผมได้เลย!</p>
       </div>
     </div>`;
