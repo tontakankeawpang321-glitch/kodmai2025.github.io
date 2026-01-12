@@ -1,7 +1,5 @@
 export default async function handler(req, res) {
-  // --- ส่วนที่เพิ่ม: อนุญาตให้เว็บอื่นเรียกใช้ได้ (CORS) ---
-  // ใส่ '*' คืออนุญาตทุกเว็บ (สะดวกสุด)
-  // หรือใส่ 'https://www.yoursite.com' ถ้าอยากระบุเจาะจง
+  // --- ตั้งค่า Header เพื่อให้เว็บอื่นเรียกใช้ได้ (CORS) ---
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -10,8 +8,8 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  // ----------------------------------------------------
 
+  // ถ้าไม่ใช่การส่งข้อมูลแบบ POST ให้แจ้งเตือน
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -24,8 +22,9 @@ export default async function handler(req, res) {
 
   try {
     const { history } = req.body;
-    // ใช้ Model flash เพื่อความเร็วและประหยัด
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+    
+    // ✅ ใช้ URL รุ่นล่าสุดที่เสถียร (แก้ปัญหาหา Model ไม่เจอ)
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
 
     const response = await fetch(GEMINI_URL, {
       method: 'POST',
@@ -35,16 +34,17 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    // ถ้า Google แจ้ง Error กลับมา
     if (!response.ok) {
       throw new Error(data.error?.message || 'Gemini API Error');
     }
     
+    // ดึงคำตอบส่งกลับไปที่หน้าเว็บ
     const aiReply = data.candidates[0].content.parts[0].text;
     res.status(200).json({ reply: aiReply });
 
   } catch (error) {
-    console.error(error);
+    console.error("Backend Error:", error);
     res.status(500).json({ error: error.message });
   }
 }
-
