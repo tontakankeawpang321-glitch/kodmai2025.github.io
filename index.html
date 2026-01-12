@@ -46,6 +46,7 @@
     padding-bottom: 100px; /* Space for FAB */
     background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
     background-size: 24px 24px; /* Subtle pattern */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
   }
 
   /* --- App Header --- */
@@ -86,6 +87,34 @@
     margin-top: 6px;
     font-weight: 300;
     margin-left: 44px; /* Align with text start */
+  }
+
+  /* Mobile Typography & Layout Adjustments */
+  @media (max-width: 640px) {
+    .app-title { 
+      font-size: 22px; 
+      justify-content: center; /* Center title on mobile */
+    }
+    .app-subtitle { 
+      font-size: 13px; 
+      margin-left: 0; 
+      text-align: center;
+      margin-top: 4px;
+    }
+    .app-header { 
+      padding-bottom: 40px; 
+      border-radius: 0 0 24px 24px;
+    } 
+    .section { 
+      margin-bottom: 24px; 
+    }
+    .search-container { 
+      margin-top: -24px; 
+      padding: 6px;
+    }
+    .wrap {
+      padding: 0 16px; /* Slightly tighter padding */
+    }
   }
 
   /* --- Container & Sections --- */
@@ -129,8 +158,9 @@
     color: var(--text-main);
     background: transparent;
     font-weight: 500;
+    min-width: 0; /* Fix flex issue on small screens */
   }
-  .search-input::placeholder { color: #94a3b8; font-weight: 400; }
+  .search-input::placeholder { color: #94a3b8; font-weight: 400; font-size: 14px; }
   
   .search-btn {
     background: var(--accent-gradient);
@@ -139,6 +169,7 @@
     border-radius: 14px;
     width: 48px;
     height: 48px;
+    flex-shrink: 0; /* Prevent button shrinking */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -412,7 +443,7 @@
   }
   
   .chat-window {
-    height: 100vh;
+    height: 100dvh; /* Mobile viewport fix: dynamic viewport height */
     display: flex;
     flex-direction: column;
     background: white;
@@ -556,7 +587,7 @@
     <div class="fb-page" 
       data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
       data-tabs="timeline" 
-      data-width="500" 
+      data-width="" 
       data-height="" 
       data-small-header="false" 
       data-adapt-container-width="true" 
