@@ -711,7 +711,8 @@
 /* ส่วนของ Chatbot Backend Logic (เหมือนเดิม) */
 
 // ⚠️ แก้ตรงนี้: เปลี่ยนจาก URL ยาวๆ เป็น '/api/chat' เพื่อเรียกใช้ Backend ของ Vercel
-const BACKEND_URL = '/api/chat'; 
+// ✅ แก้ไขบรรทัดนี้ในไฟล์หน้าเว็บของคุณ
+const BACKEND_URL = 'https://kodmai2025-github-io.vercel.app/api/chat';
 
 let chatHistory = [];
 const chatHistoryEl = document.getElementById('chat-history');
