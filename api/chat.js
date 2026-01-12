@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     const { history } = req.body;
     
     // ✅ ใช้ URL รุ่นล่าสุดที่เสถียร (แก้ปัญหาหา Model ไม่เจอ)
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-latest:generateContent?key=${API_KEY}`;
 
     const response = await fetch(GEMINI_URL, {
       method: 'POST',
