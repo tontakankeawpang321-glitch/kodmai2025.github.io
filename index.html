@@ -384,7 +384,7 @@
       <span class="material-symbols-rounded" style="font-size: 32px;">balance</span>
       <span>Thai Law Lite</span>
     </div>
-    <div class="app-subtitle">คลังกฎหมายไทยฉบับพกพา อัพเดทล่าสุด</div>
+    <div class="app-subtitle">คลังกฎหมายไทยฉบับพกพา อัพเดทล่าสุด (โหมดออฟไลน์)</div>
   </div>
 </header>
 
@@ -399,7 +399,7 @@
       </button>
     </div>
   </section>
-<!-- โหลด SDK ของ Facebook -->
+<!-- โหลด SDK ของ Facebook (จะทำงานเมื่อออนไลน์เท่านั้น) -->
 <div id="fb-root"></div>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script async defer crossorigin="anonymous" 
@@ -469,8 +469,8 @@
       <div class="flex items-center gap-2">
         <span class="material-symbols-rounded">smart_toy</span>
         <div>
-          <h1 class="text-lg font-bold">Thai Law AI</h1>
-          <p class="text-xs opacity-80">ผู้ช่วยค้นหากฎหมายอัจฉริยะ</p>
+          <h1 class="text-lg font-bold">Thai Law AI (Offline)</h1>
+          <p class="text-xs opacity-80">ผู้ช่วยค้นหากฎหมายอัจฉริยะแบบพกพา</p>
         </div>
       </div>
       <div class="flex gap-2">
@@ -484,7 +484,7 @@
           <span class="material-symbols-rounded text-blue-600 text-lg">smart_toy</span>
         </div>
         <div class="chat-bubble chat-bubble-model p-3 max-w-[85%] relative bg-white border border-gray-100 shadow-sm">
-          <p>สวัสดีครับ! ผมคือ AI ผู้ช่วยด้านกฎหมาย ยินดีให้ความช่วยเหลือครับ สอบถามเรื่องข้อกฎหมายหรือการสืบค้นได้เลยครับ</p>
+          <p>สวัสดีครับ! ผมคือ AI ผู้ช่วยด้านกฎหมาย (โหมดออฟไลน์) ยินดีให้ความช่วยเหลือครับ สอบถามเรื่องข้อกฎหมายเบื้องต้นได้เลยครับ</p>
         </div>
       </div>
     </main>
@@ -498,7 +498,7 @@
     </div>
     <footer class="p-3 bg-white border-t border-gray-200 shrink-0">
       <div class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-        <input id="user-input" type="text" placeholder="พิมพ์คำถามที่นี่..." class="flex-1 bg-transparent outline-none text-sm py-1">
+        <input id="user-input" type="text" placeholder="พิมพ์คำถามที่นี่... (เช่น กฎหมายแพ่ง, อาญา)" class="flex-1 bg-transparent outline-none text-sm py-1">
         <button id="send-btn" class="text-blue-600 hover:text-blue-800 transition p-1"><span class="material-symbols-rounded">send</span></button>
       </div>
     </footer>
@@ -508,14 +508,64 @@
 <script src="app.js"></script>
 
 <script type="module">
-/* ส่วนของ Chatbot Backend Logic ถ้าจะแยกไฟล์ก็ทำเหมือนกัน */
-const BACKEND_URL = 'https://us-central1-law-ai-14740.cloudfunctions.net/api/chat';
+/* ส่วนของ Chatbot Logic แบบ Offline 100% (โหลดข้อมูลจาก JSON) */
+
 let chatHistory = [];
 const chatHistoryEl = document.getElementById('chat-history');
 const userInput   = document.getElementById('user-input');
 const sendBtn     = document.getElementById('send-btn');
 const newChatBtn  = document.getElementById('new-chat-btn');
 const thinkingIndicator = document.getElementById('thinking-indicator');
+
+// ประกาศตัวแปรเก็บ Knowledge Base
+let knowledgeBase = [];
+
+// ฟังก์ชันโหลดข้อมูลจากไฟล์ JSON
+async function loadKnowledgeBase() {
+  try {
+    const response = await fetch('./law_data.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    knowledgeBase = await response.json();
+    console.log("Knowledge base loaded successfully:", knowledgeBase.length, "items");
+  } catch (error) {
+    console.error("Failed to load knowledge base:", error);
+    // เพิ่มข้อความแจ้งเตือนใน Chat หากโหลดไฟล์ไม่ได้
+    setTimeout(() => {
+        addChatBubble(`⚠️ <b>แจ้งเตือนระบบ:</b> ไม่สามารถโหลดไฟล์ข้อมูล <code>law_data.json</code> ได้<br><br>หากคุณเปิดไฟล์ HTML นี้โดยตรง (file://) กรุณารันผ่าน Local Server หรือวางไฟล์ JSON ไว้ในโฟลเดอร์เดียวกัน`, false);
+    }, 1000);
+    
+    // ใช้ข้อมูลสำรองเล็กน้อยกรณีโหลดไฟล์ไม่ได้
+    knowledgeBase = [
+       { keywords: ["สวัสดี"], answer: "สวัสดีครับ (ระบบโหลดข้อมูลภายนอกล้มเหลว)" }
+    ];
+  }
+}
+
+// เรียกใช้งานฟังก์ชันโหลดข้อมูลเมื่อเริ่มต้น
+loadKnowledgeBase();
+
+// ฟังก์ชันสร้างคำตอบแบบ Offline (Rule-based) โดยใช้ข้อมูลที่โหลดมา
+function getOfflineReply(message) {
+  const msg = message.toLowerCase();
+  
+  if (knowledgeBase.length === 0) {
+      return "กำลังโหลดฐานข้อมูล... กรุณารอสักครู่ครับ";
+  }
+
+  // ค้นหาคีย์เวิร์ดที่ตรงกัน
+  const found = knowledgeBase.find(item => {
+    return item.keywords.some(keyword => msg.includes(keyword));
+  });
+
+  if (found) {
+    return found.answer;
+  } else {
+    // คำตอบ Default กรณีไม่พบข้อมูล
+    return `ขออภัยครับ ในโหมด Offline ผมมีความรู้จำกัด อาจจะไม่สามารถตอบคำถามที่ซับซ้อนได้ครับ <br><br>ลองพิมพ์คำค้นหากว้างๆ เช่น <b>"แพ่ง", "อาญา", "กู้ยืม", "หมิ่นประมาท", "เลิกจ้าง", "จราจร", "ออนไลน์"</b> ดูนะครับ`;
+  }
+}
 
 function addChatBubble(message, isUser = true) {
   const bubbleType = isUser ? 'user' : 'model';
@@ -532,20 +582,18 @@ function addChatBubble(message, isUser = true) {
   
   const bubble = document.createElement('div');
   bubble.className = `chat-bubble chat-bubble-${bubbleType} p-3 max-w-[85%] relative ${isUser ? '' : 'bg-white border border-gray-100 shadow-sm'}`;
-  bubble.innerHTML = `<p></p>`;
-  bubble.querySelector('p').innerText = message; 
+  
+  // รองรับ HTML สำหรับบอท
+  if (!isUser) {
+     bubble.innerHTML = `<p>${message}</p>`;
+  } else {
+     bubble.innerHTML = `<p></p>`;
+     bubble.querySelector('p').innerText = message; 
+  }
   
   wrap.appendChild(iconDiv);
   wrap.appendChild(bubble);
   chatHistoryEl.appendChild(wrap);
-  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-}
-
-function addChatError(message) {
-  const w = document.createElement('div');
-  w.className = 'flex justify-center my-2';
-  w.innerHTML = `<span class="bg-red-50 text-red-600 text-xs px-3 py-1 rounded-full border border-red-100">${message}</span>`;
-  chatHistoryEl.appendChild(w);
   chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
 
@@ -558,38 +606,32 @@ async function handleSend() {
   const message = (userInput.value || '').trim();
   if (!message) return;
 
+  // 1. แสดงข้อความผู้ใช้
   addChatBubble(message, true);
   userInput.value = '';
   setThinking(true);
   sendBtn.disabled = true;
 
-  chatHistory.push({ role: "user", parts: [{ text: message }] });
-
+  // 2. จำลองเวลาคิด (Artificial Delay) เพื่อความสมจริง
   try {
-    const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history: chatHistory }) 
-    });
+    await new Promise(resolve => setTimeout(resolve, 800)); // หน่วงเวลา 0.8 วินาที
 
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.error || `Server error: ${response.status}`);
-    }
+    // 3. เรียกใช้ Logic แบบ Offline
+    const aiReply = getOfflineReply(message);
 
-    const data = await response.json();
-    const aiReply = data.reply;
-
-    chatHistory.push({ role: "model", parts: [{ text: aiReply }] });
     setThinking(false);
     addChatBubble(aiReply, false);
 
   } catch (err) {
-    console.error("Fetch Error:", err);
+    console.error("Error:", err);
     setThinking(false);
-    addChatError(`ขออภัย ระบบขัดข้อง: ${err.message}`);
+    addChatBubble("เกิดข้อผิดพลาดในการประมวลผล", false);
   } finally {
     sendBtn.disabled = false;
+    // โฟกัสกลับที่ input
+    if (window.innerWidth >= 640) { // เฉพาะจอใหญ่
+        userInput.focus();
+    }
   }
 }
 
@@ -608,12 +650,11 @@ newChatBtn.addEventListener('click', async () => {
         <span class="material-symbols-rounded text-blue-600 text-lg">smart_toy</span>
       </div>
       <div class="chat-bubble chat-bubble-model p-3 max-w-[85%] relative bg-white border border-gray-100 shadow-sm">
-        <p>เริ่มสนทนาใหม่เรียบร้อยครับ ถามผมได้เลย!</p>
+        <p>เริ่มสนทนาใหม่เรียบร้อยครับ (Offline Mode) ถามผมได้เลย!</p>
       </div>
     </div>`;
   userInput.value = '';
   setThinking(false);
-  chatHistory = []; 
 });
 
 /* Modal Logic */
