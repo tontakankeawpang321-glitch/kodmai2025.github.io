@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // 1. ตั้งค่า CORS (ให้เว็บเรียกใช้ได้)
+  // 1. ตั้งค่า CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -18,8 +18,8 @@ export default async function handler(req, res) {
   try {
     const { history } = req.body;
     
-    // ✅ แก้ไข: เติมคำว่า '-latest' ต่อท้าย เพื่อให้ Google หาเจอแน่นอน
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+    // ✅ เปลี่ยนมาใช้ 'gemini-2.0-flash' ให้ตรงกับบัญชีคุณ
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(GEMINI_URL, {
       method: 'POST',
