@@ -1,6 +1,5 @@
 export default {
   async fetch(request, env) {
-    // CORS
     const headers = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -49,9 +48,6 @@ export default {
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "ไม่สามารถตอบได้";
 
-    return new Response(
-      JSON.stringify({ reply }),
-      { headers }
-    );
+    return new Response(JSON.stringify({ reply }), { headers });
   }
 };
