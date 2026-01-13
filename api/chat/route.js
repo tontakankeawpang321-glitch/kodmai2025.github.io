@@ -2,7 +2,6 @@
 /* ===============================
    Chatbot Backend Logic (FIXED)
    =============================== */
-
 const BACKEND_URL = 'https://kodmai2025-github-io.vercel.app/api/chat';
 
 let chatHistory = [];
