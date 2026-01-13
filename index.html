@@ -127,6 +127,9 @@
   .section {
     margin-bottom: 32px;
   }
+  .chatbot-hidden {
+    display: none;
+  }
 
   /* --- Search Bar (Floating) --- */
   .search-container {
@@ -616,7 +619,7 @@
 
   <section class="section">
     <div class="catbar-scroll" id="catbar" role="tablist" aria-label="เลือกหมวดกฎหมาย">
-      <!-- Chips will be inserted here by app.js -->
+      <!-- Chips will be inserted here by JS -->
     </div>
   </section>
 
@@ -630,7 +633,7 @@
     </div>
     
     <div id="list" class="list-container">
-      <!-- Law Cards will be inserted here by app.js -->
+      <!-- Law Cards will be inserted here by JS -->
     </div>
 
     <div class="loadbar">
@@ -705,31 +708,213 @@
   </div>
 </div>
 
-<script src="app.js"></script>
+<script>
+// Mock Data (Simulating App DB)
+const categories = [
+    { id: 'all', name: 'ทั้งหมด', icon: 'apps' },
+    { id: 'criminal', name: 'อาญา', icon: 'gavel' },
+    { id: 'civil', name: 'แพ่ง', icon: 'handshake' },
+    { id: 'traffic', name: 'จราจร', icon: 'directions_car' },
+    { id: 'labor', name: 'แรงงาน', icon: 'engineering' },
+    { id: 'constitution', name: 'รัฐธรรมนูญ', icon: 'account_balance' },
+    { id: 'family', name: 'ครอบครัว', icon: 'family_restroom' }
+];
+
+const laws = [
+    { id: 1, title: "ประมวลกฎหมายอาญา", category: "criminal", desc: "รวมความผิดและโทษทางอาญา ลักทรัพย์ ทำร้ายร่างกาย", tags: ["ความผิด", "โทษจำคุก"], update: "2567" },
+    { id: 2, title: "ประมวลกฎหมายแพ่งและพาณิชย์", category: "civil", desc: "กฎหมายเรื่องสัญญา ทรัพย์สิน การกู้ยืม", tags: ["สัญญา", "ทรัพย์สิน"], update: "2566" },
+    { id: 3, title: "พ.ร.บ. จราจรทางบก", category: "traffic", desc: "กฎจราจร การขับขี่ ใบสั่ง และค่าปรับต่างๆ", tags: ["ขับขี่", "ใบสั่ง"], update: "2565" },
+    { id: 4, title: "พ.ร.บ. คุ้มครองแรงงาน", category: "labor", desc: "สิทธิวันลา ค่าชดเชย ค่าล่วงเวลา", tags: ["นายจ้าง", "ลูกจ้าง"], update: "2566" },
+    { id: 5, title: "รัฐธรรมนูญแห่งราชอาณาจักรไทย", category: "constitution", desc: "กฎหมายสูงสุดของประเทศ สิทธิและเสรีภาพ", tags: ["สิทธิ", "หน้าที่"], update: "2560" },
+    { id: 6, title: "กฎหมายครอบครัว", category: "family", desc: "การจดทะเบียนสมรส การหย่า รับบุตรบุญธรรม", tags: ["สมรส", "มรดก"], update: "2564" },
+];
+
+const newsUpdates = [
+    { title: "📌 อัพเดท: ค่าแรงขั้นต่ำปรับขึ้นทั่วประเทศ มีผล 1 ม.ค. นี้" },
+    { title: "🚗 กฎหมายจราจรใหม่ ตัดแต้มใบขับขี่ เช็คด่วน!" },
+    { title: "⚖️ พ.ร.บ. สมรสเท่าเทียม ผ่านสภาแล้ว รอประกาศใช้" },
+    { title: "⚠️ เตือนภัย! กลโกงออนไลน์รูปแบบใหม่ ผิด พ.ร.บ. คอมฯ" }
+];
+
+// App State
+let currentCategory = 'all';
+let searchQuery = '';
+
+// DOM Elements
+const catbar = document.getElementById('catbar');
+const list = document.getElementById('list');
+const latestTrack = document.getElementById('latestTrack');
+const dotsContainer = document.getElementById('dots');
+const panelTitle = document.getElementById('panelTitle');
+const panelNote = document.getElementById('panelNote');
+
+// Initialization
+function initApp() {
+    renderChips();
+    renderList();
+    initSlider();
+    
+    // Search Event
+    document.getElementById('btnSearch').addEventListener('click', handleSearch);
+    document.getElementById('q').addEventListener('keyup', (e) => {
+        if(e.key === 'Enter') handleSearch();
+        if(e.target.value === '') {
+            searchQuery = '';
+            renderList();
+        }
+    });
+}
+
+function handleSearch() {
+    const q = document.getElementById('q').value.trim();
+    searchQuery = q;
+    currentCategory = 'all'; // Reset category on search
+    renderChips(); // Update active chip
+    renderList();
+}
+
+function renderChips() {
+    catbar.innerHTML = categories.map(c => `
+        <div class="chip ${currentCategory === c.id ? 'active' : ''}" onclick="setCategory('${c.id}')">
+            <span class="material-symbols-rounded" style="font-size:18px">${c.icon}</span>
+            ${c.name}
+        </div>
+    `).join('');
+}
+
+window.setCategory = (id) => {
+    currentCategory = id;
+    searchQuery = ''; // Clear search when picking category
+    document.getElementById('q').value = '';
+    renderChips();
+    renderList();
+};
+
+function renderList() {
+    let filtered = laws.filter(l => {
+        const matchesCat = currentCategory === 'all' || l.category === currentCategory;
+        const matchesSearch = !searchQuery || l.title.includes(searchQuery) || l.tags.some(t => t.includes(searchQuery));
+        return matchesCat && matchesSearch;
+    });
+
+    panelTitle.textContent = searchQuery ? `ผลการค้นหา "${searchQuery}"` : 
+                             (currentCategory === 'all' ? 'รายการกฎหมายทั้งหมด' : categories.find(c=>c.id===currentCategory).name);
+    
+    panelNote.textContent = `${filtered.length} รายการ`;
+
+    if (filtered.length === 0) {
+        list.innerHTML = `
+            <div class="empty">
+                <span class="material-symbols-rounded text-gray-300" style="font-size:48px">search_off</span>
+                <p>ไม่พบข้อมูลที่ค้นหา</p>
+                <button onclick="setCategory('all')" class="text-blue-500 text-sm hover:underline">ดูทั้งหมด</button>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = filtered.map(l => `
+        <div class="law-card group">
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="law-title group-hover:text-blue-700 transition-colors">${l.title}</h3>
+                <span class="text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100">อัพเดท ${l.update}</span>
+            </div>
+            <p class="text-sm text-gray-500 mb-3 line-clamp-2">${l.desc}</p>
+            <div class="law-meta">
+                ${l.tags.map(t => `<span class="tag">#${t}</span>`).join('')}
+            </div>
+            <div class="flex justify-end">
+                <a href="#" class="action-btn">
+                    อ่านฉบับเต็ม <span class="material-symbols-rounded" style="font-size:16px">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+    `).join('');
+}
+
+function initSlider() {
+    // Populate Track
+    latestTrack.innerHTML = newsUpdates.map(n => `
+        <div class="latest-slide">
+             <div class="slide-title">${n.title}</div>
+             <p class="text-xs text-gray-400">เมื่อสักครู่</p>
+        </div>
+    `).join('');
+    
+    // Populate Dots
+    dotsContainer.innerHTML = newsUpdates.map((_, i) => `<div class="dot ${i===0?'active':''}"></div>`).join('');
+
+    let idx = 0;
+    setInterval(() => {
+        idx = (idx + 1) % newsUpdates.length;
+        latestTrack.style.transform = `translateX(-${idx * 100}%)`;
+        
+        // Update dots
+        Array.from(dotsContainer.children).forEach((d, i) => {
+            d.classList.toggle('active', i === idx);
+        });
+    }, 4000);
+}
+
+// Start App
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
 
 <script type="module">
 /* ===============================
-   Chatbot Backend Logic (QUEUE + HISTORY)
+   Chatbot Logic (Cloudflare Backend)
    =============================== */
 
-const BACKEND_URL =
-  'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
+// Configuration
+const BACKEND_URL = "https://polished-sunset-f33e.tontakankeawpang321.workers.dev";
 
+// State
 let chatHistory = [];
-let pollingTimer = null;
-let lastUserMessage = "";
+// Note: We don't need a SYSTEM_PROMPT here because the backend handles it or we send it once.
+// We'll keep the client-side chatHistory for UI, but format it for the backend.
 
+let isGenerating = false;
+
+// DOM Elements for Chat
 const chatHistoryEl = document.getElementById('chat-history');
-const userInput   = document.getElementById('user-input');
-const sendBtn     = document.getElementById('send-btn');
-const newChatBtn  = document.getElementById('new-chat-btn');
+const userInput     = document.getElementById('user-input');
+const sendBtn       = document.getElementById('send-btn');
+const newChatBtn    = document.getElementById('new-chat-btn');
 const thinkingIndicator = document.getElementById('thinking-indicator');
+const fabToggle     = document.getElementById('fab-chat-toggle');
+const chatbotModal  = document.getElementById('chatbot-modal');
+const closeChatBtn  = document.getElementById('chatbot-close-btn');
+const chatWindow    = document.getElementById('chat-window-inner');
 
-/* ---------- UI Helpers ---------- */
+/* ---------- UI Logic ---------- */
+
+// FAB Toggle
+fabToggle.addEventListener('click', () => {
+    chatbotModal.classList.remove('opacity-0', 'pointer-events-none');
+    chatWindow.classList.remove('translate-y-full', 'scale-95'); // Reset transform
+    fabToggle.style.transform = "scale(0)"; // Hide FAB
+    setTimeout(() => userInput.focus(), 300);
+});
+
+// Close Modal
+const closeModal = () => {
+    chatWindow.classList.add('translate-y-full', 'scale-95'); // Hide Window
+    chatbotModal.classList.add('opacity-0');
+    setTimeout(() => {
+        chatbotModal.classList.add('pointer-events-none');
+        fabToggle.style.transform = ""; // Restore FAB
+    }, 300);
+};
+
+closeChatBtn.addEventListener('click', closeModal);
+chatbotModal.addEventListener('click', (e) => {
+    if (e.target === chatbotModal) closeModal();
+});
+
+// Add Bubble Helper
 function addChatBubble(message, isUser = true) {
-  const bubbleType = isUser ? 'user' : 'model';
-
-  const icon = isUser
+    const bubbleType = isUser ? 'user' : 'model';
+    const icon = isUser
     ? `<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
          <span class="material-symbols-rounded text-gray-500 text-sm">person</span>
        </div>`
@@ -737,155 +922,94 @@ function addChatBubble(message, isUser = true) {
          <span class="material-symbols-rounded text-sm">smart_toy</span>
        </div>`;
 
-  const wrap = document.createElement('div');
-  wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+    const wrap = document.createElement('div');
+    wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
 
-  const bubble = document.createElement('div');
-  bubble.className = `chat-bubble chat-bubble-${bubbleType}`;
-  bubble.innerHTML = `<p>${(message || '').replace(/\n/g, '<br>')}</p>`;
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble chat-bubble-${bubbleType}`;
+    // Basic formatting
+    let formatted = (message || '').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+    bubble.innerHTML = `<p>${formatted}</p>`;
 
-  wrap.innerHTML = icon;
-  wrap.appendChild(bubble);
+    wrap.innerHTML = icon;
+    wrap.appendChild(bubble);
 
-  chatHistoryEl.appendChild(wrap);
-  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+    chatHistoryEl.appendChild(wrap);
+    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
 
-function addSystemMessage(text) {
-  const w = document.createElement('div');
-  w.className = 'flex justify-center my-2';
-  w.innerHTML = `
-    <span class="bg-amber-50 text-amber-700 text-xs px-4 py-2 rounded-full border border-amber-100">
-      ${text}
-    </span>`;
-  chatHistoryEl.appendChild(w);
-  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-}
-
-function addChatError(text) {
-  const w = document.createElement('div');
-  w.className = 'flex justify-center my-2';
-  w.innerHTML = `
-    <span class="bg-red-50 text-red-600 text-xs px-4 py-2 rounded-full border border-red-100 flex items-center gap-1">
-      <span class="material-symbols-rounded text-sm">error</span>
-      ${text}
-    </span>`;
-  chatHistoryEl.appendChild(w);
-  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-}
-
-function setThinking(on) {
-  thinkingIndicator.classList.toggle('hidden', !on);
-  if (on) chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-}
-
-/* ---------- Backend Call (รองรับคิว) ---------- */
-async function callBackend() {
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: "thai-law-user",
-        message: lastUserMessage,
-        history: chatHistory.map(h => ({
-          role: h.role === "model" ? "assistant" : "user",
-          text: h.parts[0].text
-        }))
-      })
-    });
-
-    const data = await response.json();
-
-    /* ===============================
-       ⏳ เข้าคิว
-       =============================== */
-    if (data.status === "queued") {
-      setThinking(false);
-
-      addSystemMessage(
-        `กำลังรอคิวลำดับที่ ${data.position} (ประมาณ ${data.waitSeconds} วินาที)`
-      );
-
-      clearTimeout(pollingTimer);
-      pollingTimer = setTimeout(callBackend, 8000); // poll ทุก 8 วิ
-      return;
-    }
-
-    /* ===============================
-       ✅ ได้คำตอบ
-       =============================== */
-    if (data.reply) {
-      clearTimeout(pollingTimer);
-      setThinking(false);
-
-      addChatBubble(data.reply, false);
-
-      chatHistory.push({
-        role: "model",
-        parts: [{ text: data.reply }]
-      });
-      chatHistory = chatHistory.slice(-6);
-    }
-
-  } catch (err) {
-    console.error(err);
-    setThinking(false);
-    addChatError("ระบบขัดข้อง กรุณาลองใหม่");
-    chatHistory.pop();
-  } finally {
-    sendBtn.disabled = false;
-    setTimeout(() => userInput.focus(), 100);
-  }
-}
-
-/* ---------- Send Logic ---------- */
-async function handleSend() {
-  const message = (userInput.value || '').trim();
-  if (!message) return;
-
-  lastUserMessage = message;
-
-  addChatBubble(message, true);
-  userInput.value = '';
-  setThinking(true);
-  sendBtn.disabled = true;
-
-  chatHistory.push({
-    role: "user",
-    parts: [{ text: message }]
-  });
-  chatHistory = chatHistory.slice(-6); // ประหยัด token
-
-  await callBackend();
-}
-
-/* ---------- Events ---------- */
-sendBtn.addEventListener('click', handleSend);
-
-userInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    handleSend();
-  }
+// Clear Chat
+newChatBtn.addEventListener('click', () => {
+    chatHistoryEl.innerHTML = '';
+    chatHistory = [];
+    // Add Welcome again
+    const welcomeMsg = "เริ่มสนทนาใหม่เรียบร้อยครับ ถามข้อกฎหมายได้เลยครับ";
+    addChatBubble(welcomeMsg, false);
 });
 
-newChatBtn.addEventListener('click', () => {
-  chatHistoryEl.innerHTML = `
-    <div class="flex items-start space-x-2">
-      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 shadow-sm text-white">
-        <span class="material-symbols-rounded text-sm">smart_toy</span>
-      </div>
-      <div class="chat-bubble chat-bubble-model">
-        <p>เริ่มสนทนาใหม่เรียบร้อยครับ ถามผมได้เลย!</p>
-      </div>
-    </div>`;
-  chatHistory = [];
-  clearTimeout(pollingTimer);
-  setThinking(false);
+/* ---------- Logic (Cloudflare Worker) ---------- */
+async function sendMessage() {
+    const text = userInput.value.trim();
+    if (!text || isGenerating) return;
+
+    // 1. UI Updates
+    userInput.value = "";
+    addChatBubble(text, true);
+    isGenerating = true;
+    thinkingIndicator.classList.remove('hidden');
+    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+    
+    // 2. Add to history (Internal Format)
+    // We store it as { role: 'user'|'model', parts: [{text: ...}] } to match our internal consistent structure
+    chatHistory.push({ role: "user", parts: [{ text: text }] });
+
+    try {
+        // 3. Prepare payload for Backend
+        // Backend expects: { sessionId, message, history: [ { role: 'assistant'|'user', text: string } ] }
+        const payload = {
+            sessionId: "thai-law",
+            message: text,
+            history: chatHistory.map(h => ({
+                role: h.role === "model" ? "assistant" : "user",
+                text: h.parts[0].text
+            }))
+        };
+
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        
+        // 4. Handle Backend Response
+        // Expecting data.reply
+        const reply = data.reply || "ขออภัย ระบบไม่ตอบสนอง";
+        
+        thinkingIndicator.classList.add('hidden');
+        addChatBubble(reply, false);
+        chatHistory.push({ role: "model", parts: [{ text: reply }] });
+
+    } catch (error) {
+        console.error("Chat Error:", error);
+        thinkingIndicator.classList.add('hidden');
+        addChatBubble("ขออภัย เกิดข้อขัดข้องในการเชื่อมต่อกับเซิร์ฟเวอร์", false);
+    } finally {
+        isGenerating = false;
+        setTimeout(() => userInput.focus(), 100);
+    }
+}
+
+// Event Listeners
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keydown', (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
 });
 </script>
-
 
 </body>
 </html>
