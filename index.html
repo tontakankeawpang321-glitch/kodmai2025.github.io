@@ -14,28 +14,27 @@
 
 <style>
   :root {
-    /* 🎨 Modern Law Palette */
+    /* 🎨 Solid & Stable Palette */
     --primary: #1e3a8a;       /* Deep Navy */
-    --primary-light: #3b82f6; /* Bright Blue */
-    --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    --primary-dark: #172554;
+    --primary-gradient: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%); /* Simpler gradient */
     
     --accent: #d97706;        /* Amber */
-    --accent-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
     
-    --bg-app: #f8fafc;        /* Slate 50 - Cool White */
+    --bg-app: #f1f5f9;        /* Slate 100 - Solid Light Gray */
     --bg-card: #ffffff;
     
-    --text-main: #1e293b;     /* Slate 800 */
+    --text-main: #0f172a;     /* Slate 900 - High Contrast */
     --text-muted: #64748b;    /* Slate 500 */
-    --border: #e2e8f0;        /* Slate 200 */
+    --border: #cbd5e1;        /* Slate 300 - Clearer Border */
     
-    --radius-card: 20px;
-    --radius-btn: 14px;
+    --radius-card: 12px;      /* Standard Modern Radius */
+    --radius-btn: 8px;
     
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-    --shadow-float: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 15px rgba(37, 99, 235, 0.2);
+    /* Optimized Shadows (Less spread, better performance) */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 2px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); 
+    --shadow-float: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 
   body {
@@ -43,171 +42,133 @@
     color: var(--text-main);
     font-family: "Sarabun", sans-serif;
     -webkit-font-smoothing: antialiased;
-    padding-bottom: 100px; /* Space for FAB */
-    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-    background-size: 24px 24px; /* Subtle pattern */
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+    padding-bottom: 100px;
+    /* Remove heavy background patterns for mobile performance */
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* --- App Header --- */
+  /* --- App Header (Solid & Stable) --- */
   .app-header {
     background: var(--primary-gradient);
     color: white;
-    padding: 20px 16px 50px; /* Extra padding for search overlap */
-    border-radius: 0 0 32px 32px;
+    padding: 16px 16px 40px; /* Adjusted padding */
+    border-radius: 0 0 20px 20px; /* Reduced curvature */
     position: relative;
     z-index: 10;
-    box-shadow: 0 10px 30px -10px rgba(30, 58, 138, 0.4);
-    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* Removed heavy decorative pseudo-elements */
   }
-  
-  /* Decorative circles in header */
-  .app-header::before, .app-header::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    background: white;
-    opacity: 0.05;
-  }
-  .app-header::before { width: 150px; height: 150px; top: -50px; right: -20px; }
-  .app-header::after { width: 100px; height: 100px; bottom: 10px; left: 10%; }
 
   .app-title {
-    font-size: 26px;
-    font-weight: 800;
+    font-size: 22px;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 12px;
-    letter-spacing: -0.5px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    gap: 10px;
   }
   .app-subtitle {
-    font-size: 15px;
+    font-size: 14px;
     opacity: 0.9;
-    margin-top: 6px;
-    font-weight: 300;
-    margin-left: 44px; /* Align with text start */
+    margin-top: 4px;
+    font-weight: 400;
+    margin-left: 42px;
   }
 
-  /* Mobile Typography & Layout Adjustments */
+  /* Mobile Adjustments */
   @media (max-width: 640px) {
     .app-title { 
-      font-size: 22px; 
-      justify-content: center; /* Center title on mobile */
+      justify-content: center; 
     }
     .app-subtitle { 
-      font-size: 13px; 
       margin-left: 0; 
       text-align: center;
-      margin-top: 4px;
     }
-    .app-header { 
-      padding-bottom: 40px; 
-      border-radius: 0 0 24px 24px;
-    } 
-    .section { 
-      margin-bottom: 24px; 
-    }
-    .search-container { 
-      margin-top: -24px; 
-      padding: 6px;
-    }
-    .wrap {
-      padding: 0 16px; /* Slightly tighter padding */
+    .search-container {
+      margin-top: -20px;
     }
   }
 
-  /* --- Container & Sections --- */
+  /* --- Container --- */
   .wrap {
-    max-width: 700px; /* Slimmer for better reading */
+    max-width: 600px; /* Standard mobile width optimization */
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 16px;
     position: relative;
   }
   .section {
-    margin-bottom: 32px;
-  }
-  .chatbot-hidden {
-    display: none;
+    margin-bottom: 24px;
   }
 
-  /* --- Search Bar (Floating) --- */
+  /* --- Search Bar (Solid & Real) --- */
   .search-container {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 8px;
+    background: #ffffff; /* Solid White - No Glass/Blur */
+    border-radius: 12px;
+    padding: 4px 8px;
     box-shadow: var(--shadow-float);
     display: flex;
-    gap: 10px;
-    margin-top: -30px; /* Pull up into header */
+    gap: 8px;
+    margin-top: -24px;
     position: relative;
     z-index: 20;
-    border: 1px solid rgba(255,255,255,0.5);
-    transition: transform 0.3s ease;
-  }
-  .search-container:focus-within {
-    transform: translateY(-2px);
-    box-shadow: 0 25px 30px -5px rgba(0,0,0,0.15);
+    border: 1px solid var(--border); /* Clear border */
+    align-items: center;
+    height: 56px;
   }
   
   .search-input {
     flex: 1;
     border: none;
     outline: none;
-    padding: 0 16px;
+    padding: 0 8px;
     font-family: "Sarabun";
-    font-size: 16px;
+    font-size: 16px; /* Prevents iOS zoom */
     color: var(--text-main);
     background: transparent;
-    font-weight: 500;
-    min-width: 0; /* Fix flex issue on small screens */
+    height: 100%;
   }
-  .search-input::placeholder { color: #94a3b8; font-weight: 400; font-size: 14px; }
   
   .search-btn {
-    background: var(--accent-gradient);
+    background: var(--accent); /* Solid color, easier to render */
     color: white;
     border: none;
-    border-radius: 14px;
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0; /* Prevent button shrinking */
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
-  .search-btn:hover { transform: scale(1.05); }
-  .search-btn:active { transform: scale(0.95); }
+  .search-btn:active { transform: scale(0.96); }
 
-  /* --- Latest Slider (Card Style) --- */
+  /* --- Cards (Clean & Sharp) --- */
   .slider-card {
     background: var(--bg-card);
     border-radius: var(--radius-card);
-    padding: 20px;
+    padding: 16px;
     box-shadow: var(--shadow-card);
-    border: 1px solid var(--border);
-    overflow: hidden;
+    border: 1px solid var(--border); /* Distinct border */
   }
   .slider-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
   }
   .slider-title {
     font-weight: 700;
     color: var(--primary);
-    font-size: 17px;
+    font-size: 16px;
     display: flex;
     align-items: center;
     gap: 8px;
   }
+  
+  /* --- Restored Animations --- */
   .icon-pulse {
     animation: pulse-orange 2s infinite;
   }
@@ -218,30 +179,26 @@
   }
 
   .latest-viewport { overflow: hidden; }
-  .latest-track { display: flex; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  .latest-track { display: flex; transition: transform 0.3s ease-out; /* Faster transition */ }
   .latest-slide {
     min-width: 100%;
-    padding: 4px;
+    padding: 2px;
   }
   .slide-title {
     font-weight: 600;
-    font-size: 16px;
-    line-height: 1.6;
-    margin-bottom: 8px;
+    font-size: 15px;
+    line-height: 1.5;
     color: var(--text-main);
   }
-  .dots { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #e2e8f0; transition: all 0.3s; cursor: pointer; }
-  .dot.active { background: var(--primary); width: 24px; border-radius: 4px; }
+  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; transition: 0.2s; }
+  .dot.active { background: var(--primary); width: 16px; border-radius: 3px; }
 
-  /* --- Category Chips (Scrollable) --- */
+  /* --- Chips --- */
   .catbar-scroll {
     overflow-x: auto;
     white-space: nowrap;
-    padding: 8px 4px 20px 4px;
-    margin: 0 -20px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 4px 0 16px 0;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
@@ -250,182 +207,157 @@
   .chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
+    gap: 6px;
+    padding: 8px 16px;
     background: white;
     border: 1px solid var(--border);
-    border-radius: 12px; /* Soft square */
-    margin-right: 10px;
-    cursor: pointer;
+    border-radius: 20px;
+    margin-right: 8px;
     font-size: 14px;
     font-weight: 500;
     color: var(--text-muted);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-  }
-  .chip:hover {
-    transform: translateY(-2px);
-    border-color: #cbd5e1;
+    /* Removed heavy shadow, rely on border */
   }
   .chip.active {
     background: var(--primary);
     color: white;
     border-color: var(--primary);
-    box-shadow: 0 8px 16px -4px rgba(30, 58, 138, 0.4);
-    transform: translateY(-1px);
+    font-weight: 600;
   }
 
   /* --- List Cards --- */
   .section-title {
-    font-size: 19px;
-    font-weight: 800;
+    font-size: 18px;
+    font-weight: 700;
     color: var(--text-main);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-    letter-spacing: -0.3px;
+    align-items: center;
   }
   .list-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
   .law-card {
     background: var(--bg-card);
     border-radius: var(--radius-card);
-    padding: 20px;
-    border: 1px solid transparent;
-    box-shadow: var(--shadow-card);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    padding: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm); /* Minimal shadow */
+    transition: transform 0.1s, background-color 0.1s; /* Faster, simpler feedback */
     position: relative;
-    overflow: hidden;
-    cursor: default;
   }
-  .law-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-float);
-    border-color: rgba(30, 58, 138, 0.1);
+  .law-card:active {
+    background-color: #f8fafc; /* Touch feedback */
+    transform: scale(0.99);
   }
-  /* Decorative left bar */
+  
+  /* Simplified decorative bar */
   .law-card::before {
     content: '';
     position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 5px;
-    background: var(--primary-gradient);
-    opacity: 0;
-    transition: 0.3s;
+    left: 0; top: 12px; bottom: 12px;
+    width: 4px;
+    background: var(--primary);
+    border-radius: 0 4px 4px 0;
+    opacity: 0.7;
   }
-  .law-card:hover::before { opacity: 1; }
 
   .law-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-main);
-    margin-bottom: 10px;
-    line-height: 1.5;
+    margin-bottom: 6px;
+    line-height: 1.4;
+    padding-left: 8px; /* Space for the bar */
   }
   .law-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-muted);
-    margin-bottom: 16px;
-    align-items: center;
+    margin-bottom: 12px;
+    padding-left: 8px;
   }
   .tag {
     background: #f1f5f9;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 2px 8px;
+    border-radius: 4px;
     color: #475569;
     font-weight: 500;
     font-size: 12px;
+    border: 1px solid #e2e8f0;
   }
   
   .action-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    background: #eff6ff; /* Blue 50 */
+    gap: 4px;
+    padding: 8px 16px;
+    background: #eff6ff;
     color: var(--primary);
-    font-weight: 700;
-    font-size: 14px;
-    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 6px;
     text-decoration: none;
-    transition: all 0.2s;
-  }
-  .action-btn:hover { 
-    background: #dbeafe; 
-    transform: translateX(4px);
+    border: 1px solid #dbeafe;
+    margin-left: 8px;
   }
 
-  /* --- Pagination --- */
+  /* --- Navigation Buttons --- */
   .loadbar {
     display: flex;
     justify-content: center;
-    gap: 16px;
-    margin-top: 32px;
+    gap: 12px;
+    margin-top: 24px;
   }
   .btn-nav {
-    padding: 12px 24px;
-    border-radius: 50px;
+    padding: 10px 20px;
+    border-radius: 8px;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 14px;
     cursor: pointer;
     border: none;
-    transition: all 0.2s;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
   .btn-nav.next { 
     background: var(--primary); 
     color: white; 
-    box-shadow: 0 4px 12px rgba(30,58,138,0.3); 
-  }
-  .btn-nav.next:hover {
-    background: #1e40af;
-    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
   .btn-nav.prev { 
     background: white; 
     color: var(--text-muted); 
     border: 1px solid var(--border); 
   }
-  .btn-nav.prev:hover {
-    background: #f8fafc;
-  }
-  .btn-nav:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
   /* --- Chat FAB & Modal --- */
   #fab-chat-toggle {
     position: fixed;
-    bottom: 30px;
-    right: 24px;
-    width: 64px;
-    height: 64px;
-    background: var(--accent-gradient);
+    bottom: 24px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: var(--accent);
     color: white;
     border: none;
-    border-radius: 24px;
+    border-radius: 16px; /* Squircle */
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 25px rgba(217, 119, 6, 0.5);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
     cursor: pointer;
     z-index: 100;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s;
   }
-  #fab-chat-toggle:hover { 
-    transform: scale(1.1) rotate(-5deg); 
-    box-shadow: 0 15px 35px rgba(217, 119, 6, 0.6);
-  }
-  #fab-chat-toggle .material-symbols-rounded { font-size: 32px; }
-  
-  /* Pulse effect for FAB */
+  #fab-chat-toggle .material-symbols-rounded { font-size: 28px; }
+
+  /* Restored Pulse Effect for Chat Button */
   #fab-chat-toggle::after {
     content: '';
     position: absolute;
@@ -441,12 +373,12 @@
   }
 
   #chatbot-modal {
-    background: rgba(15, 23, 42, 0.6); /* Slate 900 fade */
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.5); /* Simple dim */
+    /* Removed backdrop-filter for performance */
   }
   
   .chat-window {
-    height: 100dvh; /* Mobile viewport fix: dynamic viewport height */
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     background: white;
@@ -454,61 +386,54 @@
   }
   @media (min-width: 640px) {
     .chat-window {
-      height: 650px;
-      width: 420px;
+      height: 600px;
+      width: 400px;
       position: fixed;
-      bottom: 30px;
-      right: 30px;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255,255,255,0.1);
+      bottom: 24px;
+      right: 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      border: 1px solid #e2e8f0;
     }
   }
 
   .chat-header {
     background: white;
-    padding: 18px 20px;
+    padding: 14px 16px;
     color: var(--text-main);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .chat-header h1 {
-    font-size: 18px;
-    color: var(--primary);
+    border-bottom: 1px solid #e2e8f0;
   }
 
-  /* Chat Bubbles Modern */
+  /* Chat Bubbles (Solid & Readable) */
   .chat-bubble { 
     font-size: 15px; 
-    line-height: 1.6; 
+    line-height: 1.5; 
     position: relative;
-    padding: 12px 16px;
+    padding: 10px 14px;
   }
   .chat-bubble-user { 
-    background: var(--primary-gradient); 
+    background: var(--primary); 
     color: white; 
-    border-radius: 18px 18px 4px 18px; 
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+    border-radius: 12px 12px 2px 12px; 
   }
   .chat-bubble-model { 
     background: #f1f5f9; 
-    color: var(--text-main); 
-    border-radius: 18px 18px 18px 4px; 
+    color: #334155; 
+    border-radius: 12px 12px 12px 2px; 
     border: 1px solid #e2e8f0;
   }
 
-  /* Gemini Animation Bar */
+  /* Gemini Animation Bar (Simple) */
   .gemini-thinking-bar {
-    height: 4px;
+    height: 3px;
     background: #e2e8f0;
     border-radius: 2px;
     overflow: hidden;
     position: relative;
-    width: 100%;
-    max-width: 80px;
+    width: 60px;
   }
   .gemini-thinking-bar::before {
     content: '';
@@ -516,37 +441,23 @@
     top: 0; left: 0; height: 100%; width: 40%;
     background: var(--accent);
     animation: thinking 1.2s infinite ease-in-out;
-    border-radius: 2px;
   }
   @keyframes thinking {
-    0% { transform: translateX(-150%); }
-    100% { transform: translateX(350%); }
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(300%); }
   }
 
-  /* Utilities */
-  .empty { 
-    padding: 60px 20px; 
-    text-align: center; 
-    color: var(--text-muted); 
-    background: white; 
-    border-radius: 20px; 
-    border: 2px dashed #e2e8f0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-  }
   .material-symbols-rounded { vertical-align: middle; }
   
-  /* Facebook Page Container */
   .fb-container {
     background: white;
     border-radius: var(--radius-card);
-    padding: 16px;
+    padding: 12px;
     box-shadow: var(--shadow-card);
     display: flex;
     justify-content: center;
     margin-bottom: 24px;
+    border: 1px solid var(--border);
     overflow: hidden;
   }
 </style>
@@ -556,8 +467,8 @@
 <header class="app-header">
   <div class="wrap">
     <div class="app-title">
-      <div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
-        <span class="material-symbols-rounded" style="font-size: 32px;">balance</span>
+      <div class="bg-white/20 p-1.5 rounded-lg">
+        <span class="material-symbols-rounded" style="font-size: 28px;">balance</span>
       </div>
       <span>Thai Law Lite</span>
     </div>
@@ -572,7 +483,7 @@
       <button class="w-10 h-10 flex items-center justify-center text-gray-400 cursor-default">
          <span class="material-symbols-rounded">search</span>
       </button>
-      <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย, มาตรา, หรือคำสำคัญ..." aria-label="ค้นหากฎหมาย">
+      <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย, มาตรา..." aria-label="ค้นหากฎหมาย">
       <button id="btnSearch" class="search-btn" type="button">
         <span class="material-symbols-rounded">arrow_forward</span>
       </button>
@@ -603,12 +514,12 @@
     <div class="slider-card">
       <div class="slider-header">
         <div class="slider-title">
-          <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 icon-pulse">
-             <span class="material-symbols-rounded">campaign</span>
+          <div class="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 icon-pulse">
+             <span class="material-symbols-rounded" style="font-size: 18px;">campaign</span>
           </div>
           <span>ประกาศล่าสุด</span>
         </div>
-        <span class="text-xs text-gray-400 font-medium bg-gray-50 px-2 py-1 rounded-md">Auto Slide</span>
+        <span class="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded border border-gray-200">Auto Slide</span>
       </div>
       <div class="latest-viewport" id="latestViewport">
         <div id="latestTrack" class="latest-track" aria-live="polite"></div>
@@ -619,21 +530,21 @@
 
   <section class="section">
     <div class="catbar-scroll" id="catbar" role="tablist" aria-label="เลือกหมวดกฎหมาย">
-      <!-- Chips will be inserted here by JS -->
+      <!-- Chips will be inserted here by app.js -->
     </div>
   </section>
 
   <section class="section">
     <div class="section-title">
       <div class="flex items-center gap-2">
-        <span class="w-1 h-6 bg-blue-600 rounded-full"></span>
+        <span class="w-1 h-5 bg-blue-700 rounded-sm"></span>
         <span id="panelTitle">รายการกฎหมาย</span>
       </div>
-      <span id="panelNote" class="text-xs font-medium text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">แสดงผล</span>
+      <span id="panelNote" class="text-xs font-medium text-gray-500">แสดงผลล่าสุด</span>
     </div>
     
     <div id="list" class="list-container">
-      <!-- Law Cards will be inserted here by JS -->
+      <!-- Law Cards will be inserted here by app.js -->
     </div>
 
     <div class="loadbar">
@@ -652,23 +563,23 @@
   <span class="material-symbols-rounded">smart_toy</span>
 </button>
 
-<div id="chatbot-modal" class="chatbot-hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-  <div class="chat-window w-full flex flex-col transform transition-transform duration-300 translate-y-full sm:translate-y-0 sm:scale-95" id="chat-window-inner">
+<div id="chatbot-modal" class="chatbot-hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
+  <div class="chat-window w-full flex flex-col transform transition-transform duration-200 translate-y-full sm:translate-y-0 sm:scale-100" id="chat-window-inner">
     <header class="chat-header shrink-0">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
-           <span class="material-symbols-rounded">smart_toy</span>
+        <div class="w-9 h-9 rounded-full bg-blue-700 flex items-center justify-center text-white">
+           <span class="material-symbols-rounded" style="font-size: 20px;">smart_toy</span>
         </div>
         <div>
-          <h1 class="font-bold text-gray-800">Thai Law AI</h1>
+          <h1 class="font-bold text-gray-800 text-base">Thai Law AI</h1>
           <div class="flex items-center gap-1">
-             <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-             <p class="text-xs text-gray-500">พร้อมให้บริการ</p>
+             <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+             <p class="text-xs text-gray-500">Online</p>
           </div>
         </div>
       </div>
       <div class="flex gap-2">
-        <button id="new-chat-btn" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 py-1.5 px-3 rounded-lg transition font-medium">ล้างแชท</button>
+        <button id="new-chat-btn" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 py-1.5 px-3 rounded border border-gray-200 transition font-medium">ล้างแชท</button>
         <button id="chatbot-close-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 hover:text-red-500 text-gray-400 transition">
           <span class="material-symbols-rounded">close</span>
         </button>
@@ -677,7 +588,7 @@
     
     <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
       <div class="flex items-start space-x-2">
-        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 shadow-sm text-white">
+        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-white">
           <span class="material-symbols-rounded text-sm">smart_toy</span>
         </div>
         <div class="chat-bubble chat-bubble-model">
@@ -691,16 +602,16 @@
         <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
            <span class="material-symbols-rounded text-gray-400 text-sm">smart_toy</span>
         </div>
-        <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+        <div class="bg-white p-3 rounded-xl border border-gray-200">
            <div class="gemini-thinking-bar"></div>
         </div>
       </div>
     </div>
     
-    <footer class="p-3 bg-white border-t border-gray-100 shrink-0">
-      <div class="flex items-center gap-2 bg-gray-50 rounded-2xl px-4 py-3 border border-gray-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
-        <input id="user-input" type="text" placeholder="พิมพ์คำถามข้อกฎหมาย..." class="flex-1 bg-transparent outline-none text-sm text-gray-700 placeholder-gray-400">
-        <button id="send-btn" class="text-blue-600 hover:text-blue-700 transition p-1 transform active:scale-90">
+    <footer class="p-3 bg-white border-t border-gray-200 shrink-0">
+      <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+        <input id="user-input" type="text" placeholder="พิมพ์คำถามข้อกฎหมาย..." class="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder-gray-500">
+        <button id="send-btn" class="text-blue-600 hover:text-blue-800 transition p-1">
           <span class="material-symbols-rounded">send</span>
         </button>
       </div>
@@ -708,308 +619,152 @@
   </div>
 </div>
 
-<script>
-// Mock Data (Simulating App DB)
-const categories = [
-    { id: 'all', name: 'ทั้งหมด', icon: 'apps' },
-    { id: 'criminal', name: 'อาญา', icon: 'gavel' },
-    { id: 'civil', name: 'แพ่ง', icon: 'handshake' },
-    { id: 'traffic', name: 'จราจร', icon: 'directions_car' },
-    { id: 'labor', name: 'แรงงาน', icon: 'engineering' },
-    { id: 'constitution', name: 'รัฐธรรมนูญ', icon: 'account_balance' },
-    { id: 'family', name: 'ครอบครัว', icon: 'family_restroom' }
-];
-
-const laws = [
-    { id: 1, title: "ประมวลกฎหมายอาญา", category: "criminal", desc: "รวมความผิดและโทษทางอาญา ลักทรัพย์ ทำร้ายร่างกาย", tags: ["ความผิด", "โทษจำคุก"], update: "2567" },
-    { id: 2, title: "ประมวลกฎหมายแพ่งและพาณิชย์", category: "civil", desc: "กฎหมายเรื่องสัญญา ทรัพย์สิน การกู้ยืม", tags: ["สัญญา", "ทรัพย์สิน"], update: "2566" },
-    { id: 3, title: "พ.ร.บ. จราจรทางบก", category: "traffic", desc: "กฎจราจร การขับขี่ ใบสั่ง และค่าปรับต่างๆ", tags: ["ขับขี่", "ใบสั่ง"], update: "2565" },
-    { id: 4, title: "พ.ร.บ. คุ้มครองแรงงาน", category: "labor", desc: "สิทธิวันลา ค่าชดเชย ค่าล่วงเวลา", tags: ["นายจ้าง", "ลูกจ้าง"], update: "2566" },
-    { id: 5, title: "รัฐธรรมนูญแห่งราชอาณาจักรไทย", category: "constitution", desc: "กฎหมายสูงสุดของประเทศ สิทธิและเสรีภาพ", tags: ["สิทธิ", "หน้าที่"], update: "2560" },
-    { id: 6, title: "กฎหมายครอบครัว", category: "family", desc: "การจดทะเบียนสมรส การหย่า รับบุตรบุญธรรม", tags: ["สมรส", "มรดก"], update: "2564" },
-];
-
-const newsUpdates = [
-    { title: "📌 อัพเดท: ค่าแรงขั้นต่ำปรับขึ้นทั่วประเทศ มีผล 1 ม.ค. นี้" },
-    { title: "🚗 กฎหมายจราจรใหม่ ตัดแต้มใบขับขี่ เช็คด่วน!" },
-    { title: "⚖️ พ.ร.บ. สมรสเท่าเทียม ผ่านสภาแล้ว รอประกาศใช้" },
-    { title: "⚠️ เตือนภัย! กลโกงออนไลน์รูปแบบใหม่ ผิด พ.ร.บ. คอมฯ" }
-];
-
-// App State
-let currentCategory = 'all';
-let searchQuery = '';
-
-// DOM Elements
-const catbar = document.getElementById('catbar');
-const list = document.getElementById('list');
-const latestTrack = document.getElementById('latestTrack');
-const dotsContainer = document.getElementById('dots');
-const panelTitle = document.getElementById('panelTitle');
-const panelNote = document.getElementById('panelNote');
-
-// Initialization
-function initApp() {
-    renderChips();
-    renderList();
-    initSlider();
-    
-    // Search Event
-    document.getElementById('btnSearch').addEventListener('click', handleSearch);
-    document.getElementById('q').addEventListener('keyup', (e) => {
-        if(e.key === 'Enter') handleSearch();
-        if(e.target.value === '') {
-            searchQuery = '';
-            renderList();
-        }
-    });
-}
-
-function handleSearch() {
-    const q = document.getElementById('q').value.trim();
-    searchQuery = q;
-    currentCategory = 'all'; // Reset category on search
-    renderChips(); // Update active chip
-    renderList();
-}
-
-function renderChips() {
-    catbar.innerHTML = categories.map(c => `
-        <div class="chip ${currentCategory === c.id ? 'active' : ''}" onclick="setCategory('${c.id}')">
-            <span class="material-symbols-rounded" style="font-size:18px">${c.icon}</span>
-            ${c.name}
-        </div>
-    `).join('');
-}
-
-window.setCategory = (id) => {
-    currentCategory = id;
-    searchQuery = ''; // Clear search when picking category
-    document.getElementById('q').value = '';
-    renderChips();
-    renderList();
-};
-
-function renderList() {
-    let filtered = laws.filter(l => {
-        const matchesCat = currentCategory === 'all' || l.category === currentCategory;
-        const matchesSearch = !searchQuery || l.title.includes(searchQuery) || l.tags.some(t => t.includes(searchQuery));
-        return matchesCat && matchesSearch;
-    });
-
-    panelTitle.textContent = searchQuery ? `ผลการค้นหา "${searchQuery}"` : 
-                             (currentCategory === 'all' ? 'รายการกฎหมายทั้งหมด' : categories.find(c=>c.id===currentCategory).name);
-    
-    panelNote.textContent = `${filtered.length} รายการ`;
-
-    if (filtered.length === 0) {
-        list.innerHTML = `
-            <div class="empty">
-                <span class="material-symbols-rounded text-gray-300" style="font-size:48px">search_off</span>
-                <p>ไม่พบข้อมูลที่ค้นหา</p>
-                <button onclick="setCategory('all')" class="text-blue-500 text-sm hover:underline">ดูทั้งหมด</button>
-            </div>
-        `;
-        return;
-    }
-
-    list.innerHTML = filtered.map(l => `
-        <div class="law-card group">
-            <div class="flex justify-between items-start mb-2">
-                <h3 class="law-title group-hover:text-blue-700 transition-colors">${l.title}</h3>
-                <span class="text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100">อัพเดท ${l.update}</span>
-            </div>
-            <p class="text-sm text-gray-500 mb-3 line-clamp-2">${l.desc}</p>
-            <div class="law-meta">
-                ${l.tags.map(t => `<span class="tag">#${t}</span>`).join('')}
-            </div>
-            <div class="flex justify-end">
-                <a href="#" class="action-btn">
-                    อ่านฉบับเต็ม <span class="material-symbols-rounded" style="font-size:16px">arrow_forward</span>
-                </a>
-            </div>
-        </div>
-    `).join('');
-}
-
-function initSlider() {
-    // Populate Track
-    latestTrack.innerHTML = newsUpdates.map(n => `
-        <div class="latest-slide">
-             <div class="slide-title">${n.title}</div>
-             <p class="text-xs text-gray-400">เมื่อสักครู่</p>
-        </div>
-    `).join('');
-    
-    // Populate Dots
-    dotsContainer.innerHTML = newsUpdates.map((_, i) => `<div class="dot ${i===0?'active':''}"></div>`).join('');
-
-    let idx = 0;
-    setInterval(() => {
-        idx = (idx + 1) % newsUpdates.length;
-        latestTrack.style.transform = `translateX(-${idx * 100}%)`;
-        
-        // Update dots
-        Array.from(dotsContainer.children).forEach((d, i) => {
-            d.classList.toggle('active', i === idx);
-        });
-    }, 4000);
-}
-
-// Start App
-document.addEventListener('DOMContentLoaded', initApp);
-</script>
+<script src="app.js"></script>
 
 <script type="module">
-/* ===============================
-   Chatbot Logic (Cloudflare Backend)
-   =============================== */
+/* ส่วนของ Chatbot Backend Logic */
 
-// Configuration
-const BACKEND_URL = "https://polished-sunset-f33e.tontakankeawpang321.workers.dev";
+// ⚠️ แก้ตรงนี้: เปลี่ยนจาก URL ยาวๆ เป็น '/api/chat' เพื่อเรียกใช้ Backend ของ Vercel
+const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev'; 
 
-// State
 let chatHistory = [];
-// Note: We don't need a SYSTEM_PROMPT here because the backend handles it or we send it once.
-// We'll keep the client-side chatHistory for UI, but format it for the backend.
-
-let isGenerating = false;
-
-// DOM Elements for Chat
 const chatHistoryEl = document.getElementById('chat-history');
-const userInput     = document.getElementById('user-input');
-const sendBtn       = document.getElementById('send-btn');
-const newChatBtn    = document.getElementById('new-chat-btn');
+const userInput   = document.getElementById('user-input');
+const sendBtn     = document.getElementById('send-btn');
+const newChatBtn  = document.getElementById('new-chat-btn');
 const thinkingIndicator = document.getElementById('thinking-indicator');
-const fabToggle     = document.getElementById('fab-chat-toggle');
-const chatbotModal  = document.getElementById('chatbot-modal');
-const closeChatBtn  = document.getElementById('chatbot-close-btn');
-const chatWindow    = document.getElementById('chat-window-inner');
 
-/* ---------- UI Logic ---------- */
-
-// FAB Toggle
-fabToggle.addEventListener('click', () => {
-    chatbotModal.classList.remove('opacity-0', 'pointer-events-none');
-    chatWindow.classList.remove('translate-y-full', 'scale-95'); // Reset transform
-    fabToggle.style.transform = "scale(0)"; // Hide FAB
-    setTimeout(() => userInput.focus(), 300);
-});
-
-// Close Modal
-const closeModal = () => {
-    chatWindow.classList.add('translate-y-full', 'scale-95'); // Hide Window
-    chatbotModal.classList.add('opacity-0');
-    setTimeout(() => {
-        chatbotModal.classList.add('pointer-events-none');
-        fabToggle.style.transform = ""; // Restore FAB
-    }, 300);
-};
-
-closeChatBtn.addEventListener('click', closeModal);
-chatbotModal.addEventListener('click', (e) => {
-    if (e.target === chatbotModal) closeModal();
-});
-
-// Add Bubble Helper
 function addChatBubble(message, isUser = true) {
-    const bubbleType = isUser ? 'user' : 'model';
-    const icon = isUser
-    ? `<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
-         <span class="material-symbols-rounded text-gray-500 text-sm">person</span>
-       </div>`
-    : `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 shadow-sm text-white">
-         <span class="material-symbols-rounded text-sm">smart_toy</span>
-       </div>`;
+  const bubbleType = isUser ? 'user' : 'model';
+  // Updated Styles for JS generated bubbles
+  const iconContent = isUser 
+    ? `<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0"><span class="material-symbols-rounded text-gray-500 text-sm">person</span></div>` 
+    : `<div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-white"><span class="material-symbols-rounded text-sm">smart_toy</span></div>`;
+  
+  const wrap = document.createElement('div');
+  wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+  
+  const bubble = document.createElement('div');
+  bubble.className = `chat-bubble chat-bubble-${bubbleType}`;
+  
+  // รองรับการเว้นบรรทัดจาก AI
+  const formattedMessage = message.replace(/\n/g, '<br>');
+  bubble.innerHTML = `<p>${formattedMessage}</p>`; 
+  
+  if (isUser) {
+     wrap.innerHTML = iconContent; 
+     wrap.appendChild(bubble);
+  } else {
+     wrap.innerHTML = iconContent;
+     wrap.appendChild(bubble);
+  }
 
-    const wrap = document.createElement('div');
-    wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
-
-    const bubble = document.createElement('div');
-    bubble.className = `chat-bubble chat-bubble-${bubbleType}`;
-    // Basic formatting
-    let formatted = (message || '').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-    bubble.innerHTML = `<p>${formatted}</p>`;
-
-    wrap.innerHTML = icon;
-    wrap.appendChild(bubble);
-
-    chatHistoryEl.appendChild(wrap);
-    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+  chatHistoryEl.appendChild(wrap);
+  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
 
-// Clear Chat
-newChatBtn.addEventListener('click', () => {
-    chatHistoryEl.innerHTML = '';
-    chatHistory = [];
-    // Add Welcome again
-    const welcomeMsg = "เริ่มสนทนาใหม่เรียบร้อยครับ ถามข้อกฎหมายได้เลยครับ";
-    addChatBubble(welcomeMsg, false);
-});
-
-/* ---------- Logic (Cloudflare Worker) ---------- */
-async function sendMessage() {
-    const text = userInput.value.trim();
-    if (!text || isGenerating) return;
-
-    // 1. UI Updates
-    userInput.value = "";
-    addChatBubble(text, true);
-    isGenerating = true;
-    thinkingIndicator.classList.remove('hidden');
-    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-    
-    // 2. Add to history (Internal Format)
-    // We store it as { role: 'user'|'model', parts: [{text: ...}] } to match our internal consistent structure
-    chatHistory.push({ role: "user", parts: [{ text: text }] });
-
-    try {
-        // 3. Prepare payload for Backend
-        // Backend expects: { sessionId, message, history: [ { role: 'assistant'|'user', text: string } ] }
-        const payload = {
-            sessionId: "thai-law",
-            message: text,
-            history: chatHistory.map(h => ({
-                role: h.role === "model" ? "assistant" : "user",
-                text: h.parts[0].text
-            }))
-        };
-
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-        
-        // 4. Handle Backend Response
-        // Expecting data.reply
-        const reply = data.reply || "ขออภัย ระบบไม่ตอบสนอง";
-        
-        thinkingIndicator.classList.add('hidden');
-        addChatBubble(reply, false);
-        chatHistory.push({ role: "model", parts: [{ text: reply }] });
-
-    } catch (error) {
-        console.error("Chat Error:", error);
-        thinkingIndicator.classList.add('hidden');
-        addChatBubble("ขออภัย เกิดข้อขัดข้องในการเชื่อมต่อกับเซิร์ฟเวอร์", false);
-    } finally {
-        isGenerating = false;
-        setTimeout(() => userInput.focus(), 100);
-    }
+function addChatError(message) {
+  const w = document.createElement('div');
+  w.className = 'flex justify-center my-4';
+  w.innerHTML = `<span class="bg-red-50 text-red-600 text-xs px-4 py-2 rounded-full border border-red-100 flex items-center gap-1"><span class="material-symbols-rounded text-sm">error</span> ${message}</span>`;
+  chatHistoryEl.appendChild(w);
+  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
 
-// Event Listeners
-sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keydown', (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+function setThinking(on) {
+  thinkingIndicator.classList.toggle('hidden', !on);
+  if (on) chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+}
+
+async function handleSend() {
+  const message = (userInput.value || '').trim();
+  if (!message) return;
+
+  addChatBubble(message, true);
+  userInput.value = '';
+  setThinking(true);
+  sendBtn.disabled = true;
+
+  chatHistory.push({ role: "user", parts: [{ text: message }] });
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ history: chatHistory }) 
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error || `Server error: ${response.status}`);
     }
+
+    const data = await response.json();
+    const aiReply = data.reply;
+
+    chatHistory.push({ role: "model", parts: [{ text: aiReply }] });
+    setThinking(false);
+    addChatBubble(aiReply, false);
+
+  } catch (err) {
+    console.error("Fetch Error:", err);
+    setThinking(false);
+    addChatError(`ขออภัย ระบบขัดข้อง: ${err.message}`);
+    // ลบประวัติล่าสุดออกกัน error ค้าง
+    chatHistory.pop();
+  } finally {
+    sendBtn.disabled = false;
+    setTimeout(() => userInput.focus(), 100);
+  }
+}
+
+sendBtn.addEventListener('click', handleSend);
+userInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleSend();
+  }
 });
+
+newChatBtn.addEventListener('click', async () => {
+  chatHistoryEl.innerHTML = `
+    <div class="flex items-start space-x-2">
+      <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-white">
+        <span class="material-symbols-rounded text-sm">smart_toy</span>
+      </div>
+      <div class="chat-bubble chat-bubble-model">
+        <p>เริ่มสนทนาใหม่เรียบร้อยครับ ถามผมได้เลย!</p>
+      </div>
+    </div>`;
+  userInput.value = '';
+  setThinking(false);
+  chatHistory = []; 
+});
+
+/* Modal Logic */
+const fabToggle = document.getElementById('fab-chat-toggle');
+const chatModal = document.getElementById('chatbot-modal');
+const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
+const chatWindowInner = document.getElementById('chat-window-inner');
+
+if (fabToggle && chatModal && chatbotCloseBtn) {
+  fabToggle.addEventListener('click', () => {
+    chatModal.classList.remove('chatbot-hidden');
+    chatModal.classList.remove('opacity-0', 'pointer-events-none');
+    chatWindowInner.classList.remove('translate-y-full', 'scale-100');
+    fabToggle.style.transform = 'scale(0)';
+    setTimeout(() => { document.getElementById('user-input').focus(); }, 200);
+  });
+  
+  chatbotCloseBtn.addEventListener('click', () => {
+    chatWindowInner.classList.add('translate-y-full', 'scale-100');
+    setTimeout(() => {
+        chatModal.classList.add('opacity-0', 'pointer-events-none');
+        chatModal.classList.add('chatbot-hidden');
+        fabToggle.style.transform = 'scale(1)';
+    }, 200);
+  });
+}
 </script>
-
 </body>
 </html>
