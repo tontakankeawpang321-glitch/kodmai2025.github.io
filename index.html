@@ -164,6 +164,21 @@
         /* Dot Indicators */
         .dot { width: 6px; height: 6px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
         .dot.active { width: 20px; background-color: var(--accent); border-radius: 10px; }
+
+        /* --- Fix for Slider Text Overflow on Mobile (สำคัญ) --- */
+        #latestTrack > div {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        /* บังคับตัดคำและบรรทัดสำหรับข้อความใน Slider ทุกตัว */
+        #latestTrack span {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            max-width: 100%;
+            display: block;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -214,18 +229,18 @@
                 
                 <div id="latestViewport" class="overflow-hidden relative touch-pan-y">
                     <div id="latestTrack" class="flex transition-transform duration-500 ease-in-out w-full">
-                        <!-- Slider Content: Added whitespace-normal to allow text wrapping on mobile -->
+                        <!-- Slider Content: Added CSS rules in <style> to force wrap regardless of app.js -->
                         <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
-                            <span class="text-sm font-bold text-slate-800 whitespace-normal px-2 leading-tight">พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
-                            <span class="text-xs text-slate-500 whitespace-normal px-4">อัพเดทแนวปฏิบัติใหม่ เริ่มใช้ 1 ม.ค. 67</span>
+                            <span class="text-sm font-bold text-slate-800 px-2">พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
+                            <span class="text-xs text-slate-500 px-4">อัพเดทแนวปฏิบัติใหม่ เริ่มใช้ 1 ม.ค. 67</span>
                         </div>
                         <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
-                            <span class="text-sm font-bold text-slate-800 whitespace-normal px-2 leading-tight">กฎหมายจราจรใหม่</span>
-                            <span class="text-xs text-slate-500 whitespace-normal px-4">ตัดแต้มใบขับขี่ เริ่มบังคับใช้แล้ว</span>
+                            <span class="text-sm font-bold text-slate-800 px-2">กฎหมายจราจรใหม่</span>
+                            <span class="text-xs text-slate-500 px-4">ตัดแต้มใบขับขี่ เริ่มบังคับใช้แล้ว</span>
                         </div>
                          <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
-                            <span class="text-sm font-bold text-slate-800 whitespace-normal px-2 leading-tight">ประมวลกฎหมายแพ่งฯ (ฉบับแก้ไข)</span>
-                            <span class="text-xs text-slate-500 whitespace-normal px-4">ปรับปรุงเรื่องดอกเบี้ยผิดนัด</span>
+                            <span class="text-sm font-bold text-slate-800 px-2">ประมวลกฎหมายแพ่งฯ (ฉบับแก้ไข)</span>
+                            <span class="text-xs text-slate-500 px-4">ปรับปรุงเรื่องดอกเบี้ยผิดนัด</span>
                         </div>
                     </div>
                 </div>
