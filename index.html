@@ -150,6 +150,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
 
         /* --- Modal System --- */
@@ -203,6 +204,8 @@
             border: 1px solid var(--border);
             overflow: hidden;
             min-height: 500px;
+            display: flex;
+            justify-content: center;
         }
 
         /* --- Law Cards --- */
@@ -214,17 +217,21 @@
             box-shadow: var(--shadow-sm);
             position: relative;
             margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        .fav-btn {
+        .fav-add-btn {
             position: absolute;
             top: 12px;
             right: 12px;
             color: #cbd5e1;
             cursor: pointer;
             transition: color 0.2s;
+            user-select: none;
         }
-        .fav-btn.active { color: #ef4444; }
+        .fav-add-btn.active { color: #ef4444; font-variation-settings: 'FILL' 1; }
 
         /* --- Chat FAB --- */
         #fab-chat-toggle {
@@ -242,6 +249,7 @@
             justify-content: center;
             box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
             z-index: 90;
+            cursor: pointer;
         }
         
         .hidden { display: none !important; }
@@ -266,6 +274,7 @@
             margin-right: 8px;
             font-size: 14px;
             color: var(--text-muted);
+            cursor: pointer;
         }
         .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
 
@@ -278,9 +287,12 @@
         }
         
         /* Chat logic classes */
-        .chat-bubble { font-size: 15px; padding: 10px 14px; margin-bottom: 10px; border-radius: 12px; }
-        .chat-bubble-user { background: var(--primary); color: white; align-self: flex-end; }
-        .chat-bubble-model { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
+        .chat-bubble { font-size: 15px; padding: 10px 14px; margin-bottom: 10px; border-radius: 12px; max-width: 85%; }
+        .chat-bubble-user { background: var(--primary); color: white; align-self: flex-end; border-radius: 12px 12px 2px 12px; }
+        .chat-bubble-model { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; align-self: flex-start; border-radius: 12px 12px 12px 2px; }
+        
+        /* Skeleton & Loading */
+        .latest-slide { min-width: 100%; padding: 4px; }
     </style>
 </head>
 <body>
@@ -298,7 +310,7 @@
             </div>
         </div>
         
-        <button id="openFavs" class="fav-toggle-btn">
+        <button id="openFavs" class="fav-toggle-btn" aria-label="รายการโปรด">
             <span class="material-symbols-rounded">bookmark_heart</span>
         </button>
     </div>
@@ -328,7 +340,9 @@
                     </div>
                 </div>
                 <div id="latestViewport" class="overflow-hidden">
-                    <div id="latestTrack" class="flex transition-transform duration-300"></div>
+                    <div id="latestTrack" class="flex transition-transform duration-300">
+                        <!-- Auto-generated slides -->
+                    </div>
                 </div>
                 <div id="dots" class="flex justify-center gap-1.5 mt-3"></div>
             </div>
@@ -336,17 +350,22 @@
 
         <!-- Categories -->
         <section class="mt-4">
-            <div class="catbar-scroll" id="catbar"></div>
+            <div class="catbar-scroll" id="catbar">
+                <!-- Categories will be here -->
+            </div>
         </section>
 
         <!-- Law List -->
         <section class="mt-4 pb-10">
             <div class="flex items-center gap-2 mb-3">
-                <span class="w-1 h-5 bg-blue-700 rounded-full"></span>
-                <h2 id="panelTitle" class="font-bold text-slate-800">รายการกฎหมาย</h2>
+                <div class="flex items-center gap-2">
+                    <span class="w-1 h-5 bg-blue-700 rounded-full"></span>
+                    <h2 id="panelTitle" class="font-bold text-slate-800">รายการกฎหมาย</h2>
+                </div>
+                <span id="panelNote" class="text-xs font-medium text-slate-400 ml-auto">แสดงผลล่าสุด</span>
             </div>
             <div id="list" class="flex flex-col gap-3">
-                <!-- Data from app.js will be here -->
+                <!-- Data will be loaded here -->
             </div>
             <div class="flex justify-center gap-3 mt-6">
                 <button id="btnPrev" class="px-4 py-2 rounded-lg bg-white border border-slate-300 text-sm hidden">ย้อนกลับ</button>
@@ -358,7 +377,7 @@
     <!-- หน้า Community (Facebook) -->
     <div id="page-community">
         <div class="pt-6">
-            <h2 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <h2 class="font-bold text-lg mb-4 flex items-center gap-2 px-2">
                 <span class="material-symbols-rounded text-blue-600">groups</span>
                 ชุมชนกฎหมายน่าสนใจ
             </h2>
@@ -381,18 +400,18 @@
 
 <!-- Bottom Navigation -->
 <nav class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('home')">
+    <div class="nav-item active" id="nav-home">
         <span class="material-symbols-rounded">home</span>
         <span>หน้าหลัก</span>
     </div>
-    <div class="nav-item" onclick="switchTab('community')">
+    <div class="nav-item" id="nav-community">
         <span class="material-symbols-rounded">forum</span>
         <span>ชุมชน</span>
     </div>
 </nav>
 
 <!-- Chatbot FAB -->
-<button id="fab-chat-toggle">
+<button id="fab-chat-toggle" aria-label="เปิดแชทไอเอ">
     <span class="material-symbols-rounded">smart_toy</span>
 </button>
 
@@ -410,59 +429,116 @@
         </div>
         <div id="favList" class="modal-body space-y-3">
             <!-- Saved items will appear here -->
-            <p class="text-center text-slate-400 py-10 text-sm">ยังไม่มีรายการที่บันทึก</p>
         </div>
     </div>
 </div>
 
 <!-- Chatbot Modal -->
-<div id="chatbot-modal" class="modal-overlay flex-col !justify-end sm:!justify-center hidden">
-    <div class="bg-white w-full sm:max-w-[400px] h-[80vh] sm:h-[600px] rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden">
-        <header class="p-4 border-bottom flex justify-between items-center bg-slate-50">
+<div id="chatbot-modal" class="modal-overlay flex-col !justify-end sm:!justify-center">
+    <div class="bg-white w-full sm:max-w-[400px] h-[85vh] sm:h-[600px] rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden relative shadow-2xl">
+        <header class="p-4 border-b flex justify-between items-center bg-slate-50 shrink-0">
             <div class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-blue-600">smart_toy</span>
-                <span class="font-bold">Thai Law AI</span>
+                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                    <span class="material-symbols-rounded text-sm">smart_toy</span>
+                </div>
+                <span class="font-bold text-slate-800">Thai Law AI</span>
             </div>
-            <button id="chatbot-close-btn"><span class="material-symbols-rounded">close</span></button>
+            <button id="chatbot-close-btn" class="p-1 hover:bg-slate-200 rounded-full transition">
+                <span class="material-symbols-rounded">close</span>
+            </button>
         </header>
-        <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50"></div>
-        <div id="thinking-indicator" class="px-4 py-2 hidden">
-             <div class="text-xs text-slate-400 italic">AI กำลังคิด...</div>
+        <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 bg-slate-50/50">
+            <div class="chat-bubble chat-bubble-model">
+                สวัสดีครับ ผมคือผู้ช่วยอัจฉริยะด้านกฎหมาย ต้องการสอบถามข้อมูลด้านไหนดีครับ?
+            </div>
         </div>
-        <div class="p-3 border-t bg-white flex gap-2">
-            <input id="user-input" type="text" class="flex-1 bg-slate-100 rounded-full px-4 py-2 text-sm outline-none border focus:border-blue-500" placeholder="ถามกฎหมายที่นี่...">
-            <button id="send-btn" class="bg-blue-600 text-white p-2 rounded-full flex items-center justify-center">
+        <div id="thinking-indicator" class="px-4 py-2 hidden">
+             <div class="text-[10px] text-slate-400 italic flex items-center gap-1">
+                <div class="w-1 h-1 bg-slate-400 rounded-full animate-bounce"></div>
+                AI กำลังประมวลผล...
+             </div>
+        </div>
+        <div class="p-3 border-t bg-white flex gap-2 shrink-0">
+            <input id="user-input" type="text" class="flex-1 bg-slate-100 rounded-full px-4 py-2 text-sm outline-none border border-transparent focus:border-blue-500 transition" placeholder="ถามกฎหมายที่นี่...">
+            <button id="send-btn" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 transition">
                 <span class="material-symbols-rounded">send</span>
             </button>
         </div>
     </div>
 </div>
 
-<!-- เชื่อมต่อ app.js เดิม -->
-<script src="app.js"></script>
+<!-- Mock app.js Logic (เพื่อให้ตัวอย่างทำงานได้ในหน้าเดียว) -->
+<script>
+// Mock Data สำหรับตัวอย่าง (ในกรณีที่ app.js ยังไม่ถูกเขียนหรือโหลดไม่สำเร็จ)
+const mockLaws = [
+    { id: '1', title: 'ประมวลกฎหมายอาญา มาตรา 1', tag: 'อาญา' },
+    { id: '2', title: 'ประมวลกฎหมายแพ่งและพาณิชย์ มาตรา 4', tag: 'แพ่ง' },
+    { id: '3', title: 'พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)', tag: 'พ.ร.บ.' }
+];
+
+function initApp() {
+    const listEl = document.getElementById('list');
+    const catbarEl = document.getElementById('catbar');
+    const trackEl = document.getElementById('latestTrack');
+    const dotsEl = document.getElementById('dots');
+
+    // Load Categories
+    ['ทั้งหมด', 'อาญา', 'แพ่ง', 'รัฐธรรมนูญ', 'ปกครอง'].forEach((cat, idx) => {
+        const chip = document.createElement('div');
+        chip.className = `chip ${idx === 0 ? 'active' : ''}`;
+        chip.innerText = cat;
+        catbarEl.appendChild(chip);
+    });
+
+    // Load Laws
+    const favs = JSON.parse(localStorage.getItem('thai_law_favs') || '[]');
+    listEl.innerHTML = mockLaws.map(law => {
+        const isFav = favs.some(f => f.id === law.id);
+        return `
+        <div class="law-card">
+            <span class="material-symbols-rounded fav-add-btn ${isFav ? 'active' : ''}" data-id="${law.id}" data-title="${law.title}">favorite</span>
+            <div class="text-xs text-blue-600 font-bold mb-1">[${law.tag}]</div>
+            <div class="font-bold text-slate-800 pr-8">${law.title}</div>
+            <div class="mt-2 flex gap-2">
+                <button class="text-[11px] bg-slate-100 px-3 py-1 rounded text-slate-500">อ่านเพิ่มเติม</button>
+            </div>
+        </div>
+    `}).join('');
+
+    // Load Slides
+    const slides = ['อัพเดท พ.ร.บ. จราจรใหม่ 2567', 'ระวัง! กฎหมายไซเบอร์ฉบับแก้ไข', 'เปิดเกณฑ์ยื่นภาษีปีล่าสุด'];
+    trackEl.innerHTML = slides.map(s => `<div class="latest-slide"><div class="text-sm font-semibold text-slate-700">${s}</div></div>`).join('');
+    dotsEl.innerHTML = slides.map((_, i) => `<div class="w-1.5 h-1.5 rounded-full ${i===0?'bg-blue-700 w-4':'bg-slate-300'}"></div>`).join('');
+}
+
+window.addEventListener('load', initApp);
+</script>
 
 <script>
 // --- Navigation Logic ---
-function switchTab(tab) {
-    const home = document.getElementById('page-home');
-    const community = document.getElementById('page-community');
-    const navItems = document.querySelectorAll('.nav-item');
-    
-    if (tab === 'home') {
-        home.style.display = 'block';
-        community.style.display = 'none';
-        navItems[0].classList.add('active');
-        navItems[1].classList.remove('active');
+const navHome = document.getElementById('nav-home');
+const navComm = document.getElementById('nav-community');
+const pageHome = document.getElementById('page-home');
+const pageComm = document.getElementById('page-community');
+
+function switchTab(target) {
+    if (target === 'home') {
+        pageHome.classList.remove('hidden');
+        pageComm.style.display = 'none';
+        navHome.classList.add('active');
+        navComm.classList.remove('active');
     } else {
-        home.style.display = 'none';
-        community.style.display = 'block';
-        navItems[0].classList.remove('active');
-        navItems[1].classList.add('active');
-        // รีเฟรช Facebook XFBML เผื่อกรณีค้าง
+        pageHome.classList.add('hidden');
+        pageComm.style.display = 'block';
+        navHome.classList.remove('active');
+        navComm.classList.add('active');
         if(window.FB) FB.XFBML.parse();
     }
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
 }
+
+navHome.onclick = () => switchTab('home');
+navComm.onclick = () => switchTab('community');
 
 // --- Favorites Storage Logic ---
 const FAV_KEY = 'thai_law_favs';
@@ -471,87 +547,78 @@ function getFavorites() {
     return JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
 }
 
-function saveToFavorites(lawId, lawTitle) {
-    let favs = getFavorites();
-    if (!favs.find(f => f.id === lawId)) {
-        favs.push({ id: lawId, title: lawTitle, date: new Date().toLocaleDateString('th-TH') });
-        localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-        renderFavorites();
-        return true;
-    }
-    return false;
-}
-
-function removeFromFavorites(lawId) {
-    let favs = getFavorites();
-    favs = favs.filter(f => f.id !== lawId);
-    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-    renderFavorites();
-}
-
 function renderFavorites() {
     const favList = document.getElementById('favList');
     const favs = getFavorites();
-    
     if (favs.length === 0) {
         favList.innerHTML = `<p class="text-center text-slate-400 py-10 text-sm">ยังไม่มีรายการที่บันทึก</p>`;
         return;
     }
-    
     favList.innerHTML = favs.map(item => `
-        <div class="p-3 border border-slate-100 rounded-xl bg-slate-50 flex justify-between items-start">
-            <div>
-                <div class="text-sm font-semibold text-slate-700">${item.title}</div>
-                <div class="text-[10px] text-slate-400 mt-1">บันทึกเมื่อ: ${item.date}</div>
+        <div class="p-3 border border-slate-100 rounded-xl bg-slate-50 flex justify-between items-center">
+            <div class="flex-1 pr-2">
+                <div class="text-xs font-semibold text-slate-700 line-clamp-1">${item.title}</div>
+                <div class="text-[9px] text-slate-400">บันทึกเมื่อ: ${item.date}</div>
             </div>
-            <button onclick="removeFromFavorites('${item.id}')" class="text-slate-300 hover:text-red-500">
+            <button onclick="removeFav('${item.id}')" class="text-slate-300 hover:text-red-500 shrink-0">
                 <span class="material-symbols-rounded text-lg">delete</span>
             </button>
         </div>
     `).join('');
 }
 
-// --- UI Interaction ---
-document.getElementById('openFavs').addEventListener('click', () => {
+function removeFav(id) {
+    let favs = getFavorites().filter(f => f.id !== id);
+    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+    renderFavorites();
+    // Update main list icon if visible
+    const icon = document.querySelector(`.fav-add-btn[data-id="${id}"]`);
+    if(icon) icon.classList.remove('active');
+}
+
+document.getElementById('openFavs').onclick = () => {
     document.getElementById('favModal').style.display = 'flex';
     renderFavorites();
-});
+};
+document.getElementById('openFavs').onclick = () => {
+    document.getElementById('favModal').style.display = 'flex';
+    renderFavorites();
+};
+document.getElementById('closeFavs').onclick = () => document.getElementById('favModal').style.display = 'none';
 
-document.getElementById('closeFavs').addEventListener('click', () => {
-    document.getElementById('favModal').style.display = 'none';
-});
-
-// ดักฟังคลิกปุ่ม "บันทึก" ในรายการกฎหมาย (ต้องไปแก้ใน app.js ให้มีปุ่มที่มี class 'fav-add-btn')
-// ตัวอย่าง: <span class="material-symbols-rounded fav-add-btn" data-id="123" data-title="พรบ.">favorite</span>
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.fav-add-btn')) {
-        const btn = e.target.closest('.fav-add-btn');
+    const btn = e.target.closest('.fav-add-btn');
+    if (btn) {
         const id = btn.dataset.id;
         const title = btn.dataset.title;
-        
+        let favs = getFavorites();
         if (btn.classList.contains('active')) {
-            removeFromFavorites(id);
+            favs = favs.filter(f => f.id !== id);
             btn.classList.remove('active');
         } else {
-            saveToFavorites(id, title);
+            favs.push({ id, title, date: new Date().toLocaleDateString('th-TH') });
             btn.classList.add('active');
         }
+        localStorage.setItem(FAV_KEY, JSON.stringify(favs));
     }
 });
 
-// --- Chatbot Logic (เชื่อม API) ---
+// --- Chatbot Logic ---
 const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
 let chatHistory = [];
-
 const fab = document.getElementById('fab-chat-toggle');
 const chatModal = document.getElementById('chatbot-modal');
 const closeChat = document.getElementById('chatbot-close-btn');
 const sendBtn = document.getElementById('send-btn');
 const userInput = document.getElementById('user-input');
 const chatHistoryEl = document.getElementById('chat-history');
+const thinking = document.getElementById('thinking-indicator');
 
-fab.onclick = () => chatModal.classList.remove('hidden');
-closeChat.onclick = () => chatModal.classList.add('hidden');
+fab.onclick = () => {
+    chatModal.style.display = 'flex';
+    userInput.focus();
+};
+closeChat.onclick = () => chatModal.style.display = 'none';
 
 async function handleChat() {
     const text = userInput.value.trim();
@@ -559,7 +626,8 @@ async function handleChat() {
     
     appendBubble(text, 'user');
     userInput.value = '';
-    document.getElementById('thinking-indicator').classList.remove('hidden');
+    thinking.classList.remove('hidden');
+    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
     
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     
@@ -570,29 +638,36 @@ async function handleChat() {
             body: JSON.stringify({ history: chatHistory })
         });
         const data = await res.json();
-        appendBubble(data.reply, 'model');
-        chatHistory.push({ role: "model", parts: [{ text: data.reply }] });
+        const reply = data.reply || "ขออภัย ผมไม่สามารถประมวลผลคำถามนี้ได้ในขณะนี้";
+        appendBubble(reply, 'model');
+        chatHistory.push({ role: "model", parts: [{ text: reply }] });
     } catch (e) {
-        appendBubble("ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อ", 'model');
+        appendBubble("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์", 'model');
     } finally {
-        document.getElementById('thinking-indicator').classList.add('hidden');
+        thinking.classList.add('hidden');
+        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
     }
 }
 
 function appendBubble(msg, role) {
     const div = document.createElement('div');
-    div.className = `chat-bubble chat-bubble-${role} ${role === 'user' ? 'ml-auto' : 'mr-auto'}`;
+    div.className = `chat-bubble chat-bubble-${role}`;
     div.innerText = msg;
     chatHistoryEl.appendChild(div);
-    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
 
 sendBtn.onclick = handleChat;
 userInput.onkeydown = (e) => e.key === 'Enter' && handleChat();
 
-// Init Favorites
-renderFavorites();
+// ปิด Modal เมื่อคลิกด้านนอก
+window.onclick = (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+        e.target.style.display = 'none';
+    }
+};
 </script>
+
+<script src="app.js?v=2" defer></script>
 
 </body>
 </html>
