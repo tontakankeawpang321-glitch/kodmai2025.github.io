@@ -123,7 +123,7 @@
             background: white;
             width: 100%;
             overflow: hidden;
-            /* Remove fixed min-height to fit content properly */
+            min-height: 200px;
         }
 
         /* Modals */
@@ -214,18 +214,18 @@
                 
                 <div id="latestViewport" class="overflow-hidden relative touch-pan-y">
                     <div id="latestTrack" class="flex transition-transform duration-500 ease-in-out w-full">
-                        <!-- Slider Content -->
+                        <!-- Slider Content: Added whitespace-normal to allow text wrapping on mobile -->
                         <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
-                            <span class="text-sm font-bold text-slate-800">พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
-                            <span class="text-xs text-slate-500">อัพเดทแนวปฏิบัติใหม่ เริ่มใช้ 1 ม.ค. 67</span>
+                            <span class="text-sm font-bold text-slate-800 whitespace-normal px-2 leading-tight">พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
+                            <span class="text-xs text-slate-500 whitespace-normal px-4">อัพเดทแนวปฏิบัติใหม่ เริ่มใช้ 1 ม.ค. 67</span>
                         </div>
                         <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
-                            <span class="text-sm font-bold text-slate-800">กฎหมายจราจรใหม่</span>
-                            <span class="text-xs text-slate-500">ตัดแต้มใบขับขี่ เริ่มบังคับใช้แล้ว</span>
+                            <span class="text-sm font-bold text-slate-800 whitespace-normal px-2 leading-tight">กฎหมายจราจรใหม่</span>
+                            <span class="text-xs text-slate-500 whitespace-normal px-4">ตัดแต้มใบขับขี่ เริ่มบังคับใช้แล้ว</span>
                         </div>
                          <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
-                            <span class="text-sm font-bold text-slate-800">ประมวลกฎหมายแพ่งฯ (ฉบับแก้ไข)</span>
-                            <span class="text-xs text-slate-500">ปรับปรุงเรื่องดอกเบี้ยผิดนัด</span>
+                            <span class="text-sm font-bold text-slate-800 whitespace-normal px-2 leading-tight">ประมวลกฎหมายแพ่งฯ (ฉบับแก้ไข)</span>
+                            <span class="text-xs text-slate-500 whitespace-normal px-4">ปรับปรุงเรื่องดอกเบี้ยผิดนัด</span>
                         </div>
                     </div>
                 </div>
@@ -288,10 +288,11 @@
                 <div class="fb-container p-2">
                     <div id="fb-root"></div>
                     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0"></script>
+                    <!-- Adjusted data-width to 380 for better mobile fit -->
                     <div class="fb-page" 
                          data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
                          data-tabs="timeline" 
-                         data-width="500" 
+                         data-width="380" 
                          data-height="800" 
                          data-small-header="true" 
                          data-adapt-container-width="true" 
@@ -388,7 +389,7 @@
 
 <!-- Scripts -->
 
-<!-- 1. UI Control Script (Restore: Controls Tabs, Modals, Slider) -->
+<!-- 1. UI Control Script -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Init Slider
@@ -412,7 +413,6 @@
         const btnOpenFavs = document.getElementById('btnOpenFavs');
         const btnCloseFavs = document.getElementById('btnCloseFavs');
         if(btnOpenFavs) btnOpenFavs.addEventListener('click', () => {
-             // If app.js has openFavs function, call it. If not, just toggle.
              if(typeof openFavs === 'function') openFavs();
              toggleModal('modalFavs', true);
         });
@@ -473,7 +473,6 @@
         }, 4000);
     }
     
-    // Make functions global if app.js needs them (though unlikely)
     window.switchTab = switchTab;
     window.toggleModal = toggleModal;
 </script>
@@ -498,19 +497,15 @@
         const text = userInput.value.trim();
         if (!text) return;
 
-        // 1. Add User Bubble
         addBubble(text, 'user');
         userInput.value = '';
         
-        // 2. Add to history
         chatHistory.push({ role: "user", content: text });
 
-        // 3. Show Loading
         const loading = document.getElementById('chatLoading');
         if(loading) loading.classList.remove('hidden');
         scrollToBottom();
 
-        // 4. Call Backend
         try {
             const response = await fetch(BACKEND_URL, {
                 method: 'POST',
@@ -533,7 +528,6 @@
             if(loading) loading.classList.add('hidden');
             addBubble(aiReply, 'ai');
             
-            // Update history
             chatHistory.push({ role: "assistant", content: aiReply });
 
         } catch (error) {
