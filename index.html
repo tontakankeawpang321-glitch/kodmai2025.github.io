@@ -14,26 +14,20 @@
 
 <style>
   :root {
-    /* 🎨 Solid & Stable Palette */
-    --primary: #1e3a8a;       /* Deep Navy */
+    /* 🎨 Palette */
+    --primary: #1e3a8a;
     --primary-dark: #172554;
-    --primary-gradient: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%); /* Simpler gradient */
-    
-    --accent: #d97706;        /* Amber */
-    
-    --bg-app: #f1f5f9;        /* Slate 100 - Solid Light Gray */
+    --primary-gradient: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+    --accent: #d97706;
+    --bg-app: #f1f5f9;
     --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border: #cbd5e1;
     
-    --text-main: #0f172a;     /* Slate 900 - High Contrast */
-    --text-muted: #64748b;    /* Slate 500 */
-    --border: #cbd5e1;        /* Slate 300 - Clearer Border */
+    --radius-card: 12px;
+    --nav-height: 65px; /* ความสูง Bottom Nav */
     
-    --radius-card: 12px;      /* Standard Modern Radius */
-    --radius-btn: 8px;
-    
-    /* Optimized Shadows (Less spread, better performance) */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-card: 0 2px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); 
     --shadow-float: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 
@@ -42,443 +36,268 @@
     color: var(--text-main);
     font-family: "Sarabun", sans-serif;
     -webkit-font-smoothing: antialiased;
-    padding-bottom: 100px;
-    /* Remove heavy background patterns for mobile performance */
+    padding-bottom: calc(var(--nav-height) + 20px); /* เว้นที่ด้านล่าง */
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* --- App Header (Solid & Stable) --- */
+  /* --- Header --- */
   .app-header {
     background: var(--primary-gradient);
     color: white;
-    padding: 16px 16px 40px; /* Adjusted padding */
-    border-radius: 0 0 20px 20px; /* Reduced curvature */
-    position: relative;
-    z-index: 10;
+    padding: 16px 16px 20px;
+    border-radius: 0 0 20px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    /* Removed heavy decorative pseudo-elements */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .app-title {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 700;
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  .app-subtitle {
-    font-size: 14px;
-    opacity: 0.9;
-    margin-top: 4px;
-    font-weight: 400;
-    margin-left: 42px;
-  }
 
-  /* Mobile Adjustments */
-  @media (max-width: 640px) {
-    .app-title { 
-      justify-content: center; 
-    }
-    .app-subtitle { 
-      margin-left: 0; 
-      text-align: center;
-    }
-    .search-container {
-      margin-top: -20px;
-    }
+  .header-actions {
+    display: flex;
+    gap: 8px;
   }
+  
+  .header-btn {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .header-btn:active { background: rgba(255,255,255,0.3); }
 
-  /* --- Container --- */
-  .wrap {
-    max-width: 600px; /* Standard mobile width optimization */
+  /* --- Views (Tab Content) --- */
+  .view-container {
+    display: none; /* ซ่อนไว้ก่อน */
+    animation: fadeIn 0.3s ease;
+    max-width: 600px;
     margin: 0 auto;
     padding: 0 16px;
-    position: relative;
   }
-  .section {
-    margin-bottom: 24px;
+  .view-container.active {
+    display: block; /* แสดงเมื่อ active */
   }
 
-  /* --- Search Bar (Solid & Real) --- */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- Search Bar --- */
   .search-container {
-    background: #ffffff; /* Solid White - No Glass/Blur */
+    background: #ffffff;
     border-radius: 12px;
     padding: 4px 8px;
     box-shadow: var(--shadow-float);
     display: flex;
     gap: 8px;
-    margin-top: -24px;
+    margin-top: -24px; /* ลอยทับ Header */
     position: relative;
-    z-index: 20;
-    border: 1px solid var(--border); /* Clear border */
+    z-index: 50;
+    border: 1px solid var(--border);
     align-items: center;
     height: 56px;
+    margin-bottom: 20px;
   }
-  
   .search-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    padding: 0 8px;
-    font-family: "Sarabun";
-    font-size: 16px; /* Prevents iOS zoom */
-    color: var(--text-main);
-    background: transparent;
-    height: 100%;
+    flex: 1; border: none; outline: none; padding: 0 8px;
+    font-family: "Sarabun"; font-size: 16px; color: var(--text-main);
+    background: transparent; height: 100%;
   }
-  
   .search-btn {
-    background: var(--accent); /* Solid color, easier to render */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: var(--accent); color: white; border: none;
+    border-radius: 8px; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
   }
-  .search-btn:active { transform: scale(0.96); }
 
-  /* --- Cards (Clean & Sharp) --- */
-  .slider-card {
+  /* --- Components --- */
+  .section { margin-bottom: 24px; }
+  
+  .slider-card, .law-card {
     background: var(--bg-card);
     border-radius: var(--radius-card);
     padding: 16px;
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--border); /* Distinct border */
-  }
-  .slider-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  .slider-title {
-    font-weight: 700;
-    color: var(--primary);
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  /* --- Restored Animations --- */
-  .icon-pulse {
-    animation: pulse-orange 2s infinite;
-  }
-  @keyframes pulse-orange {
-    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-  }
-
-  .latest-viewport { overflow: hidden; }
-  .latest-track { display: flex; transition: transform 0.3s ease-out; /* Faster transition */ }
-  .latest-slide {
-    min-width: 100%;
-    padding: 2px;
-  }
-  .slide-title {
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 1.5;
-    color: var(--text-main);
-  }
-  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; transition: 0.2s; }
-  .dot.active { background: var(--primary); width: 16px; border-radius: 3px; }
-
-  /* --- Chips --- */
-  .catbar-scroll {
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 4px 0 16px 0;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-  .catbar-scroll::-webkit-scrollbar { display: none; }
-  
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: white;
     border: 1px solid var(--border);
-    border-radius: 20px;
-    margin-right: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-muted);
-    /* Removed heavy shadow, rely on border */
-  }
-  .chip.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-    font-weight: 600;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   }
 
-  /* --- List Cards --- */
-  .section-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .law-card { position: relative; padding-left: 16px; margin-bottom: 12px; }
+  .law-card::before {
+    content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
+    width: 4px; background: var(--primary); border-radius: 0 4px 4px 0; opacity: 0.7;
   }
-  .list-container {
+  
+  /* --- Bottom Navigation --- */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--nav-height);
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 40;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+  }
+  
+  .nav-item {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-  }
-  .law-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-card);
-    padding: 16px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm); /* Minimal shadow */
-    transition: transform 0.1s, background-color 0.1s; /* Faster, simpler feedback */
-    position: relative;
-  }
-  .law-card:active {
-    background-color: #f8fafc; /* Touch feedback */
-    transform: scale(0.99);
-  }
-  
-  /* Simplified decorative bar */
-  .law-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 12px; bottom: 12px;
-    width: 4px;
-    background: var(--primary);
-    border-radius: 0 4px 4px 0;
-    opacity: 0.7;
-  }
-
-  .law-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 6px;
-    line-height: 1.4;
-    padding-left: 8px; /* Space for the bar */
-  }
-  .law-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    padding-left: 8px;
-  }
-  .tag {
-    background: #f1f5f9;
-    padding: 2px 8px;
-    border-radius: 4px;
-    color: #475569;
-    font-weight: 500;
-    font-size: 12px;
-    border: 1px solid #e2e8f0;
-  }
-  
-  .action-btn {
-    display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 8px 16px;
-    background: #eff6ff;
-    color: var(--primary);
-    font-weight: 600;
-    font-size: 13px;
-    border-radius: 6px;
-    text-decoration: none;
-    border: 1px solid #dbeafe;
-    margin-left: 8px;
-  }
-
-  /* --- Navigation Buttons --- */
-  .loadbar {
-    display: flex;
     justify-content: center;
-    gap: 12px;
-    margin-top: 24px;
-  }
-  .btn-nav {
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
+    color: var(--text-muted);
+    background: none; border: none;
+    height: 100%;
     cursor: pointer;
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    transition: color 0.2s;
   }
-  .btn-nav.next { 
-    background: var(--primary); 
-    color: white; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  .btn-nav.prev { 
-    background: white; 
-    color: var(--text-muted); 
-    border: 1px solid var(--border); 
-  }
+  .nav-item span { font-size: 24px; margin-bottom: 2px; }
+  .nav-item p { font-size: 10px; font-weight: 500; }
+  
+  .nav-item.active { color: var(--primary); }
+  .nav-item.active span { font-variation-settings: 'FILL' 1; }
 
-  /* --- Chat FAB & Modal --- */
+  /* --- Dialog (Favorites) --- */
+  .dialog-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .dialog-overlay.open { opacity: 1; pointer-events: auto; }
+  
+  .dialog-box {
+    background: white; width: 90%; max-width: 400px; max-height: 80vh;
+    border-radius: 16px; display: flex; flex-direction: column;
+    transform: scale(0.95); transition: transform 0.2s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .dialog-overlay.open .dialog-box { transform: scale(1); }
+  
+  .dialog-header { padding: 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary); }
+  .dialog-content { padding: 0; overflow-y: auto; flex: 1; }
+  .dialog-footer { padding: 12px 16px; border-top: 1px solid #e2e8f0; text-align: right; }
+  
+  .fav-item { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: flex-start; }
+  .fav-item:last-child { border-bottom: none; }
+  .fav-info { font-size: 14px; }
+  .fav-title { font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
+  .fav-detail { font-size: 12px; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .btn-del-fav { color: #ef4444; background: #fef2f2; padding: 6px; border-radius: 6px; margin-left: 8px; }
+
+  /* --- Chat FAB (Adjusted Position) --- */
   #fab-chat-toggle {
     position: fixed;
-    bottom: 24px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 16px; /* Squircle */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    bottom: calc(var(--nav-height) + 16px); /* สูงกว่า Nav */
+    right: 16px;
+    width: 56px; height: 56px;
+    background: var(--accent); color: white;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
-    cursor: pointer;
-    z-index: 100;
+    z-index: 50;
     transition: all 0.3s;
   }
-  #fab-chat-toggle .material-symbols-rounded { font-size: 28px; }
-
-  /* Restored Pulse Effect for Chat Button */
   #fab-chat-toggle::after {
-    content: '';
-    position: absolute;
-    width: 100%; height: 100%;
-    border-radius: inherit;
-    border: 2px solid #f59e0b;
-    animation: fab-ping 2s infinite;
-    z-index: -1;
+    content: ''; position: absolute; width: 100%; height: 100%;
+    border-radius: inherit; border: 2px solid #f59e0b;
+    animation: fab-ping 2s infinite; z-index: -1;
   }
   @keyframes fab-ping {
     0% { transform: scale(1); opacity: 0.8; }
     100% { transform: scale(1.5); opacity: 0; }
   }
 
-  #chatbot-modal {
-    background: rgba(0, 0, 0, 0.5); /* Simple dim */
-    /* Removed backdrop-filter for performance */
-  }
-  
-  .chat-window {
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    background: white;
-    font-family: "Sarabun", sans-serif;
-  }
+  /* Chat Window Logic */
+  .chatbot-hidden { display: none; }
+  #chatbot-modal { background: rgba(0, 0, 0, 0.5); }
+  .chat-window { height: 100dvh; display: flex; flex-direction: column; background: white; }
   @media (min-width: 640px) {
-    .chat-window {
-      height: 600px;
-      width: 400px;
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      border: 1px solid #e2e8f0;
-    }
+    .chat-window { height: 600px; width: 400px; position: fixed; bottom: 100px; right: 24px; border-radius: 16px; }
   }
-
-  .chat-header {
-    background: white;
-    padding: 14px 16px;
-    color: var(--text-main);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  /* Chat Bubbles (Solid & Readable) */
-  .chat-bubble { 
-    font-size: 15px; 
-    line-height: 1.5; 
-    position: relative;
-    padding: 10px 14px;
-  }
-  .chat-bubble-user { 
-    background: var(--primary); 
-    color: white; 
-    border-radius: 12px 12px 2px 12px; 
-  }
-  .chat-bubble-model { 
-    background: #f1f5f9; 
-    color: #334155; 
-    border-radius: 12px 12px 12px 2px; 
-    border: 1px solid #e2e8f0;
-  }
-
-  /* Gemini Animation Bar (Simple) */
-  .gemini-thinking-bar {
-    height: 3px;
-    background: #e2e8f0;
-    border-radius: 2px;
-    overflow: hidden;
-    position: relative;
-    width: 60px;
-  }
-  .gemini-thinking-bar::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; height: 100%; width: 40%;
-    background: var(--accent);
-    animation: thinking 1.2s infinite ease-in-out;
-  }
-  @keyframes thinking {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(300%); }
-  }
-
-  .material-symbols-rounded { vertical-align: middle; }
+  /* Utility for Chips */
+  .catbar-scroll { overflow-x: auto; white-space: nowrap; padding: 4px 0 16px; scrollbar-width: none; }
+  .chip { display: inline-flex; padding: 8px 16px; background: white; border: 1px solid var(--border); border-radius: 20px; margin-right: 8px; font-size: 14px; color: var(--text-muted); }
+  .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
   
-  .fb-container {
-    background: white;
-    border-radius: var(--radius-card);
-    padding: 12px;
-    box-shadow: var(--shadow-card);
-    display: flex;
-    justify-content: center;
-    margin-bottom: 24px;
-    border: 1px solid var(--border);
-    overflow: hidden;
+  /* Facebook Container */
+  .fb-wrapper {
+    background: white; border-radius: var(--radius-card); padding: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border);
+    margin-top: 16px; display: flex; justify-content: center;
   }
 </style>
 </head>
 <body>
 
+<!-- HEADER: FIXED TOP -->
 <header class="app-header">
-  <div class="wrap">
-    <div class="app-title">
-      <div class="bg-white/20 p-1.5 rounded-lg">
-        <span class="material-symbols-rounded" style="font-size: 28px;">balance</span>
-      </div>
-      <span>Thai Law Lite</span>
+  <div class="app-title">
+    <div class="bg-white/20 p-1.5 rounded-lg">
+      <span class="material-symbols-rounded" style="font-size: 24px;">balance</span>
     </div>
-    <div class="app-subtitle">คลังกฎหมายไทยฉบับพกพา อัพเดทล่าสุด</div>
+    <div class="flex flex-col">
+       <span>Thai Law Lite</span>
+       <span class="text-[10px] font-normal opacity-80 leading-none">กฎหมายไทยฉบับพกพา</span>
+    </div>
+  </div>
+  
+  <!-- ปุ่มขวาบน: รายการโปรด & รีเฟรช -->
+  <div class="header-actions">
+    <button onclick="openFavDialog()" class="header-btn" title="รายการโปรด">
+      <span class="material-symbols-rounded">star</span>
+    </button>
+    <button onclick="window.location.reload()" class="header-btn" title="รีเฟรช">
+      <span class="material-symbols-rounded">refresh</span>
+    </button>
   </div>
 </header>
 
-<main class="wrap">
-  
-  <section class="section">
+<!-- MAIN CONTENT WRAPPER -->
+<main>
+
+  <!-- VIEW 1: HOME (FACEBOOK) -->
+  <div id="view-home" class="view-container active">
+    <div class="fb-wrapper">
+      <div id="fb-root"></div>
+      <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0"></script>
+      <div class="fb-page" 
+        data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
+        data-tabs="timeline" 
+        data-width="500" 
+        data-height="800" 
+        data-small-header="false" 
+        data-adapt-container-width="true" 
+        data-hide-cover="false" 
+        data-show-facepile="true">
+      </div>
+    </div>
+    <div class="text-center text-gray-400 text-sm mt-4 pb-8">
+      ติดตามข่าวสารและคำพิพากษาศาลฎีกาได้ที่นี่
+    </div>
+  </div>
+
+  <!-- VIEW 2: SEARCH (LAW) -->
+  <div id="view-search" class="view-container">
+    
+    <!-- Search Bar -->
     <div class="search-container" role="search">
       <button class="w-10 h-10 flex items-center justify-center text-gray-400 cursor-default">
          <span class="material-symbols-rounded">search</span>
@@ -488,283 +307,258 @@
         <span class="material-symbols-rounded">arrow_forward</span>
       </button>
     </div>
-  </section>
 
-  <!-- โหลด SDK ของ Facebook -->
-  <div id="fb-root"></div>
-  <script async defer crossorigin="anonymous" 
-    src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0" nonce="abc123">
-  </script>
-
-  <!-- Facebook Page Container -->
-  <div class="fb-container">
-    <div class="fb-page" 
-      data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
-      data-tabs="timeline" 
-      data-width="" 
-      data-height="" 
-      data-small-header="false" 
-      data-adapt-container-width="true" 
-      data-hide-cover="false" 
-      data-show-facepile="true">
-    </div>
-  </div>
-
-  <section class="section">
-    <div class="slider-card">
-      <div class="slider-header">
-        <div class="slider-title">
-          <div class="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 icon-pulse">
-             <span class="material-symbols-rounded" style="font-size: 18px;">campaign</span>
+    <!-- Announcement Slider -->
+    <section class="section">
+      <div class="slider-card">
+        <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
+          <div class="text-blue-900 font-bold flex items-center gap-2">
+            <span class="material-symbols-rounded text-amber-500">campaign</span> ประกาศล่าสุด
           </div>
-          <span>ประกาศล่าสุด</span>
         </div>
-        <span class="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded border border-gray-200">Auto Slide</span>
+        <div style="overflow:hidden;"><div id="latestTrack" class="flex whitespace-nowrap text-sm text-gray-700">กำลังโหลด...</div></div>
       </div>
-      <div class="latest-viewport" id="latestViewport">
-        <div id="latestTrack" class="latest-track" aria-live="polite"></div>
+    </section>
+
+    <!-- Categories -->
+    <section class="section">
+      <div class="catbar-scroll" id="catbar">
+        <!-- App.js จะมาเติม chips ตรงนี้ -->
+        <button class="chip active">ทั้งหมด</button>
+        <button class="chip">อาญา</button>
+        <button class="chip">แพ่ง</button>
       </div>
-      <div id="dots" class="dots" aria-hidden="true"></div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section">
-    <div class="catbar-scroll" id="catbar" role="tablist" aria-label="เลือกหมวดกฎหมาย">
-      <!-- Chips will be inserted here by app.js -->
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-title">
-      <div class="flex items-center gap-2">
-        <span class="w-1 h-5 bg-blue-700 rounded-sm"></span>
-        <span id="panelTitle">รายการกฎหมาย</span>
+    <!-- Law List -->
+    <section class="section">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-gray-800 text-lg border-l-4 border-blue-700 pl-2">รายการกฎหมาย</h3>
       </div>
-      <span id="panelNote" class="text-xs font-medium text-gray-500">แสดงผลล่าสุด</span>
-    </div>
-    
-    <div id="list" class="list-container">
-      <!-- Law Cards will be inserted here by app.js -->
-    </div>
+      
+      <div id="list">
+        <!-- App.js จะมาเติมข้อมูลตรงนี้ -->
+        <!-- ตัวอย่างข้อมูล Mockup เพื่อแสดงปุ่ม Fav -->
+        <div class="law-card flex justify-between items-start">
+            <div>
+                <div class="font-bold text-gray-800">ประมวลกฎหมายอาญา</div>
+                <div class="text-xs text-gray-500 mt-1">มาตรา 288 ผู้ใดฆ่าผู้อื่น...</div>
+            </div>
+            <button onclick="addToFav('ประมวลกฎหมายอาญา', 'มาตรา 288 ผู้ใดฆ่าผู้อื่น', '123')" class="text-gray-300 hover:text-amber-500 p-1">
+                <span class="material-symbols-rounded">star</span>
+            </button>
+        </div>
+      </div>
 
-    <div class="loadbar">
-      <button id="btnPrev" class="btn-nav prev" type="button" style="display:none">
-        <span class="material-symbols-rounded">arrow_back</span> ย้อนกลับ
-      </button>
-      <button id="btnNext" class="btn-nav next" type="button" style="display:none">
-        ถัดไป <span class="material-symbols-rounded">arrow_forward</span>
-      </button>
-    </div>
-  </section>
+      <div class="flex justify-center gap-4 mt-6">
+        <button id="btnPrev" class="px-4 py-2 rounded bg-white border shadow-sm hidden">ก่อนหน้า</button>
+        <button id="btnNext" class="px-4 py-2 rounded bg-blue-800 text-white shadow-sm hidden">ถัดไป</button>
+      </div>
+    </section>
+  </div>
 
 </main>
 
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
+    <span class="material-symbols-rounded">home</span>
+    <p>หน้าหลัก</p>
+  </button>
+  <button class="nav-item" onclick="switchTab('search')" id="nav-search">
+    <span class="material-symbols-rounded">search</span>
+    <p>ค้นหา</p>
+  </button>
+</nav>
+
+<!-- FAVORITES DIALOG -->
+<div id="fav-dialog" class="dialog-overlay">
+  <div class="dialog-box">
+    <div class="dialog-header">
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-amber-500">star</span> รายการโปรด</span>
+        <button onclick="closeFavDialog()" class="text-gray-400 hover:text-gray-600"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <div id="fav-list-content" class="dialog-content">
+        <!-- รายการจะถูกสร้างด้วย JS -->
+        <div class="p-8 text-center text-gray-400">ยังไม่มีรายการที่บันทึกไว้</div>
+    </div>
+    <div class="dialog-footer">
+        <button onclick="closeFavDialog()" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHATBOT BUTTON & MODAL -->
 <button id="fab-chat-toggle" title="ปรึกษา Thai Law AI">
   <span class="material-symbols-rounded">smart_toy</span>
 </button>
 
 <div id="chatbot-modal" class="chatbot-hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
   <div class="chat-window w-full flex flex-col transform transition-transform duration-200 translate-y-full sm:translate-y-0 sm:scale-100" id="chat-window-inner">
-    <header class="chat-header shrink-0">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-full bg-blue-700 flex items-center justify-center text-white">
-           <span class="material-symbols-rounded" style="font-size: 20px;">smart_toy</span>
+    <!-- Chat Header -->
+    <header class="p-3 border-b flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center text-white"><span class="material-symbols-rounded text-sm">smart_toy</span></div>
+            <span class="font-bold text-gray-800">Thai Law AI</span>
         </div>
-        <div>
-          <h1 class="font-bold text-gray-800 text-base">Thai Law AI</h1>
-          <div class="flex items-center gap-1">
-             <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-             <p class="text-xs text-gray-500">Online</p>
-          </div>
-        </div>
-      </div>
-      <div class="flex gap-2">
-        <button id="new-chat-btn" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 py-1.5 px-3 rounded border border-gray-200 transition font-medium">ล้างแชท</button>
-        <button id="chatbot-close-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 hover:text-red-500 text-gray-400 transition">
-          <span class="material-symbols-rounded">close</span>
-        </button>
-      </div>
+        <button id="chatbot-close-btn" class="w-8 h-8 flex items-center justify-center text-gray-500 rounded-full hover:bg-gray-100"><span class="material-symbols-rounded">close</span></button>
     </header>
-    
-    <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
-      <div class="flex items-start space-x-2">
-        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-white">
-          <span class="material-symbols-rounded text-sm">smart_toy</span>
+    <!-- Chat History -->
+    <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"></main>
+    <!-- Chat Input -->
+    <footer class="p-3 border-t bg-white">
+        <div class="flex bg-gray-100 rounded-full px-4 py-2">
+            <input id="user-input" class="flex-1 bg-transparent outline-none text-sm" placeholder="ถามกฎหมาย...">
+            <button id="send-btn" class="text-blue-600 ml-2"><span class="material-symbols-rounded">send</span></button>
         </div>
-        <div class="chat-bubble chat-bubble-model">
-          <p>สวัสดีครับ! ผมคือ AI ผู้ช่วยด้านกฎหมาย ยินดีให้ความช่วยเหลือครับ สอบถามเรื่องข้อกฎหมายหรือการสืบค้นได้เลยครับ</p>
-        </div>
-      </div>
-    </main>
-    
-    <div id="thinking-indicator" class="px-4 pb-2 hidden">
-      <div class="flex items-center space-x-2">
-        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-           <span class="material-symbols-rounded text-gray-400 text-sm">smart_toy</span>
-        </div>
-        <div class="bg-white p-3 rounded-xl border border-gray-200">
-           <div class="gemini-thinking-bar"></div>
-        </div>
-      </div>
-    </div>
-    
-    <footer class="p-3 bg-white border-t border-gray-200 shrink-0">
-      <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-        <input id="user-input" type="text" placeholder="พิมพ์คำถามข้อกฎหมาย..." class="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder-gray-500">
-        <button id="send-btn" class="text-blue-600 hover:text-blue-800 transition p-1">
-          <span class="material-symbols-rounded">send</span>
-        </button>
-      </div>
     </footer>
   </div>
 </div>
 
+<!-- EXTERNAL JS (App Logic Original) -->
 <script src="app.js"></script>
 
+<!-- UI LOGIC SCRIPT -->
+<script>
+    /* --- Tab Switching Logic --- */
+    function switchTab(tabId) {
+        // Toggle Views
+        document.getElementById('view-home').classList.remove('active');
+        document.getElementById('view-search').classList.remove('active');
+        document.getElementById('view-' + tabId).classList.add('active');
+
+        // Toggle Nav State
+        document.getElementById('nav-home').classList.remove('active');
+        document.getElementById('nav-search').classList.remove('active');
+        document.getElementById('nav-' + tabId).classList.add('active');
+    }
+
+    /* --- Favorites Logic (Local Storage) --- */
+    const FAV_KEY = 'thailaw_favorites';
+
+    function getFavs() {
+        return JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+    }
+
+    function saveFavs(favs) {
+        localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+        renderFavList();
+    }
+
+    // ฟังก์ชันเพิ่มรายการโปรด (สามารถเรียกใช้จาก app.js ได้)
+    // ตัวอย่างการใช้: addToFav('กฎหมายอาญา', 'มาตรา 1...', 'law_1')
+    window.addToFav = function(title, detail, id) {
+        const favs = getFavs();
+        // เช็คว่ามีอยู่แล้วไหม
+        if(favs.some(f => f.id === id)) {
+            alert('รายการนี้อยู่ในรายการโปรดแล้ว');
+            return;
+        }
+        favs.push({ title, detail, id, date: new Date().toLocaleDateString('th-TH') });
+        saveFavs(favs);
+        alert('บันทึกรายการโปรดเรียบร้อย');
+    }
+
+    function removeFav(id) {
+        let favs = getFavs();
+        favs = favs.filter(f => f.id !== id);
+        saveFavs(favs);
+    }
+
+    function renderFavList() {
+        const listEl = document.getElementById('fav-list-content');
+        const favs = getFavs();
+
+        if (favs.length === 0) {
+            listEl.innerHTML = '<div class="p-8 text-center text-gray-400 flex flex-col items-center"><span class="material-symbols-rounded text-4xl mb-2 opacity-50">stars</span>ยังไม่มีรายการที่บันทึกไว้</div>';
+            return;
+        }
+
+        listEl.innerHTML = favs.map(f => `
+            <div class="fav-item">
+                <div class="fav-info">
+                    <div class="fav-title">${f.title}</div>
+                    <div class="fav-detail">${f.detail}</div>
+                    <div class="text-[10px] text-gray-400 mt-1">บันทึกเมื่อ: ${f.date}</div>
+                </div>
+                <button onclick="removeFav('${f.id}')" class="btn-del-fav" title="ลบ">
+                    <span class="material-symbols-rounded" style="font-size:16px;">delete</span>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    function openFavDialog() {
+        renderFavList();
+        const d = document.getElementById('fav-dialog');
+        d.classList.add('open');
+    }
+
+    function closeFavDialog() {
+        document.getElementById('fav-dialog').classList.remove('open');
+    }
+</script>
+
+<!-- CHATBOT SCRIPT (Simplified) -->
 <script type="module">
-/* ส่วนของ Chatbot Backend Logic */
-
-// ⚠️ แก้ตรงนี้: เปลี่ยนจาก URL ยาวๆ เป็น '/api/chat' เพื่อเรียกใช้ Backend ของ Vercel
 const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev'; 
-
 let chatHistory = [];
 const chatHistoryEl = document.getElementById('chat-history');
-const userInput   = document.getElementById('user-input');
-const sendBtn     = document.getElementById('send-btn');
-const newChatBtn  = document.getElementById('new-chat-btn');
-const thinkingIndicator = document.getElementById('thinking-indicator');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
 
-function addChatBubble(message, isUser = true) {
-  const bubbleType = isUser ? 'user' : 'model';
-  // Updated Styles for JS generated bubbles
-  const iconContent = isUser 
-    ? `<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0"><span class="material-symbols-rounded text-gray-500 text-sm">person</span></div>` 
-    : `<div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-white"><span class="material-symbols-rounded text-sm">smart_toy</span></div>`;
-  
-  const wrap = document.createElement('div');
-  wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
-  
-  const bubble = document.createElement('div');
-  bubble.className = `chat-bubble chat-bubble-${bubbleType}`;
-  
-  // รองรับการเว้นบรรทัดจาก AI
-  const formattedMessage = message.replace(/\n/g, '<br>');
-  bubble.innerHTML = `<p>${formattedMessage}</p>`; 
-  
-  if (isUser) {
-     wrap.innerHTML = iconContent; 
-     wrap.appendChild(bubble);
-  } else {
-     wrap.innerHTML = iconContent;
-     wrap.appendChild(bubble);
-  }
-
-  chatHistoryEl.appendChild(wrap);
-  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-}
-
-function addChatError(message) {
-  const w = document.createElement('div');
-  w.className = 'flex justify-center my-4';
-  w.innerHTML = `<span class="bg-red-50 text-red-600 text-xs px-4 py-2 rounded-full border border-red-100 flex items-center gap-1"><span class="material-symbols-rounded text-sm">error</span> ${message}</span>`;
-  chatHistoryEl.appendChild(w);
-  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-}
-
-function setThinking(on) {
-  thinkingIndicator.classList.toggle('hidden', !on);
-  if (on) chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+function addBubble(text, isUser) {
+    const div = document.createElement('div');
+    div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+    div.innerHTML = `<div class="p-3 rounded-lg max-w-[80%] text-sm ${isUser ? 'bg-blue-600 text-white' : 'bg-white border text-gray-800'}">${text}</div>`;
+    chatHistoryEl.appendChild(div);
+    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
 
 async function handleSend() {
-  const message = (userInput.value || '').trim();
-  if (!message) return;
-
-  addChatBubble(message, true);
-  userInput.value = '';
-  setThinking(true);
-  sendBtn.disabled = true;
-
-  chatHistory.push({ role: "user", parts: [{ text: message }] });
-
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history: chatHistory }) 
-    });
-
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.error || `Server error: ${response.status}`);
+    const msg = userInput.value.trim();
+    if(!msg) return;
+    addBubble(msg, true);
+    userInput.value = '';
+    
+    chatHistory.push({ role: "user", parts: [{ text: msg }] });
+    
+    try {
+        const res = await fetch(BACKEND_URL, {
+             method: 'POST', headers: {'Content-Type': 'application/json'},
+             body: JSON.stringify({ history: chatHistory })
+        });
+        const data = await res.json();
+        const reply = data.reply || "ขออภัย ระบบขัดข้อง";
+        chatHistory.push({ role: "model", parts: [{ text: reply }] });
+        addBubble(reply, false);
+    } catch(e) {
+        addBubble("Error: " + e.message, false);
     }
-
-    const data = await response.json();
-    const aiReply = data.reply;
-
-    chatHistory.push({ role: "model", parts: [{ text: aiReply }] });
-    setThinking(false);
-    addChatBubble(aiReply, false);
-
-  } catch (err) {
-    console.error("Fetch Error:", err);
-    setThinking(false);
-    addChatError(`ขออภัย ระบบขัดข้อง: ${err.message}`);
-    // ลบประวัติล่าสุดออกกัน error ค้าง
-    chatHistory.pop();
-  } finally {
-    sendBtn.disabled = false;
-    setTimeout(() => userInput.focus(), 100);
-  }
 }
 
 sendBtn.addEventListener('click', handleSend);
-userInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    handleSend();
-  }
-});
+userInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSend());
 
-newChatBtn.addEventListener('click', async () => {
-  chatHistoryEl.innerHTML = `
-    <div class="flex items-start space-x-2">
-      <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-white">
-        <span class="material-symbols-rounded text-sm">smart_toy</span>
-      </div>
-      <div class="chat-bubble chat-bubble-model">
-        <p>เริ่มสนทนาใหม่เรียบร้อยครับ ถามผมได้เลย!</p>
-      </div>
-    </div>`;
-  userInput.value = '';
-  setThinking(false);
-  chatHistory = []; 
-});
+// Modal Toggle
+const fab = document.getElementById('fab-chat-toggle');
+const modal = document.getElementById('chatbot-modal');
+const closeBtn = document.getElementById('chatbot-close-btn');
+const inner = document.getElementById('chat-window-inner');
 
-/* Modal Logic */
-const fabToggle = document.getElementById('fab-chat-toggle');
-const chatModal = document.getElementById('chatbot-modal');
-const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
-const chatWindowInner = document.getElementById('chat-window-inner');
-
-if (fabToggle && chatModal && chatbotCloseBtn) {
-  fabToggle.addEventListener('click', () => {
-    chatModal.classList.remove('chatbot-hidden');
-    chatModal.classList.remove('opacity-0', 'pointer-events-none');
-    chatWindowInner.classList.remove('translate-y-full', 'scale-100');
-    fabToggle.style.transform = 'scale(0)';
-    setTimeout(() => { document.getElementById('user-input').focus(); }, 200);
-  });
-  
-  chatbotCloseBtn.addEventListener('click', () => {
-    chatWindowInner.classList.add('translate-y-full', 'scale-100');
+fab.onclick = () => {
+    modal.classList.remove('chatbot-hidden', 'opacity-0', 'pointer-events-none');
+    inner.classList.remove('translate-y-full', 'scale-100');
+    fab.style.transform = 'scale(0)';
+};
+closeBtn.onclick = () => {
+    inner.classList.add('translate-y-full', 'scale-100');
     setTimeout(() => {
-        chatModal.classList.add('opacity-0', 'pointer-events-none');
-        chatModal.classList.add('chatbot-hidden');
-        fabToggle.style.transform = 'scale(1)';
+        modal.classList.add('chatbot-hidden', 'opacity-0', 'pointer-events-none');
+        fab.style.transform = 'scale(1)';
     }, 200);
-  });
-}
+};
 </script>
+
 </body>
 </html>
