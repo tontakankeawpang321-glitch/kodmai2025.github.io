@@ -169,29 +169,26 @@ function renderList(){
    ✅ LATEST (ล่าสุดรายหมวด – แก้ตรงนี้)
 ====================================================== */
 function renderLatest(){
-  const track = document.getElementById("latestTrack");
+  const track = $("#latestTrack");
   if(!track) return;
 
-  // ล่าสุดแยกตามหมวด
   const latestByCat = {};
 
-  lawsData.forEach(r => {
-    const cat = normalizeCatName(r[col('category')] || '');
+  lawsData.forEach(r=>{
+    const cat = normalizeCatName(r[col('category')]||'');
     const date = r[col('date')];
     if(!cat || !date) return;
 
-    if (
+    if(
       !latestByCat[cat] ||
       new Date(date) > new Date(latestByCat[cat][col('date')])
-    ) {
+    ){
       latestByCat[cat] = r;
     }
   });
 
-  const rows = Object.values(latestByCat);
-
-  track.innerHTML = rows.map(r => `
-    <div class="w-full px-2 py-2">
+  track.innerHTML = Object.values(latestByCat).map(r=>`
+    <div class="w-full py-3 px-3">
       <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
         <div class="text-[10px] font-bold text-blue-600 mb-1">
           ${escapeHtml(normalizeCatName(r[col('category')]))}
@@ -206,3 +203,77 @@ function renderLatest(){
     </div>
   `).join('');
 }
+
+/* ======================================================
+   LOAD
+====================================================== */
+async function loadJsonAndStart(){
+  listEl.innerHTML = "กำลังโหลดข้อมูล…";
+
+  const res = await Promise.all(
+    DATA_SOURCES.map(u=>fetch(u).then(r=>r.ok?r.json():[]).catch(()=>[]))
+  );
+  lawsData = res.flat();
+
+  FIXED_CATS.forEach(c=>CatState[c]={rows:[],page:0});
+  lawsData.forEach(r=>{
+    const cat = normalizeCatName(r[col('category')]||'');
+    if(CatState[cat]) CatState[cat].rows.push(r);
+  });
+
+  selectedCat = FIXED_CATS[0];
+  renderChips();
+  renderLatest();
+  renderList();
+}
+
+/* ======================================================
+   EVENTS
+====================================================== */
+on(catbar,'click',e=>{
+  const b=e.target.closest('[data-cat]');
+  if(b){
+    selectedCat=b.dataset.cat;
+    CatState[selectedCat].page=0;
+    renderChips();
+    renderList();
+  }
+});
+on(listEl,'click',e=>{
+  const b=e.target.closest('.fav-add-btn');
+  if(b){
+    toggleFav(b.dataset.id,b.dataset.title);
+    b.classList.toggle('active');
+  }
+});
+on(btnNext,'click',()=>{ CatState[selectedCat].page++; renderList(); });
+on(btnPrev,'click',()=>{ CatState[selectedCat].page--; renderList(); });
+on(elBtnSearch,'click',doSearch);
+on(elQ,'keydown',e=>e.key==='Enter'&&doSearch());
+
+function doSearch(){
+  const q=(elQ.value||'').trim();
+  if(!q) return renderList();
+
+  const hits=lawsData.filter(r=>
+    Object.values(COLS).some(k=>(r[k]||'').includes(q))
+  );
+  listEl.innerHTML = hits.map(renderCard).join('');
+  btnPrev.classList.add('hidden');
+  btnNext.classList.add('hidden');
+  panelTitle.textContent=`ผลการค้นหา "${q}"`;
+}
+
+/* ======================================================
+   INIT
+====================================================== */
+document.addEventListener("DOMContentLoaded",()=>{
+  loadJsonAndStart();
+  $("#btnOpenFavs")?.addEventListener('click',()=>{
+    $("#modalFavs").style.display='flex';
+    renderFavList();
+  });
+  $("#btnCloseFavs")?.addEventListener('click',()=>{
+    $("#modalFavs").style.display='none';
+  });
+})
