@@ -21,8 +21,8 @@ function escapeHtml(s = "") {
 
 function sanitizeUrl(u=''){
   try{
-    const url=new URL(u);
-    if(url.protocol==='http:'||url.protocol==='https:') return url.href;
+    const url = new URL(u);
+    if(url.protocol === 'http:' || url.protocol === 'https:') return url.href;
   }catch{}
   return '';
 }
@@ -35,13 +35,12 @@ const listEl     = $("#list");
 const btnNext    = $("#btnNext");
 const btnPrev    = $("#btnPrev");
 const panelTitle = $("#panelTitle");
-const panelNote  = $("#panelNote"); // optional
 
 const elQ        = $("#q");
 const elBtnSearch= $("#btnSearch");
 
 /* ======================================================
-   COLUMN MAP (ตรงกับ JSON คุณ)
+   COLUMN MAP (ตรงกับ JSON)
 ====================================================== */
 const COLS = {
   category : "หมวด",
@@ -53,7 +52,7 @@ const COLS = {
 const col = k => COLS[k];
 
 /* ======================================================
-   CATEGORY NORMALIZE (หัวใจสำคัญ)
+   CATEGORY NORMALIZE
 ====================================================== */
 function normalizeCatName(raw=""){
   const s = (raw || "").trim();
@@ -75,41 +74,22 @@ const FIXED_CATS = [
 let lawsData = [];
 const CatState = {};
 let selectedCat = null;
-const allIndex = [];
-
-/* ======================================================
-   DATE PARSE (รองรับ ISO + พ.ศ.)
-====================================================== */
-function parseDateTS(s){
-  if(!s) return 0;
-  try{
-    if(s.includes("T")){
-      const y = parseInt(s.slice(0,4),10);
-      const iso = (y > 2400) ? (y-543)+s.slice(4) : s;
-      return new Date(iso).getTime();
-    }
-    return new Date(s).getTime();
-  }catch{
-    return 0;
-  }
-}
 
 /* ======================================================
    RENDER
 ====================================================== */
 function renderCard(r){
-  const t=r[col('title')]||'(ไม่มีชื่อ)';
-  const d=r[col('date')]||'';
-  const c=r[col('category')]||'';
-  const u=r[col('url')]||'';
+  const t = r[col('title')] || '(ไม่มีชื่อ)';
+  const d = r[col('date')] || '';
+  const c = r[col('category')] || '';
+  const u = r[col('url')] || '';
   const safe = sanitizeUrl(u);
 
   return `
   <article class="law-card">
-    <div class="law-title">${escapeHtml(t)}</div>
-    <div class="law-meta text-sm text-gray-500 mt-1">
-      ${c?`<span>${escapeHtml(c)}</span>`:''}
-      ${d?` • <span>${escapeHtml(d)}</span>`:''}
+    <div class="law-title font-semibold">${escapeHtml(t)}</div>
+    <div class="text-sm text-gray-500 mt-1">
+      ${c ? escapeHtml(c) : ''} ${d ? ' • ' + escapeHtml(d) : ''}
     </div>
     <div class="mt-2">
       ${safe
@@ -123,7 +103,7 @@ function renderCard(r){
 function renderChips(){
   if(!catbar) return;
   catbar.innerHTML = FIXED_CATS.map(c=>`
-    <button class="chip" data-cat="${c}">
+    <button class="chip ${c===selectedCat?'active':''}" data-cat="${c}">
       ${c}
     </button>
   `).join('');
@@ -147,9 +127,10 @@ async function loadJsonAndStart(){
       return;
     }
 
-    renderChips();
     buildIndex();
-    selectCategory(FIXED_CATS[0]);
+    selectedCat = FIXED_CATS[0];
+    renderChips();
+    renderList();
 
   }catch(e){
     console.error(e);
@@ -159,10 +140,82 @@ async function loadJsonAndStart(){
 
 function buildIndex(){
   FIXED_CATS.forEach(c=>{
-    CatState[c]={rows:[],page:0};
+    CatState[c] = { rows: [], page: 0 };
   });
-document.addEventListener("DOMContentLoaded", loadJsonAndStart);
 
   lawsData.forEach(item=>{
-    const rawCat = item[col('category')];
-    const norm =
+    const rawCat = item[col('category')] || '';
+    const norm = normalizeCatName(rawCat);
+    if(CatState[norm]){
+      CatState[norm].rows.push(item);
+    }
+  });
+}
+
+function renderList(){
+  if(!selectedCat) return;
+
+  const state = CatState[selectedCat];
+  const start = state.page * PAGE_SIZE;
+  const end   = start + PAGE_SIZE;
+  const rows  = state.rows.slice(start, end);
+
+  listEl.innerHTML = rows.map(renderCard).join('');
+
+  btnPrev.classList.toggle('hidden', state.page === 0);
+  btnNext.classList.toggle('hidden', end >= state.rows.length);
+
+  if(panelTitle) panelTitle.textContent = selectedCat;
+}
+
+function selectCategory(cat){
+  selectedCat = cat;
+  CatState[cat].page = 0;
+  renderChips();
+  renderList();
+}
+
+/* ======================================================
+   EVENTS
+====================================================== */
+on(catbar, 'click', e=>{
+  const btn = e.target.closest('[data-cat]');
+  if(btn) selectCategory(btn.dataset.cat);
+});
+
+on(btnNext, 'click', ()=>{
+  CatState[selectedCat].page++;
+  renderList();
+});
+
+on(btnPrev, 'click', ()=>{
+  CatState[selectedCat].page--;
+  renderList();
+});
+
+on(elBtnSearch, 'click', doSearch);
+on(elQ, 'keydown', e=> e.key==='Enter' && doSearch());
+
+function doSearch(){
+  const q = (elQ.value || '').trim();
+  if(!q){
+    selectCategory(selectedCat);
+    return;
+  }
+
+  const hits = lawsData.filter(r =>
+    Object.values(COLS).some(k =>
+      (r[k]||'').toString().includes(q)
+    )
+  );
+
+  listEl.innerHTML = hits.map(renderCard).join('');
+  btnPrev.classList.add('hidden');
+  btnNext.classList.add('hidden');
+  if(panelTitle) panelTitle.textContent = `ผลการค้นหา: "${q}"`;
+}
+
+/* ======================================================
+   INIT
+====================================================== */
+document.addEventListener("DOMContentLoaded", loadJsonAndStart);
