@@ -55,7 +55,9 @@
             color: white; width: 42px; height: 42px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             backdrop-filter: blur(8px);
+            transition: transform 0.2s;
         }
+        .fav-header-btn:active { transform: scale(0.95); }
 
         /* Bottom Nav */
         .bottom-nav {
@@ -67,6 +69,7 @@
         .nav-item { 
             display: flex; flex-direction: column; align-items: center; gap: 4px;
             color: var(--text-muted); font-size: 12px; font-weight: 500; flex: 1;
+            cursor: pointer;
         }
         .nav-item.active { color: var(--primary); }
         .nav-item.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
@@ -78,22 +81,38 @@
             margin-top: -28px; position: relative; z-index: 20;
             border: 1px solid var(--border); align-items: center; height: 56px;
         }
-        .search-input { flex: 1; border: none; outline: none; font-size: 16px; background: transparent; }
+        .search-input { flex: 1; border: none; outline: none; font-size: 16px; background: transparent; color: var(--text-main); }
         .search-btn { 
             background: var(--accent); color: white; width: 44px; height: 44px;
             border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            border: none; cursor: pointer;
         }
 
-        /* Law Card & Favorite Button */
+        /* Law Card */
         .law-card {
             background: white; border-radius: var(--radius-card); padding: 16px;
             border: 1px solid var(--border); position: relative; margin-bottom: 12px;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
+        .law-card:active { transform: scale(0.99); }
         .fav-add-btn {
             position: absolute; top: 12px; right: 12px; color: #cbd5e1;
             padding: 6px; cursor: pointer; transition: color 0.2s;
         }
         .fav-add-btn.active { color: #ef4444; font-variation-settings: 'FILL' 1; }
+
+        /* Categories Chip */
+        .chip {
+            white-space: nowrap; padding: 6px 14px; border-radius: 20px;
+            font-size: 13px; color: var(--text-muted); background: white;
+            border: 1px solid var(--border); transition: all 0.2s; cursor: pointer;
+        }
+        .chip.active {
+            background: var(--primary); color: white; border-color: var(--primary);
+            font-weight: 500; box-shadow: 0 2px 6px rgba(30, 58, 138, 0.25);
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* Facebook Content */
         .fb-wrapper {
@@ -106,24 +125,32 @@
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.6);
             z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(4px);
         }
         .modal-box {
             background: white; width: 100%; max-width: 450px; border-radius: 24px;
             max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
 
         /* Chat Bubbles */
-        .bubble { padding: 10px 14px; border-radius: 15px; font-size: 15px; max-width: 85%; margin-bottom: 8px; }
+        .bubble { padding: 10px 14px; border-radius: 15px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.4; }
         .bubble-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .bubble-ai { background: #f1f5f9; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
 
         .hidden { display: none !important; }
+        
+        /* Pulse Animation */
         .icon-pulse { animation: pulse-orange 2s infinite; }
         @keyframes pulse-orange {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-            70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+            0% { text-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+            50% { text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
+            100% { text-shadow: 0 0 0 rgba(245, 158, 11, 0); }
         }
+
+        /* Dot Indicators */
+        .dot { width: 6px; height: 6px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
+        .dot.active { width: 20px; background-color: var(--accent); border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -132,7 +159,7 @@
 <header class="app-header">
     <div class="wrap">
         <div class="flex items-center gap-3">
-            <div class="bg-white/20 p-2 rounded-xl">
+            <div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
                 <span class="material-symbols-rounded" style="font-size: 28px;">balance</span>
             </div>
             <div>
@@ -164,42 +191,50 @@
         <!-- Announcements / Slider -->
         <section class="mt-6">
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-                <div class="flex items-center gap-2 text-amber-600 font-bold text-xs mb-3">
-                    <span class="material-symbols-rounded icon-pulse text-lg">campaign</span>
-                    ประกาศล่าสุดจากหมวดหมู่
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2 text-amber-600 font-bold text-xs">
+                        <span class="material-symbols-rounded icon-pulse text-lg">campaign</span>
+                        อัพเดทล่าสุดรายหมวด
+                    </div>
+                    <span class="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">New</span>
                 </div>
-                <div id="latestViewport" class="overflow-hidden">
-                    <div id="latestTrack" class="flex transition-transform duration-300">
-                        <div class="w-full text-center py-4 text-slate-400 text-xs italic">กำลังโหลดกฎหมายล่าสุด...</div>
+                
+                <div id="latestViewport" class="overflow-hidden relative touch-pan-y">
+                    <div id="latestTrack" class="flex transition-transform duration-500 ease-in-out w-full">
+                        <!-- Slider Items injected by JS -->
+                        <div class="w-full text-center py-4 text-slate-400 text-xs italic">กำลังโหลดข้อมูล...</div>
                     </div>
                 </div>
-                <div id="dots" class="flex justify-center gap-1.5 mt-3"></div>
+                
+                <div id="dots" class="flex justify-center gap-1.5 mt-3">
+                    <!-- Dots injected by JS -->
+                </div>
             </div>
         </section>
 
         <!-- Categories Section -->
         <section class="mt-4">
-            <div id="catbar" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
-                <!-- Chips will be rendered by app.js -->
+            <div id="catbar" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide px-1">
+                <!-- Chips will be rendered by JS -->
             </div>
         </section>
 
         <!-- Law List Section -->
-        <section class="mt-4">
+        <section class="mt-4 pb-20">
             <div class="flex items-center justify-between mb-4 px-1">
                 <div class="flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-blue-700 rounded-full"></span>
                     <h2 id="panelTitle" class="font-bold text-slate-800">รายการกฎหมาย</h2>
                 </div>
-                <span id="panelNote" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Latest</span>
+                <span id="panelNote" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">All List</span>
             </div>
             <div id="list" class="flex flex-col gap-3">
-                <!-- Cards will be rendered by app.js -->
+                <!-- Cards will be rendered by JS -->
             </div>
-            <!-- Pagination -->
-            <div class="flex justify-center gap-3 mt-8">
-                <button id="btnPrev" class="px-6 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-bold hidden">ย้อนกลับ</button>
-                <button id="btnNext" class="px-6 py-2.5 bg-blue-700 text-white rounded-xl text-xs font-bold hidden">หน้าถัดไป</button>
+            
+            <!-- Pagination (Mockup) -->
+            <div class="flex justify-center gap-3 mt-8 opacity-50">
+                <span class="text-[10px] text-slate-400">แสดงผลลัพธ์ทั้งหมด</span>
             </div>
         </section>
     </div>
@@ -230,18 +265,18 @@
 
 <!-- Navigation Bar -->
 <nav class="bottom-nav">
-    <div id="nav-home" class="nav-item active">
+    <div id="nav-home" class="nav-item active" onclick="switchTab('home')">
         <span class="material-symbols-rounded">home</span>
         <span>หน้าหลัก</span>
     </div>
-    <div id="nav-community" class="nav-item">
+    <div id="nav-community" class="nav-item" onclick="switchTab('community')">
         <span class="material-symbols-rounded">forum</span>
         <span>ชุมชน</span>
     </div>
 </nav>
 
 <!-- Chatbot Floating Button -->
-<button id="fab-chat" class="fixed bottom-[90px] right-5 w-14 h-14 bg-amber-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-50">
+<button id="fab-chat" class="fixed bottom-[90px] right-5 w-14 h-14 bg-amber-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-50 hover:bg-amber-700 transition-colors">
     <span class="material-symbols-rounded text-3xl">smart_toy</span>
 </button>
 
@@ -253,48 +288,305 @@
                 <span class="material-symbols-rounded text-red-500">favorite</span>
                 รายการโปรดของคุณ
             </h3>
-            <button id="btnCloseFavs" class="p-1 text-slate-400 hover:text-slate-600">
+            <button id="btnCloseFavs" class="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </header>
-        <div id="favContainer" class="p-4 overflow-y-auto space-y-3 min-h-[200px]">
-            <!-- Fav items will be rendered by app.js -->
+        <div id="favContainer" class="p-4 overflow-y-auto space-y-3 min-h-[200px] bg-slate-50/50">
+            <!-- Fav items -->
         </div>
     </div>
 </div>
 
 <!-- Chatbot Modal -->
 <div id="modalChat" class="modal-overlay flex-col !justify-end sm:!justify-center">
-    <div class="bg-white w-full sm:max-w-[400px] h-[85vh] sm:h-[600px] rounded-t-[32px] sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl relative">
+    <div class="bg-white w-full sm:max-w-[400px] h-[85vh] sm:h-[600px] rounded-t-[32px] sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl relative animate-slide-up">
         <header class="p-4 border-b flex justify-between items-center bg-white shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white">
                     <span class="material-symbols-rounded text-xl">smart_toy</span>
                 </div>
-                <span class="font-bold text-slate-800">Thai Law AI</span>
+                <div>
+                    <span class="font-bold text-slate-800 block leading-tight">Thai Law AI</span>
+                    <span class="text-[10px] text-green-500 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> ออนไลน์
+                    </span>
+                </div>
             </div>
-            <button id="btnCloseChat" class="p-2 hover:bg-slate-100 rounded-full">
+            <button id="btnCloseChat" class="p-2 hover:bg-slate-100 rounded-full transition-colors">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </header>
-        <div id="chatBox" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50">
-            <div class="bubble bubble-ai">สวัสดีครับ มีข้อสงสัยกฎหมายส่วนไหนสอบถามได้เลยครับ</div>
+        <div id="chatBox" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50 gap-2">
+            <div class="bubble bubble-ai">สวัสดีครับ ผมคือ AI ผู้ช่วยทางกฎหมาย มีข้อสงสัยมาตราไหน หรือต้องการคำแนะนำเบื้องต้น สอบถามได้เลยครับ</div>
         </div>
         <div id="chatLoading" class="px-4 py-2 hidden">
-             <div class="text-[10px] text-slate-400 italic animate-pulse">AI กำลังประมวลผลคำตอบ...</div>
+             <div class="flex items-center gap-2 text-[10px] text-slate-400 italic">
+                <span class="material-symbols-rounded animate-spin text-sm">sync</span>
+                AI กำลังค้นหาคำตอบ...
+             </div>
         </div>
         <div class="p-4 border-t bg-white flex gap-2">
-            <input id="chatInput" type="text" class="flex-1 bg-slate-100 rounded-full px-5 py-2.5 text-sm outline-none border focus:border-blue-500" placeholder="พิมพ์คำถามที่นี่...">
-            <button id="btnSendChat" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700">
+            <input id="chatInput" type="text" class="flex-1 bg-slate-100 rounded-full px-5 py-2.5 text-sm outline-none border border-transparent focus:border-blue-500 focus:bg-white transition-all" placeholder="พิมพ์คำถามที่นี่...">
+            <button id="btnSendChat" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 shadow-lg shadow-blue-200">
                 <span class="material-symbols-rounded">send</span>
             </button>
         </div>
     </div>
 </div>
 
-<!-- Main Scripts -->
+<!-- All Application Logic -->
 <script>
-// --- Navigation Tab Switch ---
+// --- Data Mockup ---
+const categories = [
+    { id: 'all', name: 'ทั้งหมด' },
+    { id: 'civil', name: 'แพ่งและพาณิชย์' },
+    { id: 'criminal', name: 'อาญา' },
+    { id: 'procedure', name: 'วิธีพิจารณาความ' },
+    { id: 'special', name: 'กฎหมายพิเศษ' }
+];
+
+const lawsData = [
+    { id: 1, cat: 'civil', code: 'ป.พ.พ.', section: 'มาตรา 15', title: 'สภาพบุคคล', desc: 'สภาพบุคคลย่อมเริ่มแต่เมื่อคลอดแล้วอยู่รอดเป็นทารกและสิ้นสุดลงเมื่อตาย' },
+    { id: 2, cat: 'civil', code: 'ป.พ.พ.', section: 'มาตรา 19', title: 'ผู้เยาว์', desc: 'บุคคลย่อมพ้นจากภาวะผู้เยาว์และบรรลุนิติภาวะเมื่อมีอายุยี่สิบปีบริบูรณ์' },
+    { id: 3, cat: 'criminal', code: 'ป.อาญา', section: 'มาตรา 59', title: 'เจตนา', desc: 'บุคคลจะต้องรับผิดในทางอาญาก็ต่อเมื่อได้กระทำโดยเจตนา เว้นแต่จะได้กระทำโดยประมาท' },
+    { id: 4, cat: 'criminal', code: 'ป.อาญา', section: 'มาตรา 68', title: 'ป้องกันโดยชอบ', desc: 'ผู้ใดจำต้องกระทำการใดเพื่อป้องกันสิทธิของตนหรือของผู้อื่นให้พ้นภยันตราย' },
+    { id: 5, cat: 'procedure', code: 'ป.วิ.พ.', section: 'มาตรา 1', title: 'บทวิเคราะห์ศัพท์', desc: 'ในประมวลกฎหมายนี้ "ศาล" หมายความว่าศาลยุติธรรมหรือผู้พิพากษาที่มีอำนาจ' },
+    { id: 6, cat: 'procedure', code: 'ป.วิ.อ.', section: 'มาตรา 2', title: 'ผู้เสียหาย', desc: 'ผู้เสียหาย หมายความถึง บุคคลผู้ได้รับความเสียหายเนื่องจากการกระทำผิดฐานใดฐานหนึ่ง' },
+    { id: 7, cat: 'special', code: 'พ.ร.บ.คอมฯ', section: 'มาตรา 14', title: 'การนำเข้าข้อมูลเท็จ', desc: 'ผู้ใดนำเข้าสู่ระบบคอมพิวเตอร์ซึ่งข้อมูลคอมพิวเตอร์ที่บิดเบือน หรือปลอมไม่ว่าทั้งหมดหรือบางส่วน' },
+    { id: 8, cat: 'civil', code: 'ป.พ.พ.', section: 'มาตรา 1457', title: 'การสมรส', desc: 'การสมรสตามประมวลกฎหมายนี้จะมีได้เฉพาะเมื่อได้จดทะเบียนแล้วเท่านั้น' }
+];
+
+// --- Carousel Data (Latest updates per category) ---
+const carouselItems = [
+    { 
+        category: 'แพ่งและพาณิชย์', 
+        title: 'แก้ไขเพิ่มเติม เรื่องดอกเบี้ยผิดนัด', 
+        desc: 'ปรับลดอัตราดอกเบี้ยผิดนัดจากร้อยละ 7.5 เหลือร้อยละ 5 ต่อปี มีผลบังคับใช้แล้ว',
+        icon: 'gavel',
+        color: 'text-blue-600',
+        bg: 'bg-blue-50',
+        date: '10 ก.พ. 67'
+    },
+    { 
+        category: 'กฎหมายอาญา', 
+        title: 'พ.ร.บ. ยกเลิกความผิดบางประการ', 
+        desc: 'ยกเลิกความผิดเกี่ยวกับเช็ค หากไม่มีเจตนาทุจริต ให้ถือเป็นคดีแพ่ง',
+        icon: 'local_police',
+        color: 'text-red-600',
+        bg: 'bg-red-50',
+        date: '5 ก.พ. 67'
+    },
+    { 
+        category: 'กฎหมายพิเศษ', 
+        title: 'พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)', 
+        desc: 'ประกาศคณะกรรมการเรื่องมาตรการรักษาความปลอดภัยของผู้ควบคุมข้อมูล',
+        icon: 'security',
+        color: 'text-emerald-600',
+        bg: 'bg-emerald-50',
+        date: '1 ก.พ. 67'
+    },
+    { 
+        category: 'วิธีพิจารณาความ', 
+        title: 'การไกล่เกลี่ยก่อนฟ้อง', 
+        desc: 'ส่งเสริมกระบวนการไกล่เกลี่ยข้อพิพาทออนไลน์ ลดภาระค่าใช้จ่ายประชาชน',
+        icon: 'handshake',
+        color: 'text-amber-600',
+        bg: 'bg-amber-50',
+        date: '25 ม.ค. 67'
+    }
+];
+
+// --- State ---
+let activeCategory = 'all';
+let favorites = JSON.parse(localStorage.getItem('favs')) || [];
+
+// --- Slider Logic ---
+let currentSlide = 0;
+let slideInterval;
+
+function initSlider() {
+    const track = document.getElementById('latestTrack');
+    const dotsContainer = document.getElementById('dots');
+
+    // 1. Render Slides
+    track.innerHTML = carouselItems.map((item, index) => `
+        <div class="w-full flex-shrink-0 px-1 box-border">
+            <div class="${item.bg} rounded-xl p-4 border border-slate-100 h-full flex flex-col justify-between relative overflow-hidden group cursor-pointer hover:shadow-md transition-shadow">
+                <!-- Decoration Icon -->
+                <span class="material-symbols-rounded absolute -right-3 -bottom-3 text-[60px] opacity-10 rotate-12 ${item.color}">${item.icon}</span>
+                
+                <div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider ${item.color} bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">
+                            ${item.category}
+                        </span>
+                        <span class="text-[9px] text-slate-400">${item.date}</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 mb-1 line-clamp-1">${item.title}</h3>
+                    <p class="text-[11px] text-slate-600 leading-relaxed line-clamp-2 opacity-90">
+                        ${item.desc}
+                    </p>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // 2. Render Dots
+    dotsContainer.innerHTML = carouselItems.map((_, i) => 
+        `<div class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>`
+    ).join('');
+
+    // 3. Start Auto Slide
+    startSlideTimer();
+}
+
+function updateSlider() {
+    const track = document.getElementById('latestTrack');
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    
+    // Update dots
+    document.querySelectorAll('.dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentSlide);
+    });
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % carouselItems.length;
+    updateSlider();
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    updateSlider();
+    resetSlideTimer();
+}
+
+function startSlideTimer() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(nextSlide, 5000); // 5 seconds
+}
+
+function resetSlideTimer() {
+    startSlideTimer();
+}
+
+
+// --- Main App Logic ---
+
+function initApp() {
+    renderCategories();
+    renderLaws(lawsData);
+    initSlider();
+    updateFavList();
+}
+
+// Render Categories
+function renderCategories() {
+    const catBar = document.getElementById('catbar');
+    catBar.innerHTML = categories.map(c => 
+        `<div class="chip ${c.id === activeCategory ? 'active' : ''}" onclick="filterCategory('${c.id}')">
+            ${c.name}
+        </div>`
+    ).join('');
+}
+
+// Filter Logic
+function filterCategory(id) {
+    activeCategory = id;
+    renderCategories();
+    
+    const filtered = id === 'all' ? lawsData : lawsData.filter(l => l.cat === id);
+    renderLaws(filtered);
+    
+    document.getElementById('panelTitle').innerText = categories.find(c => c.id === id).name;
+}
+
+// Render Laws List
+function renderLaws(data) {
+    const list = document.getElementById('list');
+    if(data.length === 0) {
+        list.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm">ไม่พบข้อมูลกฎหมาย</div>`;
+        return;
+    }
+
+    list.innerHTML = data.map(item => {
+        const isFav = favorites.includes(item.id);
+        return `
+        <div class="law-card group">
+            <div class="fav-add-btn ${isFav ? 'active' : ''}" onclick="toggleFav(${item.id})">
+                <span class="material-symbols-rounded">${isFav ? 'bookmark_added' : 'bookmark_add'}</span>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded font-bold">${item.code}</span>
+                <span class="text-xs font-bold text-slate-500">${item.section}</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-800 mb-1 group-hover:text-blue-700 transition-colors">${item.title}</h3>
+            <p class="text-xs text-slate-500 line-clamp-2">${item.desc}</p>
+        </div>
+    `}).join('');
+}
+
+// Search Logic
+document.getElementById('btnSearch').onclick = handleSearch;
+document.getElementById('q').onkeyup = (e) => {
+    handleSearch();
+};
+
+function handleSearch() {
+    const query = document.getElementById('q').value.toLowerCase();
+    const filtered = lawsData.filter(item => 
+        item.title.toLowerCase().includes(query) || 
+        item.section.toLowerCase().includes(query) ||
+        item.desc.toLowerCase().includes(query)
+    );
+    renderLaws(filtered);
+}
+
+// Favorites Logic
+function toggleFav(id) {
+    if(favorites.includes(id)) {
+        favorites = favorites.filter(favId => favId !== id);
+    } else {
+        favorites.push(id);
+    }
+    localStorage.setItem('favs', JSON.stringify(favorites));
+    
+    // Re-render current view to update icons
+    const currentQ = document.getElementById('q').value;
+    if (currentQ) handleSearch();
+    else filterCategory(activeCategory);
+    
+    updateFavList();
+}
+
+function updateFavList() {
+    const container = document.getElementById('favContainer');
+    if(favorites.length === 0) {
+        container.innerHTML = `<div class="text-center text-slate-400 text-sm py-4">ยังไม่มีรายการโปรด</div>`;
+        return;
+    }
+    
+    const favItems = lawsData.filter(l => favorites.includes(l.id));
+    container.innerHTML = favItems.map(item => `
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+            <div>
+                <div class="text-[10px] font-bold text-blue-600">${item.code} ${item.section}</div>
+                <div class="text-sm font-bold">${item.title}</div>
+            </div>
+            <button onclick="toggleFav(${item.id})" class="text-red-500 p-1">
+                <span class="material-symbols-rounded">delete</span>
+            </button>
+        </div>
+    `).join('');
+}
+
+// UI Modals
+const modalFavs = document.getElementById('modalFavs');
+document.getElementById('btnOpenFavs').onclick = () => { modalFavs.style.display = 'flex'; updateFavList(); };
+document.getElementById('btnCloseFavs').onclick = () => modalFavs.style.display = 'none';
+
+// Navigation
 const navHome = document.getElementById('nav-home');
 const navComm = document.getElementById('nav-community');
 const viewHome = document.getElementById('view-home');
@@ -315,18 +607,17 @@ function switchTab(to) {
     }
     window.scrollTo(0,0);
 }
-navHome.onclick = () => switchTab('home');
-navComm.onclick = () => switchTab('community');
 
-// --- Chatbot Logic ---
-const WORKER_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
-let history = [];
-
+// Chatbot
 const modalChat = document.getElementById('modalChat');
 const chatBox = document.getElementById('chatBox');
 const chatInput = document.getElementById('chatInput');
 const btnSend = document.getElementById('btnSendChat');
 const loader = document.getElementById('chatLoading');
+
+// AI Worker (Placeholder URL)
+const WORKER_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev'; 
+let history = [];
 
 document.getElementById('fab-chat').onclick = () => { modalChat.style.display = 'flex'; chatInput.focus(); };
 document.getElementById('btnCloseChat').onclick = () => modalChat.style.display = 'none';
@@ -343,7 +634,16 @@ async function askAI() {
     history.push({ role: "user", parts: [{ text: msg }] });
 
     try {
-        const res = await fetch(WORKER_URL, {
+        // Simulation for demo purposes since Worker URL might be offline
+        // Replace this setTimeout block with actual fetch in production
+        setTimeout(() => {
+            const mockReply = "ระบบรับทราบคำถาม: \"" + msg + "\" แล้วครับ (นี่เป็นระบบตอบกลับจำลอง เนื่องจากไม่ได้เชื่อมต่อ API จริง)";
+            appendMsg(mockReply, 'ai');
+            loader.classList.add('hidden');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 1500);
+
+        /* const res = await fetch(WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ history })
@@ -351,12 +651,11 @@ async function askAI() {
         const data = await res.json();
         const reply = data.reply || "ขออภัยครับ ไม่สามารถตอบคำถามได้ในขณะนี้";
         appendMsg(reply, 'ai');
-        history.push({ role: "model", parts: [{ text: reply }] });
+        */
+        
     } catch (e) {
         appendMsg("ขออภัย ระบบขัดข้องชั่วคราว", 'ai');
-    } finally {
         loader.classList.add('hidden');
-        chatBox.scrollTop = chatBox.scrollHeight;
     }
 }
 
@@ -370,13 +669,14 @@ function appendMsg(txt, role) {
 btnSend.onclick = askAI;
 chatInput.onkeydown = (e) => e.key === 'Enter' && askAI();
 
-// Close Modal on Overlay Click
+// Global Close Modal
 window.onclick = (e) => {
     if(e.target.classList.contains('modal-overlay')) e.target.style.display = 'none';
 };
+
+// Initialize
+window.onload = initApp;
+
 </script>
-
-<script src="app.js?v=9" defer></script>
-
 </body>
 </html>
