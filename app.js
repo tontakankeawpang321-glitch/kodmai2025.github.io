@@ -161,6 +161,7 @@ function buildIndex(){
   FIXED_CATS.forEach(c=>{
     CatState[c]={rows:[],page:0};
   });
+document.addEventListener("DOMContentLoaded", loadJsonAndStart);
 
   lawsData.forEach(item=>{
     const rawCat = item[col('category')];
