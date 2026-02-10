@@ -315,6 +315,9 @@
       <span class="w-1 h-5 bg-blue-700 rounded-sm"></span>
       <span id="panelTitle" class="font-bold text-lg text-slate-800">รายการกฎหมาย</span>
     </div>
+
+    <!-- ✅ เพิ่ม panelNote ตรงนี้ ตามคำขอ -->
+    <div id="panelNote" class="text-sm text-slate-500 mb-2"></div>
     
     <div id="list" class="flex flex-col gap-3 pb-4">
       <!-- Law Cards inserted by app.js -->
@@ -411,7 +414,8 @@
 </div>
 
 <!-- Import Existing Logic -->
-<script src="app.js"></script>
+<!-- ✅ แก้ไข: เพิ่ม defer เพื่อความปลอดภัยในการโหลด DOM -->
+<script src="app.js" defer></script>
 
 <!-- New Logic for Nav & Favorites -->
 <script>
