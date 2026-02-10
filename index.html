@@ -258,7 +258,7 @@
             </button>
         </header>
         <div id="favContainer" class="p-4 overflow-y-auto space-y-3 min-h-[200px]">
-            <!-- Fav items -->
+            <!-- Fav items will be rendered by app.js -->
         </div>
     </div>
 </div>
@@ -318,66 +318,6 @@ function switchTab(to) {
 navHome.onclick = () => switchTab('home');
 navComm.onclick = () => switchTab('community');
 
-// --- Favorites Management (Local Storage) ---
-const FAV_STORE = 'thai_law_lite_favs';
-
-function getFavs() { return JSON.parse(localStorage.getItem(FAV_STORE) || '[]'); }
-
-function toggleFav(id, title) {
-    let favs = getFavs();
-    const idx = favs.findIndex(f => f.id === id);
-    if(idx > -1) {
-        favs.splice(idx, 1);
-    } else {
-        favs.push({ id, title, date: new Date().toLocaleDateString('th-TH') });
-    }
-    localStorage.setItem(FAV_STORE, JSON.stringify(favs));
-    renderFavList();
-}
-
-function renderFavList() {
-    const container = document.getElementById('favContainer');
-    const favs = getFavs();
-    if(favs.length === 0) {
-        container.innerHTML = `<div class="py-12 text-center text-slate-400 text-sm italic">ยังไม่มีรายการที่บันทึกไว้</div>`;
-        return;
-    }
-    container.innerHTML = favs.map(f => `
-        <div class="p-3.5 border border-slate-100 rounded-2xl bg-slate-50 flex justify-between items-center shadow-sm">
-            <div class="flex-1 pr-3">
-                <div class="text-xs font-bold text-slate-700 line-clamp-1">${f.title}</div>
-                <div class="text-[9px] text-slate-400 mt-1 uppercase">บันทึกเมื่อ: ${f.date}</div>
-            </div>
-            <button onclick="deleteFavItem('${f.id}')" class="text-slate-300 hover:text-red-500 p-1.5 transition">
-                <span class="material-symbols-rounded text-lg">delete</span>
-            </button>
-        </div>
-    `).join('');
-}
-
-window.deleteFavItem = (id) => {
-    toggleFav(id);
-    const mainIcon = document.querySelector(`.fav-add-btn[data-id="${id}"]`);
-    if(mainIcon) mainIcon.classList.remove('active');
-};
-
-document.getElementById('btnOpenFavs').onclick = () => {
-    document.getElementById('modalFavs').style.display = 'flex';
-    renderFavList();
-};
-document.getElementById('btnCloseFavs').onclick = () => document.getElementById('modalFavs').style.display = 'none';
-
-// Event Delegation สำหรับปุ่มหัวใจใน Card
-document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.fav-add-btn');
-    if(btn) {
-        const id = btn.dataset.id;
-        const title = btn.dataset.title;
-        btn.classList.toggle('active');
-        toggleFav(id, title);
-    }
-});
-
 // --- Chatbot Logic ---
 const WORKER_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
 let history = [];
@@ -436,7 +376,7 @@ window.onclick = (e) => {
 };
 </script>
 
-<script src="app.js?v=7" defer></script>
+<script src="app.js?v=9" defer></script>
 
 </body>
 </html>
