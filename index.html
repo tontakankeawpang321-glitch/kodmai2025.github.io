@@ -14,21 +14,22 @@
 
 <style>
   :root {
-    /* 🎨 Palette */
-    --primary: #1e3a8a;
+    --primary: #1e3a8a;       /* Deep Navy */
     --primary-dark: #172554;
     --primary-gradient: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-    --accent: #d97706;
-    --bg-app: #f1f5f9;
+    
+    --accent: #d97706;        /* Amber */
+    
+    --bg-app: #f1f5f9;        /* Slate 100 */
     --bg-card: #ffffff;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --border: #cbd5e1;
+    
+    --text-main: #0f172a;     /* Slate 900 */
+    --text-muted: #64748b;    /* Slate 500 */
+    --border: #cbd5e1;        /* Slate 300 */
     
     --radius-card: 12px;
-    --nav-height: 65px; /* ความสูง Bottom Nav */
-    
-    --shadow-float: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --nav-height: 65px;       /* Bottom Nav Height */
+    --header-height: 70px;    /* Approx Header Height */
   }
 
   body {
@@ -36,126 +37,89 @@
     color: var(--text-main);
     font-family: "Sarabun", sans-serif;
     -webkit-font-smoothing: antialiased;
-    padding-bottom: calc(var(--nav-height) + 20px); /* เว้นที่ด้านล่าง */
+    /* Padding for fixed header and bottom nav */
+    padding-bottom: calc(var(--nav-height) + 20px); 
+    padding-top: 0;
+    margin: 0;
+    height: 100vh;
+    overflow-y: hidden; /* Manage scroll inside views */
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* --- Header --- */
+  /* --- App Header --- */
   .app-header {
     background: var(--primary-gradient);
     color: white;
-    padding: 16px 16px 20px;
-    border-radius: 0 0 20px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 12px 16px;
+    height: var(--header-height);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 40;
   }
 
-  .app-title {
-    font-size: 18px;
-    font-weight: 700;
+  .app-brand {
     display: flex;
     align-items: center;
     gap: 10px;
+    font-weight: 700;
+    font-size: 18px;
   }
 
-  .header-actions {
-    display: flex;
-    gap: 8px;
+  /* --- Views Management --- */
+  .view-container {
+    height: 100vh;
+    padding-top: var(--header-height);
+    padding-bottom: var(--nav-height);
+    overflow-y: auto; /* Scrollable content */
+    display: none; /* Hidden by default */
+  }
+
+  .view-container.active {
+    display: block;
+  }
+
+  /* --- Facebook Container (Home View) --- */
+  #view-home {
+    padding: 0;
+    background: #fff;
+    /* Force full height for FB */
+    height: 100vh; 
+    padding-top: var(--header-height);
+    padding-bottom: var(--nav-height);
+    overflow: hidden; 
   }
   
-  .header-btn {
-    width: 36px; height: 36px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
+  .fb-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
   }
-  .header-btn:active { background: rgba(255,255,255,0.3); }
 
-  /* --- Views (Tab Content) --- */
-  .view-container {
-    display: none; /* ซ่อนไว้ก่อน */
-    animation: fadeIn 0.3s ease;
+  /* --- Search View --- */
+  #view-search .wrap {
+    padding: 16px;
     max-width: 600px;
     margin: 0 auto;
-    padding: 0 16px;
-  }
-  .view-container.active {
-    display: block; /* แสดงเมื่อ active */
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* --- Search Bar --- */
-  .search-container {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 4px 8px;
-    box-shadow: var(--shadow-float);
-    display: flex;
-    gap: 8px;
-    margin-top: -24px; /* ลอยทับ Header */
-    position: relative;
-    z-index: 50;
-    border: 1px solid var(--border);
-    align-items: center;
-    height: 56px;
-    margin-bottom: 20px;
-  }
-  .search-input {
-    flex: 1; border: none; outline: none; padding: 0 8px;
-    font-family: "Sarabun"; font-size: 16px; color: var(--text-main);
-    background: transparent; height: 100%;
-  }
-  .search-btn {
-    background: var(--accent); color: white; border: none;
-    border-radius: 8px; width: 40px; height: 40px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  /* --- Components --- */
-  .section { margin-bottom: 24px; }
-  
-  .slider-card, .law-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-card);
-    padding: 16px;
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  }
-
-  .law-card { position: relative; padding-left: 16px; margin-bottom: 12px; }
-  .law-card::before {
-    content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
-    width: 4px; background: var(--primary); border-radius: 0 4px 4px 0; opacity: 0.7;
-  }
-  
   /* --- Bottom Navigation --- */
   .bottom-nav {
     position: fixed;
     bottom: 0; left: 0; right: 0;
     height: var(--nav-height);
     background: white;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    z-index: 40;
+    z-index: 50;
     padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
   }
-  
+
   .nav-item {
     flex: 1;
     display: flex;
@@ -163,402 +127,524 @@
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
-    background: none; border: none;
+    font-size: 12px;
+    font-weight: 500;
     height: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+
+  .nav-item.active {
+    color: var(--primary);
+  }
+
+  .nav-item .material-symbols-rounded {
+    font-size: 24px;
+    margin-bottom: 2px;
+  }
+
+  /* --- Search Bar & Components (from previous code) --- */
+  .search-container {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 4px 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    display: flex;
+    gap: 8px;
+    border: 1px solid var(--border);
+    align-items: center;
+    height: 50px;
+    margin-bottom: 20px;
+  }
+  
+  .search-input {
+    flex: 1; border: none; outline: none; padding: 0 8px;
+    font-family: "Sarabun"; font-size: 16px; color: var(--text-main);
+    background: transparent; height: 100%;
+  }
+  
+  .search-btn {
+    background: var(--accent); color: white; border: none;
+    border-radius: 8px; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  /* Chips */
+  .catbar-scroll {
+    overflow-x: auto; white-space: nowrap; padding-bottom: 12px;
+    scrollbar-width: none;
+  }
+  .catbar-scroll::-webkit-scrollbar { display: none; }
+  
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+    background: white; border: 1px solid var(--border); border-radius: 20px;
+    margin-right: 8px; font-size: 14px; color: var(--text-muted);
+  }
+  .chip.active {
+    background: var(--primary); color: white; border-color: var(--primary);
+  }
+
+  /* List Cards */
+  .law-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    padding: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .law-card::before {
+    content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
+    width: 4px; background: var(--primary); border-radius: 0 4px 4px 0;
+  }
+
+  /* Favorite Button Styling */
+  .fav-toggle-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #cbd5e1;
     cursor: pointer;
     transition: color 0.2s;
   }
-  .nav-item span { font-size: 24px; margin-bottom: 2px; }
-  .nav-item p { font-size: 10px; font-weight: 500; }
-  
-  .nav-item.active { color: var(--primary); }
-  .nav-item.active span { font-variation-settings: 'FILL' 1; }
+  .fav-toggle-btn.is-fav {
+    color: #ef4444; /* Red heart */
+    font-variation-settings: 'FILL' 1;
+  }
 
-  /* --- Dialog (Favorites) --- */
-  .dialog-overlay {
+  /* --- Favorites Modal --- */
+  .fav-modal-overlay {
+    background: rgba(0,0,0,0.6);
     position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,0.5);
-    display: flex; align-items: center; justify-content: center;
+    display: flex; justify-content: center; align-items: center;
     opacity: 0; pointer-events: none; transition: opacity 0.2s;
   }
-  .dialog-overlay.open { opacity: 1; pointer-events: auto; }
-  
-  .dialog-box {
-    background: white; width: 90%; max-width: 400px; max-height: 80vh;
-    border-radius: 16px; display: flex; flex-direction: column;
-    transform: scale(0.95); transition: transform 0.2s;
+  .fav-modal-overlay.open {
+    opacity: 1; pointer-events: auto;
+  }
+  .fav-modal {
+    background: white; width: 90%; max-width: 400px;
+    height: 80vh; border-radius: 16px;
+    display: flex; flex-direction: column;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    transform: translateY(20px); transition: transform 0.2s;
   }
-  .dialog-overlay.open .dialog-box { transform: scale(1); }
-  
-  .dialog-header { padding: 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary); }
-  .dialog-content { padding: 0; overflow-y: auto; flex: 1; }
-  .dialog-footer { padding: 12px 16px; border-top: 1px solid #e2e8f0; text-align: right; }
-  
-  .fav-item { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: flex-start; }
-  .fav-item:last-child { border-bottom: none; }
-  .fav-info { font-size: 14px; }
-  .fav-title { font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
-  .fav-detail { font-size: 12px; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .btn-del-fav { color: #ef4444; background: #fef2f2; padding: 6px; border-radius: 6px; margin-left: 8px; }
+  .fav-modal-overlay.open .fav-modal {
+    transform: translateY(0);
+  }
+  .fav-list {
+    flex: 1; overflow-y: auto; padding: 16px;
+  }
 
-  /* --- Chat FAB (Adjusted Position) --- */
+  /* --- Chatbot (Existing) --- */
   #fab-chat-toggle {
-    position: fixed;
-    bottom: calc(var(--nav-height) + 16px); /* สูงกว่า Nav */
-    right: 16px;
+    position: fixed; bottom: 85px; right: 20px; /* Moved up above nav */
     width: 56px; height: 56px;
-    background: var(--accent); color: white;
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
+    background: var(--accent); color: white; border: none;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
-    z-index: 50;
-    transition: all 0.3s;
+    z-index: 60; cursor: pointer;
   }
-  #fab-chat-toggle::after {
-    content: ''; position: absolute; width: 100%; height: 100%;
-    border-radius: inherit; border: 2px solid #f59e0b;
-    animation: fab-ping 2s infinite; z-index: -1;
-  }
-  @keyframes fab-ping {
-    0% { transform: scale(1); opacity: 0.8; }
-    100% { transform: scale(1.5); opacity: 0; }
-  }
-
-  /* Chat Window Logic */
-  .chatbot-hidden { display: none; }
-  #chatbot-modal { background: rgba(0, 0, 0, 0.5); }
-  .chat-window { height: 100dvh; display: flex; flex-direction: column; background: white; }
-  @media (min-width: 640px) {
-    .chat-window { height: 600px; width: 400px; position: fixed; bottom: 100px; right: 24px; border-radius: 16px; }
-  }
-  /* Utility for Chips */
-  .catbar-scroll { overflow-x: auto; white-space: nowrap; padding: 4px 0 16px; scrollbar-width: none; }
-  .chip { display: inline-flex; padding: 8px 16px; background: white; border: 1px solid var(--border); border-radius: 20px; margin-right: 8px; font-size: 14px; color: var(--text-muted); }
-  .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-  
-  /* Facebook Container */
-  .fb-wrapper {
-    background: white; border-radius: var(--radius-card); padding: 12px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border);
-    margin-top: 16px; display: flex; justify-content: center;
-  }
+  #chatbot-modal { z-index: 70; }
+  .chat-window { bottom: 85px; } /* Adjusted position */
+  @media (max-width: 640px) { .chat-window { bottom: 0; height: 90vh; } }
 </style>
 </head>
 <body>
 
-<!-- HEADER: FIXED TOP -->
+<!-- Header (Fixed Top) -->
 <header class="app-header">
-  <div class="app-title">
-    <div class="bg-white/20 p-1.5 rounded-lg">
-      <span class="material-symbols-rounded" style="font-size: 24px;">balance</span>
+  <div class="app-brand">
+    <div class="bg-white/20 p-1.5 rounded-lg flex items-center">
+      <span class="material-symbols-rounded">balance</span>
     </div>
-    <div class="flex flex-col">
-       <span>Thai Law Lite</span>
-       <span class="text-[10px] font-normal opacity-80 leading-none">กฎหมายไทยฉบับพกพา</span>
-    </div>
+    <span>Thai Law Lite</span>
   </div>
-  
-  <!-- ปุ่มขวาบน: รายการโปรด & รีเฟรช -->
-  <div class="header-actions">
-    <button onclick="openFavDialog()" class="header-btn" title="รายการโปรด">
-      <span class="material-symbols-rounded">star</span>
-    </button>
-    <button onclick="window.location.reload()" class="header-btn" title="รีเฟรช">
-      <span class="material-symbols-rounded">refresh</span>
-    </button>
-  </div>
+  <!-- ปุ่มรายการโปรด (เปิด Dialog) -->
+  <button id="open-fav-btn" class="relative p-2 rounded-full hover:bg-white/10 transition">
+    <span class="material-symbols-rounded text-white">favorite</span>
+    <span id="fav-count-badge" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white hidden"></span>
+  </button>
 </header>
 
-<!-- MAIN CONTENT WRAPPER -->
-<main>
+<!-- MAIN CONTENT AREAS -->
 
-  <!-- VIEW 1: HOME (FACEBOOK) -->
-  <div id="view-home" class="view-container active">
-    <div class="fb-wrapper">
-      <div id="fb-root"></div>
-      <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0"></script>
-      <div class="fb-page" 
-        data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
-        data-tabs="timeline" 
-        data-width="500" 
-        data-height="800" 
-        data-small-header="false" 
-        data-adapt-container-width="true" 
-        data-hide-cover="false" 
-        data-show-facepile="true">
-      </div>
+<!-- 1. HOME VIEW (Facebook) -->
+<div id="view-home" class="view-container active">
+  <div class="fb-wrapper">
+    <!-- Facebook Page Container -->
+    <div class="fb-page" 
+      data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
+      data-tabs="timeline" 
+      data-width="500" 
+      data-height="800"
+      data-small-header="false" 
+      data-adapt-container-width="true" 
+      data-hide-cover="false" 
+      data-show-facepile="true">
     </div>
-    <div class="text-center text-gray-400 text-sm mt-4 pb-8">
-      ติดตามข่าวสารและคำพิพากษาศาลฎีกาได้ที่นี่
+    <div class="p-4 text-center text-gray-400 text-sm">
+      <p>เลื่อนลงเพื่อดูข่าวสารกฎหมายล่าสุด</p>
     </div>
   </div>
+</div>
 
-  <!-- VIEW 2: SEARCH (LAW) -->
-  <div id="view-search" class="view-container">
-    
+<!-- 2. SEARCH VIEW (Law Search) -->
+<div id="view-search" class="view-container">
+  <div class="wrap">
     <!-- Search Bar -->
     <div class="search-container" role="search">
-      <button class="w-10 h-10 flex items-center justify-center text-gray-400 cursor-default">
-         <span class="material-symbols-rounded">search</span>
-      </button>
+      <span class="material-symbols-rounded text-gray-400 pl-1">search</span>
       <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย, มาตรา..." aria-label="ค้นหากฎหมาย">
       <button id="btnSearch" class="search-btn" type="button">
         <span class="material-symbols-rounded">arrow_forward</span>
       </button>
     </div>
 
-    <!-- Announcement Slider -->
-    <section class="section">
-      <div class="slider-card">
-        <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-          <div class="text-blue-900 font-bold flex items-center gap-2">
-            <span class="material-symbols-rounded text-amber-500">campaign</span> ประกาศล่าสุด
-          </div>
-        </div>
-        <div style="overflow:hidden;"><div id="latestTrack" class="flex whitespace-nowrap text-sm text-gray-700">กำลังโหลด...</div></div>
-      </div>
-    </section>
-
     <!-- Categories -->
-    <section class="section">
-      <div class="catbar-scroll" id="catbar">
-        <!-- App.js จะมาเติม chips ตรงนี้ -->
-        <button class="chip active">ทั้งหมด</button>
-        <button class="chip">อาญา</button>
-        <button class="chip">แพ่ง</button>
-      </div>
-    </section>
-
-    <!-- Law List -->
-    <section class="section">
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="font-bold text-gray-800 text-lg border-l-4 border-blue-700 pl-2">รายการกฎหมาย</h3>
-      </div>
-      
-      <div id="list">
-        <!-- App.js จะมาเติมข้อมูลตรงนี้ -->
-        <!-- ตัวอย่างข้อมูล Mockup เพื่อแสดงปุ่ม Fav -->
-        <div class="law-card flex justify-between items-start">
-            <div>
-                <div class="font-bold text-gray-800">ประมวลกฎหมายอาญา</div>
-                <div class="text-xs text-gray-500 mt-1">มาตรา 288 ผู้ใดฆ่าผู้อื่น...</div>
-            </div>
-            <button onclick="addToFav('ประมวลกฎหมายอาญา', 'มาตรา 288 ผู้ใดฆ่าผู้อื่น', '123')" class="text-gray-300 hover:text-amber-500 p-1">
-                <span class="material-symbols-rounded">star</span>
-            </button>
-        </div>
-      </div>
-
-      <div class="flex justify-center gap-4 mt-6">
-        <button id="btnPrev" class="px-4 py-2 rounded bg-white border shadow-sm hidden">ก่อนหน้า</button>
-        <button id="btnNext" class="px-4 py-2 rounded bg-blue-800 text-white shadow-sm hidden">ถัดไป</button>
-      </div>
-    </section>
-  </div>
-
-</main>
-
-<!-- BOTTOM NAVIGATION -->
-<nav class="bottom-nav">
-  <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
-    <span class="material-symbols-rounded">home</span>
-    <p>หน้าหลัก</p>
-  </button>
-  <button class="nav-item" onclick="switchTab('search')" id="nav-search">
-    <span class="material-symbols-rounded">search</span>
-    <p>ค้นหา</p>
-  </button>
-</nav>
-
-<!-- FAVORITES DIALOG -->
-<div id="fav-dialog" class="dialog-overlay">
-  <div class="dialog-box">
-    <div class="dialog-header">
-        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-amber-500">star</span> รายการโปรด</span>
-        <button onclick="closeFavDialog()" class="text-gray-400 hover:text-gray-600"><span class="material-symbols-rounded">close</span></button>
+    <div class="catbar-scroll" id="catbar" role="tablist">
+      <!-- Chips inserted by app.js -->
     </div>
-    <div id="fav-list-content" class="dialog-content">
-        <!-- รายการจะถูกสร้างด้วย JS -->
-        <div class="p-8 text-center text-gray-400">ยังไม่มีรายการที่บันทึกไว้</div>
+
+    <!-- Results List -->
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-1 h-5 bg-blue-700 rounded-sm"></span>
+      <span id="panelTitle" class="font-bold text-lg text-slate-800">รายการกฎหมาย</span>
     </div>
-    <div class="dialog-footer">
-        <button onclick="closeFavDialog()" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold">ปิดหน้าต่าง</button>
+    
+    <div id="list" class="flex flex-col gap-3 pb-4">
+      <!-- Law Cards inserted by app.js -->
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center gap-3 mt-4 mb-8">
+      <button id="btnPrev" class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-600 text-sm font-semibold hidden">
+        <span class="material-symbols-rounded text-sm align-middle">arrow_back</span> ย้อนกลับ
+      </button>
+      <button id="btnNext" class="px-4 py-2 rounded-lg bg-blue-800 text-white text-sm font-semibold shadow-sm hidden">
+        ถัดไป <span class="material-symbols-rounded text-sm align-middle">arrow_forward</span>
+      </button>
     </div>
   </div>
 </div>
 
-<!-- CHATBOT BUTTON & MODAL -->
+<!-- Bottom Navigation (Fixed) -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchView('home')">
+    <span class="material-symbols-rounded">home</span>
+    <span>หน้าหลัก</span>
+  </button>
+  <button class="nav-item" onclick="switchView('search')">
+    <span class="material-symbols-rounded">search_check</span>
+    <span>ค้นหากฎหมาย</span>
+  </button>
+</nav>
+
+<!-- Facebook SDK -->
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0" nonce="abc123"></script>
+
+<!-- Favorites Modal (Dialog) -->
+<div id="fav-modal-overlay" class="fav-modal-overlay">
+  <div class="fav-modal">
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="font-bold text-lg flex items-center gap-2 text-blue-900">
+        <span class="material-symbols-rounded text-red-500">favorite</span> รายการโปรด
+      </h2>
+      <button onclick="closeFavModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div id="fav-list-container" class="fav-list">
+      <!-- Favorites will be rendered here -->
+      <div class="text-center text-gray-400 mt-10">
+        <span class="material-symbols-rounded text-4xl mb-2 block">bookmark_add</span>
+        ยังไม่มีรายการโปรด<br>กดหัวใจที่กฎหมายเพื่อบันทึก
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chatbot FAB -->
 <button id="fab-chat-toggle" title="ปรึกษา Thai Law AI">
   <span class="material-symbols-rounded">smart_toy</span>
 </button>
 
-<div id="chatbot-modal" class="chatbot-hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
-  <div class="chat-window w-full flex flex-col transform transition-transform duration-200 translate-y-full sm:translate-y-0 sm:scale-100" id="chat-window-inner">
-    <!-- Chat Header -->
-    <header class="p-3 border-b flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center text-white"><span class="material-symbols-rounded text-sm">smart_toy</span></div>
-            <span class="font-bold text-gray-800">Thai Law AI</span>
+<!-- Chatbot Modal -->
+<div id="chatbot-modal" class="chatbot-hidden fixed inset-0 flex items-end sm:items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200" style="background: rgba(0,0,0,0.5);">
+  <div class="chat-window w-full flex flex-col transform transition-transform duration-200 translate-y-full sm:translate-y-0 sm:scale-100 bg-white sm:rounded-2xl" id="chat-window-inner">
+    <header class="chat-header shrink-0 p-3 border-b flex justify-between items-center bg-white sm:rounded-t-2xl">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-blue-700 flex items-center justify-center text-white">
+          <span class="material-symbols-rounded text-sm">smart_toy</span>
         </div>
-        <button id="chatbot-close-btn" class="w-8 h-8 flex items-center justify-center text-gray-500 rounded-full hover:bg-gray-100"><span class="material-symbols-rounded">close</span></button>
+        <div>
+          <h1 class="font-bold text-gray-800 text-sm">Thai Law AI</h1>
+          <p class="text-xs text-green-600">● Online</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button id="new-chat-btn" class="text-xs bg-gray-100 text-gray-600 py-1 px-3 rounded">ล้างแชท</button>
+        <button id="chatbot-close-btn" class="w-8 h-8 flex items-center justify-center text-gray-400">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
     </header>
-    <!-- Chat History -->
+    
     <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"></main>
-    <!-- Chat Input -->
+    
+    <div id="thinking-indicator" class="px-4 pb-2 hidden">
+        <div class="text-xs text-gray-400 animate-pulse">กำลังพิมพ์...</div>
+    </div>
+    
     <footer class="p-3 border-t bg-white">
-        <div class="flex bg-gray-100 rounded-full px-4 py-2">
-            <input id="user-input" class="flex-1 bg-transparent outline-none text-sm" placeholder="ถามกฎหมาย...">
-            <button id="send-btn" class="text-blue-600 ml-2"><span class="material-symbols-rounded">send</span></button>
-        </div>
+      <div class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
+        <input id="user-input" type="text" placeholder="พิมพ์คำถาม..." class="flex-1 bg-transparent outline-none text-sm">
+        <button id="send-btn" class="text-blue-600"><span class="material-symbols-rounded">send</span></button>
+      </div>
     </footer>
   </div>
 </div>
 
-<!-- EXTERNAL JS (App Logic Original) -->
+<!-- Import Existing Logic -->
 <script src="app.js"></script>
 
-<!-- UI LOGIC SCRIPT -->
+<!-- New Logic for Nav & Favorites -->
 <script>
-    /* --- Tab Switching Logic --- */
-    function switchTab(tabId) {
-        // Toggle Views
-        document.getElementById('view-home').classList.remove('active');
-        document.getElementById('view-search').classList.remove('active');
-        document.getElementById('view-' + tabId).classList.add('active');
+  // --- Navigation Logic ---
+  function switchView(viewName) {
+    // Hide all views
+    document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+    // Show selected view
+    document.getElementById('view-' + viewName).classList.add('active');
+    
+    // Update Nav Icons
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    if(viewName === 'home') document.querySelectorAll('.nav-item')[0].classList.add('active');
+    if(viewName === 'search') document.querySelectorAll('.nav-item')[1].classList.add('active');
+  }
 
-        // Toggle Nav State
-        document.getElementById('nav-home').classList.remove('active');
-        document.getElementById('nav-search').classList.remove('active');
-        document.getElementById('nav-' + tabId).classList.add('active');
+  // --- Favorites System (LocalStorage) ---
+  const FAV_KEY = 'thailaw_favorites';
+  
+  function getFavorites() {
+    return JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+  }
+
+  function toggleFavorite(lawData) {
+    const favs = getFavorites();
+    const index = favs.findIndex(f => f.title === lawData.title); // Using Title as ID for now
+    
+    if (index === -1) {
+      favs.push(lawData);
+      localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+      return true; // Added
+    } else {
+      favs.splice(index, 1);
+      localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+      return false; // Removed
     }
+  }
 
-    /* --- Favorites Logic (Local Storage) --- */
-    const FAV_KEY = 'thailaw_favorites';
+  function isFavorite(title) {
+    const favs = getFavorites();
+    return favs.some(f => f.title === title);
+  }
 
-    function getFavs() {
-        return JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
-    }
+  function updateFavBadge() {
+    const favs = getFavorites();
+    const badge = document.getElementById('fav-count-badge');
+    if(favs.length > 0) badge.classList.remove('hidden');
+    else badge.classList.add('hidden');
+  }
 
-    function saveFavs(favs) {
-        localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-        renderFavList();
-    }
+  // UI: Add Favorite Button to Cards (Event Delegation)
+  // เนื่องจาก app.js สร้างการ์ดทีหลัง เราจึงต้องใช้ Event Delegation หรือ Observer
+  // แต่วิธีที่ง่ายที่สุดคือแทรกปุ่มตอนคลิก หรือใช้ setInterval ตรวจสอบ (ไม่แนะนำ)
+  // วิธีที่ดีคือ: ให้ User กด Save ได้จาก Dialog หรือ แก้ app.js
+  // แต่ในที่นี้ ผมจะใช้ MutationObserver เพื่อดักจับว่ามีการ์ดใหม่เพิ่มเข้ามา แล้วเติมปุ่มหัวใจให้
 
-    // ฟังก์ชันเพิ่มรายการโปรด (สามารถเรียกใช้จาก app.js ได้)
-    // ตัวอย่างการใช้: addToFav('กฎหมายอาญา', 'มาตรา 1...', 'law_1')
-    window.addToFav = function(title, detail, id) {
-        const favs = getFavs();
-        // เช็คว่ามีอยู่แล้วไหม
-        if(favs.some(f => f.id === id)) {
-            alert('รายการนี้อยู่ในรายการโปรดแล้ว');
-            return;
+  const listContainer = document.getElementById('list');
+  
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === 1 && node.classList.contains('law-card')) {
+          injectFavButton(node);
         }
-        favs.push({ title, detail, id, date: new Date().toLocaleDateString('th-TH') });
-        saveFavs(favs);
-        alert('บันทึกรายการโปรดเรียบร้อย');
+      });
+    });
+  });
+
+  observer.observe(listContainer, { childList: true });
+
+  function injectFavButton(card) {
+    // ดึงข้อมูลจากการ์ด
+    const titleEl = card.querySelector('.law-title') || card.querySelector('h3') || card.querySelector('div.font-bold');
+    if (!titleEl) return;
+    
+    const title = titleEl.innerText;
+    const desc = card.innerText.substring(0, 100); // เก็บคำอธิบายสั้นๆ
+    const link = card.querySelector('a')?.href || '#';
+
+    const btn = document.createElement('span');
+    btn.className = `material-symbols-rounded fav-toggle-btn ${isFavorite(title) ? 'is-fav' : ''}`;
+    btn.innerText = 'favorite';
+    btn.onclick = (e) => {
+      e.stopPropagation(); // ไม่ให้กดทะลุไปเปิดลิงก์
+      e.preventDefault();
+      
+      const added = toggleFavorite({ title, desc, link });
+      if(added) {
+        btn.classList.add('is-fav');
+        // Animation
+        btn.style.transform = 'scale(1.2)';
+        setTimeout(() => btn.style.transform = 'scale(1)', 200);
+      } else {
+        btn.classList.remove('is-fav');
+      }
+      updateFavBadge();
+    };
+
+    card.appendChild(btn);
+  }
+
+  // --- Modal Logic ---
+  const favModalOverlay = document.getElementById('fav-modal-overlay');
+  const favListContainer = document.getElementById('fav-list-container');
+
+  document.getElementById('open-fav-btn').addEventListener('click', () => {
+    renderFavoritesList();
+    favModalOverlay.classList.add('open');
+  });
+
+  function closeFavModal() {
+    favModalOverlay.classList.remove('open');
+  }
+
+  function renderFavoritesList() {
+    const favs = getFavorites();
+    favListContainer.innerHTML = '';
+
+    if (favs.length === 0) {
+      favListContainer.innerHTML = `
+        <div class="text-center text-gray-400 mt-10">
+          <span class="material-symbols-rounded text-4xl mb-2 block">bookmark_add</span>
+          ยังไม่มีรายการโปรด
+        </div>`;
+      return;
     }
 
-    function removeFav(id) {
-        let favs = getFavs();
-        favs = favs.filter(f => f.id !== id);
-        saveFavs(favs);
-    }
+    favs.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'p-3 border-b border-gray-100 flex justify-between items-start';
+      el.innerHTML = `
+        <div onclick="window.location.href='${item.link}'" class="cursor-pointer flex-1">
+          <div class="font-bold text-sm text-blue-900">${item.title}</div>
+          <div class="text-xs text-gray-500 truncate w-48">${item.desc}</div>
+        </div>
+        <button class="text-red-500 p-1" onclick="removeFavFromModal('${item.title}')">
+          <span class="material-symbols-rounded text-lg">delete</span>
+        </button>
+      `;
+      favListContainer.appendChild(el);
+    });
+  }
 
-    function renderFavList() {
-        const listEl = document.getElementById('fav-list-content');
-        const favs = getFavs();
+  window.removeFavFromModal = function(title) {
+    const favs = getFavorites();
+    const newFavs = favs.filter(f => f.title !== title);
+    localStorage.setItem(FAV_KEY, JSON.stringify(newFavs));
+    renderFavoritesList(); // Re-render modal
+    
+    // Update icons in background list if visible
+    document.querySelectorAll('.law-card').forEach(card => {
+       const t = card.querySelector('.law-title')?.innerText;
+       if(t === title) {
+         card.querySelector('.fav-toggle-btn')?.classList.remove('is-fav');
+       }
+    });
+    updateFavBadge();
+  };
 
-        if (favs.length === 0) {
-            listEl.innerHTML = '<div class="p-8 text-center text-gray-400 flex flex-col items-center"><span class="material-symbols-rounded text-4xl mb-2 opacity-50">stars</span>ยังไม่มีรายการที่บันทึกไว้</div>';
-            return;
-        }
+  // Init
+  updateFavBadge();
 
-        listEl.innerHTML = favs.map(f => `
-            <div class="fav-item">
-                <div class="fav-info">
-                    <div class="fav-title">${f.title}</div>
-                    <div class="fav-detail">${f.detail}</div>
-                    <div class="text-[10px] text-gray-400 mt-1">บันทึกเมื่อ: ${f.date}</div>
-                </div>
-                <button onclick="removeFav('${f.id}')" class="btn-del-fav" title="ลบ">
-                    <span class="material-symbols-rounded" style="font-size:16px;">delete</span>
-                </button>
-            </div>
-        `).join('');
-    }
-
-    function openFavDialog() {
-        renderFavList();
-        const d = document.getElementById('fav-dialog');
-        d.classList.add('open');
-    }
-
-    function closeFavDialog() {
-        document.getElementById('fav-dialog').classList.remove('open');
-    }
 </script>
 
-<!-- CHATBOT SCRIPT (Simplified) -->
 <script type="module">
+/* Chatbot Logic (เหมือนเดิม) */
 const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev'; 
 let chatHistory = [];
 const chatHistoryEl = document.getElementById('chat-history');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
+const userInput   = document.getElementById('user-input');
+const sendBtn     = document.getElementById('send-btn');
+const newChatBtn  = document.getElementById('new-chat-btn');
+const thinkingIndicator = document.getElementById('thinking-indicator');
 
-function addBubble(text, isUser) {
-    const div = document.createElement('div');
-    div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
-    div.innerHTML = `<div class="p-3 rounded-lg max-w-[80%] text-sm ${isUser ? 'bg-blue-600 text-white' : 'bg-white border text-gray-800'}">${text}</div>`;
-    chatHistoryEl.appendChild(div);
-    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+function addChatBubble(message, isUser = true) {
+  const bubbleType = isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white border text-gray-800 rounded-tl-none';
+  const align = isUser ? 'justify-end' : 'justify-start';
+  
+  const div = document.createElement('div');
+  div.className = `flex ${align}`;
+  div.innerHTML = `<div class="max-w-[85%] p-3 rounded-2xl ${bubbleType} text-sm shadow-sm">${message.replace(/\n/g, '<br>')}</div>`;
+  chatHistoryEl.appendChild(div);
+  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 }
 
 async function handleSend() {
-    const msg = userInput.value.trim();
-    if(!msg) return;
-    addBubble(msg, true);
-    userInput.value = '';
-    
-    chatHistory.push({ role: "user", parts: [{ text: msg }] });
-    
-    try {
-        const res = await fetch(BACKEND_URL, {
-             method: 'POST', headers: {'Content-Type': 'application/json'},
-             body: JSON.stringify({ history: chatHistory })
-        });
-        const data = await res.json();
-        const reply = data.reply || "ขออภัย ระบบขัดข้อง";
-        chatHistory.push({ role: "model", parts: [{ text: reply }] });
-        addBubble(reply, false);
-    } catch(e) {
-        addBubble("Error: " + e.message, false);
-    }
+  const message = (userInput.value || '').trim();
+  if (!message) return;
+  addChatBubble(message, true);
+  userInput.value = '';
+  thinkingIndicator.classList.remove('hidden');
+  sendBtn.disabled = true;
+  chatHistory.push({ role: "user", parts: [{ text: message }] });
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ history: chatHistory }) 
+    });
+    if (!response.ok) throw new Error('Network error');
+    const data = await response.json();
+    const aiReply = data.reply;
+    chatHistory.push({ role: "model", parts: [{ text: aiReply }] });
+    thinkingIndicator.classList.add('hidden');
+    addChatBubble(aiReply, false);
+  } catch (err) {
+    thinkingIndicator.classList.add('hidden');
+    addChatBubble("ขออภัย ระบบขัดข้อง", false);
+    chatHistory.pop();
+  } finally {
+    sendBtn.disabled = false;
+  }
 }
 
 sendBtn.addEventListener('click', handleSend);
-userInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSend());
+userInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleSend();
+});
 
-// Modal Toggle
-const fab = document.getElementById('fab-chat-toggle');
-const modal = document.getElementById('chatbot-modal');
-const closeBtn = document.getElementById('chatbot-close-btn');
-const inner = document.getElementById('chat-window-inner');
+// Modal Logic
+const fabToggle = document.getElementById('fab-chat-toggle');
+const chatModal = document.getElementById('chatbot-modal');
+const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
+const chatWindowInner = document.getElementById('chat-window-inner');
 
-fab.onclick = () => {
-    modal.classList.remove('chatbot-hidden', 'opacity-0', 'pointer-events-none');
-    inner.classList.remove('translate-y-full', 'scale-100');
-    fab.style.transform = 'scale(0)';
-};
-closeBtn.onclick = () => {
-    inner.classList.add('translate-y-full', 'scale-100');
-    setTimeout(() => {
-        modal.classList.add('chatbot-hidden', 'opacity-0', 'pointer-events-none');
-        fab.style.transform = 'scale(1)';
-    }, 200);
-};
+fabToggle.addEventListener('click', () => {
+  chatModal.classList.remove('chatbot-hidden', 'opacity-0', 'pointer-events-none');
+  chatWindowInner.classList.remove('translate-y-full', 'scale-100');
+});
+chatbotCloseBtn.addEventListener('click', () => {
+  chatWindowInner.classList.add('translate-y-full');
+  setTimeout(() => chatModal.classList.add('chatbot-hidden', 'opacity-0', 'pointer-events-none'), 200);
+});
 </script>
-
 </body>
 </html>
