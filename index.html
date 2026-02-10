@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="th">
 <head>
     <meta charset="utf-8"/>
@@ -100,10 +100,8 @@
         .fav-add-btn {
             position: absolute; top: 12px; right: 12px; color: #cbd5e1;
             padding: 6px; cursor: pointer; transition: color 0.2s;
-            z-index: 5;
         }
         .fav-add-btn.active { color: #ef4444; font-variation-settings: 'FILL' 1; }
-        .fav-add-btn:hover { background-color: #f8fafc; border-radius: 50%; }
 
         /* Categories Chip */
         .chip {
@@ -118,14 +116,14 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Facebook Content */
+        /* Facebook Content Styling */
         .fb-container {
             display: flex; 
             justify-content: center; 
             background: white;
             width: 100%;
             overflow: hidden;
-            min-height: 500px;
+            /* Remove fixed min-height to fit content properly */
         }
 
         /* Modals */
@@ -166,20 +164,6 @@
         /* Dot Indicators */
         .dot { width: 6px; height: 6px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
         .dot.active { width: 20px; background-color: var(--accent); border-radius: 10px; }
-
-        /* Pagination Buttons */
-        .pagination-btn {
-            padding: 8px 16px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            color: var(--text-main);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .pagination-btn:hover { background: #f8fafc; border-color: var(--text-muted); }
-        .pagination-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -230,13 +214,26 @@
                 
                 <div id="latestViewport" class="overflow-hidden relative touch-pan-y">
                     <div id="latestTrack" class="flex transition-transform duration-500 ease-in-out w-full">
-                        <!-- JS will populate slides here -->
-                         <div class="w-full text-center text-xs text-slate-400 py-4">กำลังโหลดข้อมูลล่าสุด...</div>
+                        <!-- Slider Content -->
+                        <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
+                            <span class="text-sm font-bold text-slate-800">พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
+                            <span class="text-xs text-slate-500">อัพเดทแนวปฏิบัติใหม่ เริ่มใช้ 1 ม.ค. 67</span>
+                        </div>
+                        <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
+                            <span class="text-sm font-bold text-slate-800">กฎหมายจราจรใหม่</span>
+                            <span class="text-xs text-slate-500">ตัดแต้มใบขับขี่ เริ่มบังคับใช้แล้ว</span>
+                        </div>
+                         <div class="min-w-full flex flex-col gap-1 items-center text-center p-2">
+                            <span class="text-sm font-bold text-slate-800">ประมวลกฎหมายแพ่งฯ (ฉบับแก้ไข)</span>
+                            <span class="text-xs text-slate-500">ปรับปรุงเรื่องดอกเบี้ยผิดนัด</span>
+                        </div>
                     </div>
                 </div>
                 
                 <div id="dots" class="flex justify-center gap-1.5 mt-3">
-                    <!-- JS will populate dots here -->
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
                 </div>
             </div>
         </section>
@@ -244,7 +241,12 @@
         <!-- Categories Section -->
         <section class="mt-4">
             <div id="catbar" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide px-1">
-                <!-- JS will populate chips here -->
+                <button class="chip active" onclick="filterCategory('all', this)">ทั้งหมด</button>
+                <button class="chip" onclick="filterCategory('แพ่ง', this)">แพ่ง</button>
+                <button class="chip" onclick="filterCategory('อาญา', this)">อาญา</button>
+                <button class="chip" onclick="filterCategory('ธุรกิจ', this)">ธุรกิจ</button>
+                <button class="chip" onclick="filterCategory('แรงงาน', this)">แรงงาน</button>
+                <button class="chip" onclick="filterCategory('จราจร', this)">จราจร</button>
             </div>
         </section>
 
@@ -255,19 +257,20 @@
                     <span class="w-1.5 h-5 bg-blue-700 rounded-full"></span>
                     <h2 id="panelTitle" class="font-bold text-slate-800">รายการกฎหมาย</h2>
                 </div>
+                <span id="panelNote" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">All List</span>
+            </div>
+            <div id="list" class="flex flex-col gap-3">
+                <!-- Cards will be rendered by JS -->
             </div>
             
-            <div id="list" class="flex flex-col gap-3 min-h-[100px]">
-                 <!-- JS will populate cards here -->
-            </div>
-            
-            <!-- Pagination Controls -->
-            <div class="flex justify-center gap-4 mt-6 pb-8">
-                <button id="btnPrev" class="pagination-btn hidden">
-                    <span class="material-symbols-rounded align-bottom text-sm">arrow_back</span> ก่อนหน้า
+            <!-- Pagination -->
+            <div class="flex justify-center items-center gap-3 mt-8 pb-8">
+                <button id="btnPrev" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 font-medium hover:bg-slate-50 disabled:opacity-50 transition-colors">
+                    ก่อนหน้า
                 </button>
-                <button id="btnNext" class="pagination-btn hidden">
-                    ถัดไป <span class="material-symbols-rounded align-bottom text-sm">arrow_forward</span>
+                <span class="text-[10px] text-slate-400">แสดงผลลัพธ์ทั้งหมด</span>
+                <button id="btnNext" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 font-medium hover:bg-slate-50 disabled:opacity-50 transition-colors">
+                    ถัดไป
                 </button>
             </div>
         </section>
@@ -276,6 +279,7 @@
     <!-- Community Page -->
     <div id="view-community" class="hidden">
         <div class="pt-6 pb-20">
+            <!-- COMMUNITY VIEW: Facebook Feed -->
             <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <div class="p-4 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
                     <span class="material-symbols-rounded text-blue-600">forum</span>
@@ -356,7 +360,7 @@
             </button>
         </header>
         
-        <div id="chatBox" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50 gap-3 scroll-smooth">
+        <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50 gap-3 scroll-smooth">
             <div class="text-center py-2 text-xs text-slate-400">วันนี้</div>
             <div class="bubble bubble-ai">
                 สวัสดีครับ 🙏 ผมคือ AI ผู้ช่วยทางกฎหมาย<br>
@@ -373,477 +377,91 @@
         
         <div class="p-3 border-t bg-white flex gap-2 items-end">
             <div class="flex-1 bg-slate-100 rounded-[20px] px-4 py-2 border border-transparent focus-within:border-blue-500 focus-within:bg-white transition-all flex items-center gap-2">
-                <input id="chatInput" type="text" class="flex-1 bg-transparent text-sm outline-none text-slate-700 min-h-[24px] max-h-[100px]" placeholder="พิมพ์คำถามที่นี่..." autocomplete="off">
+                <input id="user-input" type="text" class="flex-1 bg-transparent text-sm outline-none text-slate-700 min-h-[24px] max-h-[100px]" placeholder="พิมพ์คำถามที่นี่..." autocomplete="off">
             </div>
-            <button id="btnSendChat" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95 transition-transform shrink-0 mb-0.5">
+            <button id="send-btn" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95 transition-transform shrink-0 mb-0.5">
                 <span class="material-symbols-rounded text-[20px] ml-0.5">send</span>
             </button>
         </div>
     </div>
 </div>
 
-<script>
-/* ======================================================
-   CONFIG & DATA HANDLING
-====================================================== */
-const PAGE_SIZE = 5;
-const DATA_SOURCES = [
-  "./pamon.json",
-  "./ratathammanoon.json",
-  "./pharaschabunyad.json",
-];
+<!-- Main UI Script (Loaded from external file as requested) -->
+<script src="./app.js"></script>
 
-// --- Mock Data for Preview (Since we can't fetch external JSON here) ---
-// ในการใช้งานจริง ลบส่วนนี้ออกและใช้ fetch ปกติ
-const MOCK_DATA = [
-  { "ชื่อกฎหมาย": "ประมวลกฎหมายแพ่งและพาณิชย์", "หมวด": "ประมวลกฎหมาย", "วันที่": "2024-01-15", "URL_PD": "https://example.com/civil.pdf" },
-  { "ชื่อกฎหมาย": "ประมวลกฎหมายอาญา", "หมวด": "ประมวลกฎหมาย", "วันที่": "2023-11-20", "URL_PD": "https://example.com/criminal.pdf" },
-  { "ชื่อกฎหมาย": "รัฐธรรมนูญแห่งราชอาณาจักรไทย", "หมวด": "รัฐธรรมนูญ", "วันที่": "2017-04-06", "URL_PD": "" },
-  { "ชื่อกฎหมาย": "พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)", "หมวด": "พระราชบัญญัติ", "วันที่": "2023-12-01", "URL_PD": "https://example.com/pdpa.pdf" },
-  { "ชื่อกฎหมาย": "พ.ร.บ. จราจรทางบก", "หมวด": "พระราชบัญญัติ", "วันที่": "2023-09-05", "URL_PD": "" },
-  { "ชื่อกฎหมาย": "พ.ร.บ. คอมพิวเตอร์", "หมวด": "พระราชบัญญัติ", "วันที่": "2022-05-10", "URL_PD": "" },
-  { "ชื่อกฎหมาย": "พ.ร.บ. แรงงานสัมพันธ์", "หมวด": "พระราชบัญญัติ", "วันที่": "2023-08-12", "URL_PD": "" },
-  { "ชื่อกฎหมาย": "พ.ร.บ. ลิขสิทธิ์", "หมวด": "พระราชบัญญัติ", "วันที่": "2023-03-22", "URL_PD": "" }
-];
+<!-- Chatbot Module Script -->
+<script type="module">
+    const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev'; 
+    let chatHistory = [];
+    const chatHistoryEl = document.getElementById('chat-history');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
 
-/* ======================================================
-   HELPERS
-====================================================== */
-const $ = (s, el = document) => el.querySelector(s);
-const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
+    sendBtn.addEventListener('click', handleUserMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleUserMessage();
+    });
 
-function escapeHtml(s = "") {
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-function sanitizeUrl(u=''){
-  try{
-    const url = new URL(u);
-    if(url.protocol === 'http:' || url.protocol === 'https:') return url.href;
-  }catch{}
-  return '';
-}
+    async function handleUserMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
 
-/* ======================================================
-   DOM
-====================================================== */
-const catbar      = $("#catbar");
-const listEl      = $("#list");
-const btnNext     = $("#btnNext");
-const btnPrev     = $("#btnPrev");
-const panelTitle  = $("#panelTitle");
-const elQ         = $("#q");
-const elBtnSearch = $("#btnSearch");
+        // 1. Add User Bubble
+        addBubble(text, 'user');
+        userInput.value = '';
+        
+        // 2. Add to history
+        chatHistory.push({ role: "user", content: text });
 
-/* ======================================================
-   FAVORITES
-====================================================== */
-const FAV_KEY = "thai_law_lite_favs";
+        // 3. Show Loading
+        const loading = document.getElementById('chatLoading');
+        loading.classList.remove('hidden');
+        scrollToBottom();
 
-function getFavs(){
-  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
-  catch { return []; }
-}
-function isFav(id){
-  return getFavs().some(f => f.id === id);
-}
-function toggleFav(id, title){
-  let favs = getFavs();
-  const i = favs.findIndex(f => f.id === id);
-  if(i > -1) favs.splice(i,1);
-  else favs.push({ id, title, date: new Date().toLocaleDateString('th-TH') });
-  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-}
-function renderFavList(){
-  const box = $("#favContainer");
-  if(!box) return;
+        // 4. Call Backend
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    message: text,
+                    history: chatHistory 
+                })
+            });
 
-  const favs = getFavs();
-  if(!favs.length){
-    box.innerHTML = `<div class="py-12 text-center text-slate-400 text-sm italic flex flex-col items-center gap-2">
-      <span class="material-symbols-rounded text-3xl opacity-30">bookmark_off</span>
-      ยังไม่มีรายการที่บันทึกไว้
-    </div>`;
-    return;
-  }
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
 
-  box.innerHTML = favs.map(f=>`
-    <div class="p-3 bg-white border border-slate-200 rounded-xl flex justify-between items-center shadow-sm">
-      <div>
-        <div class="text-sm font-bold text-slate-800">${escapeHtml(f.title)}</div>
-        <div class="text-[10px] text-slate-400 mt-0.5">บันทึกเมื่อ ${f.date}</div>
-      </div>
-      <button class="material-symbols-rounded text-slate-300 hover:text-red-500 hover:bg-red-50 p-1 rounded-full transition-colors"
-        onclick="removeFav('${f.id}')">delete</button>
-    </div>
-  `).join('');
-}
-window.removeFav = (id)=>{
-  localStorage.setItem(
-    FAV_KEY,
-    JSON.stringify(getFavs().filter(f=>f.id!==id))
-  );
-  renderFavList();
-  const btn = document.querySelector(`.fav-add-btn[data-id="${id}"]`);
-  if(btn) btn.classList.remove('active');
-};
+            const data = await response.json();
+            const aiReply = data.reply || data.response || data.message || JSON.stringify(data);
 
-/* ======================================================
-   COLUMN MAP
-====================================================== */
-const COLS = {
-  category : "หมวด",
-  title    : "ชื่อกฎหมาย",
-  date     : "วันที่",
-  url      : "URL_PD"
-};
-const col = k => COLS[k];
+            loading.classList.add('hidden');
+            addBubble(aiReply, 'ai');
+            
+            // Update history
+            chatHistory.push({ role: "assistant", content: aiReply });
 
-/* ======================================================
-   CATEGORY
-====================================================== */
-function normalizeCatName(raw=""){
-  if(raw.includes("ประมวล")) return "ประมวลกฎหมาย";
-  if(raw.includes("รัฐธรรมนูญ")) return "รัฐธรรมนูญ";
-  if(raw.includes("พระราชบัญญัติ")) return "พระราชบัญญัติ";
-  return raw;
-}
-const FIXED_CATS = ["ประมวลกฎหมาย","รัฐธรรมนูญ","พระราชบัญญัติ"];
-
-/* ======================================================
-   STATE
-====================================================== */
-let lawsData = [];
-const CatState = {};
-let selectedCat = null;
-
-/* ======================================================
-   RENDER
-====================================================== */
-function renderCard(r){
-  const t = r[col('title')] || '(ไม่มีชื่อ)';
-  const d = r[col('date')] || '';
-  const c = r[col('category')] || '';
-  const u = r[col('url')] || '';
-  const safe = sanitizeUrl(u);
-  // Create a unique ID based on title (simple version)
-  const id = btoa(unescape(encodeURIComponent(t)));
-  const fav = isFav(id);
-
-  return `
-  <article class="law-card relative">
-    <span class="fav-add-btn material-symbols-rounded ${fav?'active':''}"
-      data-id="${id}" data-title="${escapeHtml(t)}">bookmark</span>
-
-    <div class="flex items-center gap-2 mb-1">
-        <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold">${escapeHtml(c)}</span>
-        ${d ? `<span class="text-[10px] text-slate-400">${escapeHtml(d)}</span>` : ''}
-    </div>
-    
-    <div class="font-bold text-lg text-slate-800">${escapeHtml(t)}</div>
-    
-    <div class="mt-3 border-t border-slate-50 pt-2">
-      ${safe
-        ? `<a href="${safe}" target="_blank" class="inline-flex items-center gap-1 text-sm text-blue-600 font-semibold hover:underline">
-            <span class="material-symbols-rounded text-base">description</span> อ่านฉบับเต็ม
-           </a>`
-        : `<span class="inline-flex items-center gap-1 text-sm text-gray-400 cursor-not-allowed">
-            <span class="material-symbols-rounded text-base">description</span> ไม่มีไฟล์แนบ
-           </span>`
-      }
-    </div>
-  </article>`;
-}
-
-function renderChips(){
-  if(!catbar) return;
-  catbar.innerHTML = FIXED_CATS.map(c=>`
-    <button class="chip ${c===selectedCat?'active':''}" data-cat="${c}">
-      ${c}
-    </button>`).join('');
-}
-
-function renderList(){
-  if(!CatState[selectedCat]) return;
-  
-  const state = CatState[selectedCat];
-  const start = state.page * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-  const pageItems = state.rows.slice(start,end);
-
-  if(pageItems.length === 0 && state.rows.length === 0) {
-      listEl.innerHTML = `<div class="text-center text-slate-400 py-10">ไม่พบข้อมูลในหมวดนี้</div>`;
-  } else {
-      listEl.innerHTML = pageItems.map(renderCard).join('');
-  }
-  
-  btnPrev.classList.toggle('hidden', state.page===0);
-  btnNext.classList.toggle('hidden', end>=state.rows.length);
-  panelTitle.textContent = selectedCat;
-}
-
-/* ======================================================
-   LATEST (ล่าสุดรายหมวด)
-====================================================== */
-let latestIndex = 0;
-let latestTimer = null;
-
-function renderLatest(){
-  const track = document.getElementById("latestTrack");
-  const dots  = document.getElementById("dots");
-  if(!track) return;
-
-  // หาล่าสุดแยกตามหมวด
-  const latestByCat = {};
-  lawsData.forEach(r => {
-    const cat = normalizeCatName(r[col('category')] || '');
-    const date = r[col('date')];
-    if(!cat || !date) return;
-
-    if(
-      !latestByCat[cat] ||
-      new Date(date) > new Date(latestByCat[cat][col('date')])
-    ) {
-      latestByCat[cat] = r;
+        } catch (error) {
+            console.error('Error:', error);
+            loading.classList.add('hidden');
+            addBubble("ขออภัยครับ เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบ กรุณาลองใหม่อีกครั้ง", 'ai');
+        }
     }
-  });
 
-  const rows = Object.values(latestByCat);
-  if(rows.length === 0) {
-      track.innerHTML = '<div class="w-full text-center text-xs text-slate-400 py-4">ไม่มีข้อมูลอัพเดทล่าสุด</div>';
-      return;
-  }
-
-  /* ---------- render slides ---------- */
-  track.innerHTML = rows.map(r => `
-    <div class="w-full shrink-0 px-2 box-border">
-      <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 h-full flex flex-col items-center text-center gap-1">
-        <div class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 rounded-full">
-          ${escapeHtml(normalizeCatName(r[col('category')]))}
-        </div>
-        <div class="text-sm font-bold text-slate-800 line-clamp-1 w-full">
-          ${escapeHtml(r[col('title')])}
-        </div>
-        <div class="text-[10px] text-slate-400">
-          อัพเดท: ${escapeHtml(r[col('date')])}
-        </div>
-      </div>
-    </div>
-  `).join('');
-
-  track.style.width = `${rows.length * 100}%`;
-  
-  /* ---------- dots ---------- */
-  if(dots){
-    dots.innerHTML = rows.map((_,i)=>`
-      <div class="dot ${i===0?'active':''}"></div>
-    `).join('');
-  }
-
-  latestIndex = 0;
-  updateLatestSlide();
-  startLatestAuto(rows.length);
-}
-
-function updateLatestSlide(){
-  const track = document.getElementById("latestTrack");
-  const dots  = document.querySelectorAll("#dots .dot");
-  if(!track) return;
-
-  // Calculate percentage per slide based on number of slides
-  const slideCount = dots.length;
-  if(slideCount === 0) return;
-  
-  const percentage = (100 / slideCount) * latestIndex;
-  track.style.transform = `translateX(-${percentage}%)`;
-
-  dots.forEach((d,i)=>{
-    d.classList.toggle("active", i===latestIndex);
-  });
-}
-
-function startLatestAuto(len){
-  clearInterval(latestTimer);
-  if(len <= 1) return;
-
-  latestTimer = setInterval(()=>{
-    latestIndex = (latestIndex + 1) % len;
-    updateLatestSlide();
-  }, 4000); // ทุก 4 วิ
-}
-
-/* ======================================================
-   LOAD
-====================================================== */
-async function loadJsonAndStart(){
-  listEl.innerHTML = `<div class="text-center py-10 text-slate-400">กำลังโหลดข้อมูล...</div>`;
-
-  // === MOCK DATA LOGIC START (For Preview) ===
-  // ใน production ให้ลบ comment บรรทัด fetch ด้านล่างออก และลบบรรทัด mock data
-  
-  // const res = await Promise.all(
-  //   DATA_SOURCES.map(u=>fetch(u).then(r=>r.ok?r.json():[]).catch(()=>[]))
-  // );
-  // lawsData = res.flat();
-  
-  await new Promise(r => setTimeout(r, 800)); // Fake delay
-  lawsData = MOCK_DATA;
-  // === MOCK DATA LOGIC END ===
-
-  FIXED_CATS.forEach(c=>CatState[c]={rows:[],page:0});
-  lawsData.forEach(r=>{
-    const cat = normalizeCatName(r[col('category')]||'');
-    if(CatState[cat]) CatState[cat].rows.push(r);
-  });
-
-  selectedCat = FIXED_CATS[0];
-  renderChips();
-  renderLatest();
-  renderList();
-}
-
-/* ======================================================
-   EVENTS
-====================================================== */
-on(catbar,'click',e=>{
-  const b=e.target.closest('[data-cat]');
-  if(b){
-    selectedCat=b.dataset.cat;
-    CatState[selectedCat].page=0;
-    renderChips();
-    renderList();
-  }
-});
-on(listEl,'click',e=>{
-  const b=e.target.closest('.fav-add-btn');
-  if(b){
-    toggleFav(b.dataset.id,b.dataset.title);
-    b.classList.toggle('active');
-    
-    // Animation effect
-    b.style.transform = 'scale(1.2)';
-    setTimeout(() => b.style.transform = 'scale(1)', 200);
-  }
-});
-on(btnNext,'click',()=>{ CatState[selectedCat].page++; renderList(); });
-on(btnPrev,'click',()=>{ CatState[selectedCat].page--; renderList(); });
-on(elBtnSearch,'click',doSearch);
-on(elQ,'keydown',e=>e.key==='Enter'&&doSearch());
-
-function doSearch(){
-  const q=(elQ.value||'').trim();
-  if(!q) {
-      CatState[selectedCat].page = 0;
-      return renderList();
-  }
-
-  const hits=lawsData.filter(r=>
-    Object.values(COLS).some(k=>(r[k]||'').includes(q))
-  );
-  
-  if(hits.length === 0) {
-      listEl.innerHTML = `<div class="text-center text-slate-400 py-10">ไม่พบผลลัพธ์ "${escapeHtml(q)}"</div>`;
-  } else {
-      listEl.innerHTML = hits.map(renderCard).join('');
-  }
-  
-  btnPrev.classList.add('hidden');
-  btnNext.classList.add('hidden');
-  panelTitle.textContent=`ผลการค้นหา "${q}"`;
-}
-
-/* ======================================================
-   EXISTING CHATBOT & TAB LOGIC
-====================================================== */
-function toggleModal(id, show) {
-    const el = document.getElementById(id);
-    if (show) {
-        el.classList.add('active');
-        if(id === 'modalChat') setTimeout(()=>document.getElementById('chatInput').focus(), 100);
-    } else {
-        el.classList.remove('active');
+    function addBubble(text, type) {
+        const bubble = document.createElement('div');
+        bubble.className = `bubble bubble-${type} animate-slide-up`;
+        bubble.innerHTML = text;
+        chatHistoryEl.appendChild(bubble);
+        scrollToBottom();
     }
-}
 
-function switchTab(tab) {
-    document.getElementById('view-home').className = tab === 'home' ? '' : 'hidden';
-    document.getElementById('view-community').className = tab === 'community' ? '' : 'hidden';
-    document.getElementById('nav-home').className = `nav-item ${tab === 'home' ? 'active' : ''}`;
-    document.getElementById('nav-community').className = `nav-item ${tab === 'community' ? 'active' : ''}`;
-}
-
-// Chatbot Logic
-function handleUserMessage() {
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (!text) return;
-    addBubble(text, 'user');
-    input.value = '';
-    const loading = document.getElementById('chatLoading');
-    loading.classList.remove('hidden');
-    scrollToBottom();
-    setTimeout(() => {
-        loading.classList.add('hidden');
-        const aiResponse = getAIResponse(text);
-        addBubble(aiResponse, 'ai');
-    }, 1500);
-}
-
-function addBubble(text, type) {
-    const box = document.getElementById('chatBox');
-    const bubble = document.createElement('div');
-    bubble.className = `bubble bubble-${type} animate-slide-up`;
-    bubble.innerHTML = text;
-    box.appendChild(bubble);
-    scrollToBottom();
-}
-
-function scrollToBottom() {
-    const box = document.getElementById('chatBox');
-    box.scrollTop = box.scrollHeight;
-}
-
-function getAIResponse(input) {
-    const txt = input.toLowerCase();
-    if (txt.includes('สวัสดี') || txt.includes('hi')) return 'สวัสดีครับ มีเรื่องกฎหมายอะไรให้ช่วยครับ?';
-    if (txt.includes('ขอบคุณ')) return 'ยินดีเสมอครับ';
-    if (txt.includes('ฆ่า') || txt.includes('ตาย')) return 'เกี่ยวกับการทำให้เสียชีวิต มักเกี่ยวข้องกับ <b>ป.อาญา มาตรา 288</b> (เจตนาฆ่า) หรือ มาตรา 290 (ทำร้ายจนตาย) ครับ';
-    if (txt.includes('หนี้') || txt.includes('ยืม')) return 'เรื่องหนี้สินและการกู้ยืม อยู่ใน <b>ประมวลกฎหมายแพ่งและพาณิชย์</b> ครับ กู้ยืมเงินกว่า 2,000 บาทขึ้นไปต้องมีหลักฐานเป็นหนังสือ';
-    
-    // Search in current lawsData
-    const found = lawsData.find(l => (l[COLS.title]||'').includes(txt));
-    if (found) {
-        return `พบข้อมูลที่เกี่ยวข้อง: <br><b>${found[COLS.title]}</b><br>หมวด: ${found[COLS.category]}`;
+    function scrollToBottom() {
+        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
     }
-    
-    return 'ขออภัยครับ ผมอาจจะยังไม่เข้าใจบริบทลึกซึ้ง ลองถามด้วยคำค้นหาหลักๆ ดูนะครับ';
-}
-
-/* ======================================================
-   INIT
-====================================================== */
-document.addEventListener("DOMContentLoaded",()=>{
-  // 1. Load Data & Start List Logic
-  loadJsonAndStart();
-
-  // 2. Setup Favorites Modal Listeners
-  $("#btnOpenFavs")?.addEventListener('click',()=>{
-    $("#modalFavs").style.display='flex'; // Or toggle class
-    $("#modalFavs").classList.add('active');
-    renderFavList();
-  });
-  $("#btnCloseFavs")?.addEventListener('click',()=>{
-    $("#modalFavs").style.display='none';
-    $("#modalFavs").classList.remove('active');
-  });
-
-  // 3. Setup Chatbot Listeners
-  document.getElementById('fab-chat')?.addEventListener('click', () => toggleModal('modalChat', true));
-  document.getElementById('btnCloseChat')?.addEventListener('click', () => toggleModal('modalChat', false));
-  document.getElementById('btnSendChat')?.addEventListener('click', handleUserMessage);
-  document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') handleUserMessage();
-  });
-});
 </script>
 
 </body>
