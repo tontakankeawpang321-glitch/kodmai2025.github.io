@@ -341,7 +341,7 @@
                 </div>
                 <div id="latestViewport" class="overflow-hidden">
                     <div id="latestTrack" class="flex transition-transform duration-300">
-                        <!-- Auto-generated slides -->
+                        <!-- Auto-generated slides via app.js -->
                     </div>
                 </div>
                 <div id="dots" class="flex justify-center gap-1.5 mt-3"></div>
@@ -351,7 +351,7 @@
         <!-- Categories -->
         <section class="mt-4">
             <div class="catbar-scroll" id="catbar">
-                <!-- Categories will be here -->
+                <!-- Categories via app.js -->
             </div>
         </section>
 
@@ -365,7 +365,7 @@
                 <span id="panelNote" class="text-xs font-medium text-slate-400 ml-auto">แสดงผลล่าสุด</span>
             </div>
             <div id="list" class="flex flex-col gap-3">
-                <!-- Data will be loaded here -->
+                <!-- Data via app.js -->
             </div>
             <div class="flex justify-center gap-3 mt-6">
                 <button id="btnPrev" class="px-4 py-2 rounded-lg bg-white border border-slate-300 text-sm hidden">ย้อนกลับ</button>
@@ -467,53 +467,6 @@
     </div>
 </div>
 
-<!-- Mock app.js Logic (เพื่อให้ตัวอย่างทำงานได้ในหน้าเดียว) -->
-<script>
-// Mock Data สำหรับตัวอย่าง (ในกรณีที่ app.js ยังไม่ถูกเขียนหรือโหลดไม่สำเร็จ)
-const mockLaws = [
-    { id: '1', title: 'ประมวลกฎหมายอาญา มาตรา 1', tag: 'อาญา' },
-    { id: '2', title: 'ประมวลกฎหมายแพ่งและพาณิชย์ มาตรา 4', tag: 'แพ่ง' },
-    { id: '3', title: 'พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)', tag: 'พ.ร.บ.' }
-];
-
-function initApp() {
-    const listEl = document.getElementById('list');
-    const catbarEl = document.getElementById('catbar');
-    const trackEl = document.getElementById('latestTrack');
-    const dotsEl = document.getElementById('dots');
-
-    // Load Categories
-    ['ทั้งหมด', 'อาญา', 'แพ่ง', 'รัฐธรรมนูญ', 'ปกครอง'].forEach((cat, idx) => {
-        const chip = document.createElement('div');
-        chip.className = `chip ${idx === 0 ? 'active' : ''}`;
-        chip.innerText = cat;
-        catbarEl.appendChild(chip);
-    });
-
-    // Load Laws
-    const favs = JSON.parse(localStorage.getItem('thai_law_favs') || '[]');
-    listEl.innerHTML = mockLaws.map(law => {
-        const isFav = favs.some(f => f.id === law.id);
-        return `
-        <div class="law-card">
-            <span class="material-symbols-rounded fav-add-btn ${isFav ? 'active' : ''}" data-id="${law.id}" data-title="${law.title}">favorite</span>
-            <div class="text-xs text-blue-600 font-bold mb-1">[${law.tag}]</div>
-            <div class="font-bold text-slate-800 pr-8">${law.title}</div>
-            <div class="mt-2 flex gap-2">
-                <button class="text-[11px] bg-slate-100 px-3 py-1 rounded text-slate-500">อ่านเพิ่มเติม</button>
-            </div>
-        </div>
-    `}).join('');
-
-    // Load Slides
-    const slides = ['อัพเดท พ.ร.บ. จราจรใหม่ 2567', 'ระวัง! กฎหมายไซเบอร์ฉบับแก้ไข', 'เปิดเกณฑ์ยื่นภาษีปีล่าสุด'];
-    trackEl.innerHTML = slides.map(s => `<div class="latest-slide"><div class="text-sm font-semibold text-slate-700">${s}</div></div>`).join('');
-    dotsEl.innerHTML = slides.map((_, i) => `<div class="w-1.5 h-1.5 rounded-full ${i===0?'bg-blue-700 w-4':'bg-slate-300'}"></div>`).join('');
-}
-
-window.addEventListener('load', initApp);
-</script>
-
 <script>
 // --- Navigation Logic ---
 const navHome = document.getElementById('nav-home');
@@ -571,15 +524,10 @@ function removeFav(id) {
     let favs = getFavorites().filter(f => f.id !== id);
     localStorage.setItem(FAV_KEY, JSON.stringify(favs));
     renderFavorites();
-    // Update main list icon if visible
     const icon = document.querySelector(`.fav-add-btn[data-id="${id}"]`);
     if(icon) icon.classList.remove('active');
 }
 
-document.getElementById('openFavs').onclick = () => {
-    document.getElementById('favModal').style.display = 'flex';
-    renderFavorites();
-};
 document.getElementById('openFavs').onclick = () => {
     document.getElementById('favModal').style.display = 'flex';
     renderFavorites();
@@ -659,7 +607,6 @@ function appendBubble(msg, role) {
 sendBtn.onclick = handleChat;
 userInput.onkeydown = (e) => e.key === 'Enter' && handleChat();
 
-// ปิด Modal เมื่อคลิกด้านนอก
 window.onclick = (e) => {
     if (e.target.classList.contains('modal-overlay')) {
         e.target.style.display = 'none';
@@ -667,7 +614,7 @@ window.onclick = (e) => {
 };
 </script>
 
-<script src="app.js?v=2" defer></script>
+<script src="app.js?v=3" defer></script>
 
 </body>
 </html>
