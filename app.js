@@ -13,7 +13,7 @@ const DATA_SOURCES = [
    HELPERS
 ====================================================== */
 const $ = (s, el = document) => el.querySelector(s);
-const on = (el, ev, fn) => { if (el) el.addEventListener(ev, fn); };
+const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
 
 function escapeHtml(s = "") {
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -28,38 +28,57 @@ function sanitizeUrl(u=''){
 }
 
 /* ======================================================
-   DOM ELEMENTS
+   DOM
 ====================================================== */
 const catbar     = $("#catbar");
 const listEl     = $("#list");
 const btnNext    = $("#btnNext");
 const btnPrev    = $("#btnPrev");
 const panelTitle = $("#panelTitle");
-
 const elQ        = $("#q");
 const elBtnSearch= $("#btnSearch");
 
 /* ======================================================
-   COLUMN MAP (ตรงกับ JSON)
+   FAVORITES
+====================================================== */
+const FAV_KEY = "thai_law_lite_favs";
+
+function getFavs(){
+  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
+  catch { return []; }
+}
+
+function isFav(id){
+  return getFavs().some(f => f.id === id);
+}
+
+function toggleFav(id, title){
+  let favs = getFavs();
+  const i = favs.findIndex(f => f.id === id);
+  if(i > -1) favs.splice(i,1);
+  else favs.push({ id, title, date: new Date().toLocaleDateString('th-TH') });
+  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+}
+
+/* ======================================================
+   COLUMN MAP
 ====================================================== */
 const COLS = {
   category : "หมวด",
   title    : "ชื่อกฎหมาย",
   date     : "วันที่",
-  volume   : "เล่มตอน",
   url      : "URL_PD"
 };
 const col = k => COLS[k];
 
 /* ======================================================
-   CATEGORY NORMALIZE
+   CATEGORY
 ====================================================== */
 function normalizeCatName(raw=""){
-  const s = (raw || "").trim();
-  if (s.includes("ประมวล")) return "ประมวลกฎหมาย";
-  if (s.includes("รัฐธรรมนูญ")) return "รัฐธรรมนูญ";
-  if (s.includes("พระราชบัญญัติ")) return "พระราชบัญญัติ";
-  return s;
+  if(raw.includes("ประมวล")) return "ประมวลกฎหมาย";
+  if(raw.includes("รัฐธรรมนูญ")) return "รัฐธรรมนูญ";
+  if(raw.includes("พระราชบัญญัติ")) return "พระราชบัญญัติ";
+  return raw;
 }
 
 const FIXED_CATS = [
@@ -84,12 +103,19 @@ function renderCard(r){
   const c = r[col('category')] || '';
   const u = r[col('url')] || '';
   const safe = sanitizeUrl(u);
+  const id = btoa(unescape(encodeURIComponent(t)));
+  const fav = isFav(id);
 
   return `
-  <article class="law-card">
-    <div class="law-title font-semibold">${escapeHtml(t)}</div>
+  <article class="law-card relative">
+    <span class="fav-add-btn material-symbols-rounded ${fav?'active':''}"
+      data-id="${id}" data-title="${escapeHtml(t)}">
+      favorite
+    </span>
+
+    <div class="font-semibold">${escapeHtml(t)}</div>
     <div class="text-sm text-gray-500 mt-1">
-      ${c ? escapeHtml(c) : ''} ${d ? ' • ' + escapeHtml(d) : ''}
+      ${escapeHtml(c)} ${d ? ' • '+escapeHtml(d):''}
     </div>
     <div class="mt-2">
       ${safe
@@ -101,118 +127,107 @@ function renderCard(r){
 }
 
 function renderChips(){
-  if(!catbar) return;
   catbar.innerHTML = FIXED_CATS.map(c=>`
     <button class="chip ${c===selectedCat?'active':''}" data-cat="${c}">
       ${c}
-    </button>
-  `).join('');
-}
-
-/* ======================================================
-   CORE
-====================================================== */
-async function loadJsonAndStart(){
-  if(listEl) listEl.innerHTML = `<div class="empty">กำลังโหลดข้อมูล…</div>`;
-
-  try{
-    const reqs = DATA_SOURCES.map(u =>
-      fetch(u).then(r=>r.ok?r.json():[]).catch(()=>[])
-    );
-    const results = await Promise.all(reqs);
-    lawsData = results.flat();
-
-    if(!lawsData.length){
-      listEl.innerHTML = `<div class="empty">ไม่พบข้อมูล</div>`;
-      return;
-    }
-
-    buildIndex();
-    selectedCat = FIXED_CATS[0];
-    renderChips();
-    renderList();
-
-  }catch(e){
-    console.error(e);
-    listEl.innerHTML = `<div class="empty">โหลดข้อมูลไม่สำเร็จ</div>`;
-  }
-}
-
-function buildIndex(){
-  FIXED_CATS.forEach(c=>{
-    CatState[c] = { rows: [], page: 0 };
-  });
-
-  lawsData.forEach(item=>{
-    const rawCat = item[col('category')] || '';
-    const norm = normalizeCatName(rawCat);
-    if(CatState[norm]){
-      CatState[norm].rows.push(item);
-    }
-  });
+    </button>`).join('');
 }
 
 function renderList(){
-  if(!selectedCat) return;
-
   const state = CatState[selectedCat];
   const start = state.page * PAGE_SIZE;
-  const end   = start + PAGE_SIZE;
-  const rows  = state.rows.slice(start, end);
+  const end = start + PAGE_SIZE;
+  const rows = state.rows.slice(start,end);
 
   listEl.innerHTML = rows.map(renderCard).join('');
-
-  btnPrev.classList.toggle('hidden', state.page === 0);
-  btnNext.classList.toggle('hidden', end >= state.rows.length);
-
-  if(panelTitle) panelTitle.textContent = selectedCat;
+  btnPrev.classList.toggle('hidden', state.page===0);
+  btnNext.classList.toggle('hidden', end>=state.rows.length);
+  panelTitle.textContent = selectedCat;
 }
 
-function selectCategory(cat){
-  selectedCat = cat;
-  CatState[cat].page = 0;
+/* ======================================================
+   LATEST
+====================================================== */
+function renderLatest(){
+  const track = $("#latestTrack");
+  if(!track) return;
+
+  const latest = [...lawsData]
+    .filter(r=>r[col('date')])
+    .sort((a,b)=> new Date(b[col('date')]) - new Date(a[col('date')]))
+    .slice(0,5);
+
+  track.innerHTML = latest.map(r=>`
+    <div class="w-full py-2 text-sm text-slate-700">
+      ${escapeHtml(r[col('title')])}
+    </div>`).join('');
+}
+
+/* ======================================================
+   LOAD
+====================================================== */
+async function loadJsonAndStart(){
+  listEl.innerHTML = "กำลังโหลดข้อมูล…";
+
+  const reqs = DATA_SOURCES.map(u =>
+    fetch(u).then(r=>r.ok?r.json():[]).catch(()=>[])
+  );
+
+  const res = await Promise.all(reqs);
+  lawsData = res.flat();
+
+  FIXED_CATS.forEach(c=> CatState[c]={ rows:[], page:0 });
+
+  lawsData.forEach(r=>{
+    const cat = normalizeCatName(r[col('category')]||'');
+    if(CatState[cat]) CatState[cat].rows.push(r);
+  });
+
+  selectedCat = FIXED_CATS[0];
   renderChips();
+  renderLatest();
   renderList();
 }
 
 /* ======================================================
    EVENTS
 ====================================================== */
-on(catbar, 'click', e=>{
-  const btn = e.target.closest('[data-cat]');
-  if(btn) selectCategory(btn.dataset.cat);
+on(catbar,'click',e=>{
+  const b = e.target.closest('[data-cat]');
+  if(b){
+    selectedCat=b.dataset.cat;
+    CatState[selectedCat].page=0;
+    renderChips();
+    renderList();
+  }
 });
 
-on(btnNext, 'click', ()=>{
-  CatState[selectedCat].page++;
-  renderList();
+on(listEl,'click',e=>{
+  const b = e.target.closest('.fav-add-btn');
+  if(b){
+    toggleFav(b.dataset.id,b.dataset.title);
+    b.classList.toggle('active');
+  }
 });
 
-on(btnPrev, 'click', ()=>{
-  CatState[selectedCat].page--;
-  renderList();
-});
+on(btnNext,'click',()=>{ CatState[selectedCat].page++; renderList(); });
+on(btnPrev,'click',()=>{ CatState[selectedCat].page--; renderList(); });
 
-on(elBtnSearch, 'click', doSearch);
-on(elQ, 'keydown', e=> e.key==='Enter' && doSearch());
+on(elBtnSearch,'click',doSearch);
+on(elQ,'keydown',e=>e.key==='Enter'&&doSearch());
 
 function doSearch(){
-  const q = (elQ.value || '').trim();
-  if(!q){
-    selectCategory(selectedCat);
-    return;
-  }
+  const q=(elQ.value||'').trim();
+  if(!q) return renderList();
 
-  const hits = lawsData.filter(r =>
-    Object.values(COLS).some(k =>
-      (r[k]||'').toString().includes(q)
-    )
+  const hits=lawsData.filter(r =>
+    Object.values(COLS).some(k=>(r[k]||'').includes(q))
   );
 
   listEl.innerHTML = hits.map(renderCard).join('');
   btnPrev.classList.add('hidden');
   btnNext.classList.add('hidden');
-  if(panelTitle) panelTitle.textContent = `ผลการค้นหา: "${q}"`;
+  panelTitle.textContent=`ผลการค้นหา "${q}"`;
 }
 
 /* ======================================================
