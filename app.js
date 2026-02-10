@@ -168,14 +168,18 @@ function renderList(){
 /* ======================================================
    ✅ LATEST (ล่าสุดรายหมวด – แก้ตรงนี้)
 ====================================================== */
+let latestIndex = 0;
+let latestTimer = null;
+
 function renderLatest(){
-  const track = $("#latestTrack");
+  const track = document.getElementById("latestTrack");
+  const dots  = document.getElementById("dots");
   if(!track) return;
 
+  // หาล่าสุดแยกตามหมวด
   const latestByCat = {};
-
-  lawsData.forEach(r=>{
-    const cat = normalizeCatName(r[col('category')]||'');
+  lawsData.forEach(r => {
+    const cat = normalizeCatName(r[col('category')] || '');
     const date = r[col('date')];
     if(!cat || !date) return;
 
@@ -187,9 +191,12 @@ function renderLatest(){
     }
   });
 
-  track.innerHTML = Object.values(latestByCat).map(r=>`
-    <div class="w-full py-3 px-3">
-      <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+  const rows = Object.values(latestByCat);
+
+  /* ---------- render slides ---------- */
+  track.innerHTML = rows.map(r => `
+    <div class="w-full shrink-0 px-2">
+      <div class="bg-white border border-slate-200 rounded-xl p-3 h-full">
         <div class="text-[10px] font-bold text-blue-600 mb-1">
           ${escapeHtml(normalizeCatName(r[col('category')]))}
         </div>
@@ -202,6 +209,42 @@ function renderLatest(){
       </div>
     </div>
   `).join('');
+
+  track.style.width = `${rows.length * 100}%`;
+  track.style.display = "flex";
+  track.style.transition = "transform 0.4s ease";
+
+  /* ---------- dots ---------- */
+  if(dots){
+    dots.innerHTML = rows.map((_,i)=>`
+      <div class="dot ${i===0?'active':''}"></div>
+    `).join('');
+  }
+
+  latestIndex = 0;
+  updateLatestSlide();
+  startLatestAuto(rows.length);
+}
+function updateLatestSlide(){
+  const track = document.getElementById("latestTrack");
+  const dots  = document.querySelectorAll("#dots .dot");
+  if(!track) return;
+
+  track.style.transform = `translateX(-${latestIndex * 100}%)`;
+
+  dots.forEach((d,i)=>{
+    d.classList.toggle("active", i===latestIndex);
+  });
+}
+
+function startLatestAuto(len){
+  clearInterval(latestTimer);
+  if(len <= 1) return;
+
+  latestTimer = setInterval(()=>{
+    latestIndex = (latestIndex + 1) % len;
+    updateLatestSlide();
+  }, 4000); // ทุก 4 วิ
 }
 
 /* ======================================================
