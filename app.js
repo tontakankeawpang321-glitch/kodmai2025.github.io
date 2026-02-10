@@ -169,16 +169,40 @@ function renderList(){
    ✅ LATEST (ล่าสุดรายหมวด – แก้ตรงนี้)
 ====================================================== */
 function renderLatest(){
-  const track = $("#latestTrack");
+  const track = document.getElementById("latestTrack");
   if(!track) return;
 
+  // ล่าสุดแยกตามหมวด
   const latestByCat = {};
 
-  lawsData.forEach(r=>{
-    const cat = normalizeCatName(r[col('category')]||'');
+  lawsData.forEach(r => {
+    const cat = normalizeCatName(r[col('category')] || '');
     const date = r[col('date')];
     if(!cat || !date) return;
 
-    if(
+    if (
       !latestByCat[cat] ||
-      new Date(date) > new Date(latestByCa
+      new Date(date) > new Date(latestByCat[cat][col('date')])
+    ) {
+      latestByCat[cat] = r;
+    }
+  });
+
+  const rows = Object.values(latestByCat);
+
+  track.innerHTML = rows.map(r => `
+    <div class="w-full px-2 py-2">
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+        <div class="text-[10px] font-bold text-blue-600 mb-1">
+          ${escapeHtml(normalizeCatName(r[col('category')]))}
+        </div>
+        <div class="text-sm font-semibold text-slate-800 line-clamp-2">
+          ${escapeHtml(r[col('title')])}
+        </div>
+        <div class="text-[10px] text-slate-400 mt-1">
+          ${escapeHtml(r[col('date')])}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
