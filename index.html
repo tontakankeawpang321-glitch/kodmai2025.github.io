@@ -198,14 +198,15 @@
         .fb-container {
             background: white;
             border-radius: var(--radius-card);
-            padding: 8px;
+            padding: 4px;
             box-shadow: var(--shadow-card);
             margin-top: 16px;
             border: 1px solid var(--border);
             overflow: hidden;
-            min-height: 500px;
+            min-height: 450px;
             display: flex;
             justify-content: center;
+            width: 100%;
         }
 
         /* --- Law Cards --- */
@@ -228,9 +229,12 @@
             right: 12px;
             color: #cbd5e1;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: color 0.2s, transform 0.1s;
             user-select: none;
+            z-index: 5;
+            padding: 4px;
         }
+        .fav-add-btn:active { transform: scale(1.2); }
         .fav-add-btn.active { color: #ef4444; font-variation-settings: 'FILL' 1; }
 
         /* --- Chat FAB --- */
@@ -341,7 +345,8 @@
                 </div>
                 <div id="latestViewport" class="overflow-hidden">
                     <div id="latestTrack" class="flex transition-transform duration-300">
-                        <!-- Auto-generated slides via app.js -->
+                        <!-- จะถูกเติมโดย app.js -->
+                        <div class="latest-slide py-4 text-center text-slate-400 text-xs">กำลังโหลดประกาศ...</div>
                     </div>
                 </div>
                 <div id="dots" class="flex justify-center gap-1.5 mt-3"></div>
@@ -351,7 +356,7 @@
         <!-- Categories -->
         <section class="mt-4">
             <div class="catbar-scroll" id="catbar">
-                <!-- Categories via app.js -->
+                <!-- หมวดหมู่จะถูกเติมโดย app.js -->
             </div>
         </section>
 
@@ -365,7 +370,8 @@
                 <span id="panelNote" class="text-xs font-medium text-slate-400 ml-auto">แสดงผลล่าสุด</span>
             </div>
             <div id="list" class="flex flex-col gap-3">
-                <!-- Data via app.js -->
+                <!-- รายการกฎหมายจะถูกเติมโดย app.js -->
+                <div class="py-10 text-center text-slate-400 text-sm">กำลังเชื่อมต่อฐานข้อมูล...</div>
             </div>
             <div class="flex justify-center gap-3 mt-6">
                 <button id="btnPrev" class="px-4 py-2 rounded-lg bg-white border border-slate-300 text-sm hidden">ย้อนกลับ</button>
@@ -387,7 +393,7 @@
                 <div class="fb-page" 
                     data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
                     data-tabs="timeline" 
-                    data-width="500" 
+                    data-width="" 
                     data-small-header="false" 
                     data-adapt-container-width="true" 
                     data-hide-cover="false" 
@@ -485,7 +491,10 @@ function switchTab(target) {
         pageComm.style.display = 'block';
         navHome.classList.remove('active');
         navComm.classList.add('active');
-        if(window.FB) FB.XFBML.parse();
+        // รีเฟรช Facebook Plugin เมื่อเปิดหน้าชุมชน
+        if(window.FB) {
+            FB.XFBML.parse();
+        }
     }
     window.scrollTo(0, 0);
 }
@@ -497,7 +506,11 @@ navComm.onclick = () => switchTab('community');
 const FAV_KEY = 'thai_law_favs';
 
 function getFavorites() {
-    return JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+    try {
+        return JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+    } catch(e) {
+        return [];
+    }
 }
 
 function renderFavorites() {
@@ -513,20 +526,21 @@ function renderFavorites() {
                 <div class="text-xs font-semibold text-slate-700 line-clamp-1">${item.title}</div>
                 <div class="text-[9px] text-slate-400">บันทึกเมื่อ: ${item.date}</div>
             </div>
-            <button onclick="removeFav('${item.id}')" class="text-slate-300 hover:text-red-500 shrink-0">
+            <button onclick="removeFav('${item.id}')" class="text-slate-300 hover:text-red-500 shrink-0 p-1">
                 <span class="material-symbols-rounded text-lg">delete</span>
             </button>
         </div>
     `).join('');
 }
 
-function removeFav(id) {
+window.removeFav = function(id) {
     let favs = getFavorites().filter(f => f.id !== id);
     localStorage.setItem(FAV_KEY, JSON.stringify(favs));
     renderFavorites();
+    // อัปเดตไอคอนในหน้าหลักถ้ามีอยู่
     const icon = document.querySelector(`.fav-add-btn[data-id="${id}"]`);
     if(icon) icon.classList.remove('active');
-}
+};
 
 document.getElementById('openFavs').onclick = () => {
     document.getElementById('favModal').style.display = 'flex';
@@ -534,20 +548,29 @@ document.getElementById('openFavs').onclick = () => {
 };
 document.getElementById('closeFavs').onclick = () => document.getElementById('favModal').style.display = 'none';
 
+// ดักฟังการคลิกปุ่มหัวใจในรายการกฎหมาย (ใช้ Event Delegation)
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('.fav-add-btn');
     if (btn) {
+        e.preventDefault();
         const id = btn.dataset.id;
         const title = btn.dataset.title;
         let favs = getFavorites();
-        if (btn.classList.contains('active')) {
-            favs = favs.filter(f => f.id !== id);
+        const index = favs.findIndex(f => f.id === id);
+        
+        if (index > -1) {
+            favs.splice(index, 1);
             btn.classList.remove('active');
         } else {
             favs.push({ id, title, date: new Date().toLocaleDateString('th-TH') });
             btn.classList.add('active');
         }
         localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+        
+        // ถ้า Modal เปิดอยู่ ให้รีเฟรชลิสต์ใน Modal ด้วย
+        if (document.getElementById('favModal').style.display === 'flex') {
+            renderFavorites();
+        }
     }
 });
 
@@ -614,7 +637,7 @@ window.onclick = (e) => {
 };
 </script>
 
-<script src="app.js?v=3" defer></script>
+<script src="app.js?v=4" defer></script>
 
 </body>
 </html>
