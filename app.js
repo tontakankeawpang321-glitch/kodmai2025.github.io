@@ -37,7 +37,7 @@ const elQ        = $("#q");
 const elBtnSearch= $("#btnSearch");
 
 /* ======================================================
-   FAVORITES (LocalStorage)
+   FAVORITES
 ====================================================== */
 const FAV_KEY = "thai_law_lite_favs";
 
@@ -132,9 +132,7 @@ function renderCard(r){
   return `
   <article class="law-card relative">
     <span class="fav-add-btn material-symbols-rounded ${fav?'active':''}"
-      data-id="${id}" data-title="${escapeHtml(t)}">
-      favorite
-    </span>
+      data-id="${id}" data-title="${escapeHtml(t)}">favorite</span>
 
     <div class="font-semibold">${escapeHtml(t)}</div>
     <div class="text-sm text-gray-500 mt-1">
@@ -160,90 +158,27 @@ function renderList(){
   const state = CatState[selectedCat];
   const start = state.page * PAGE_SIZE;
   const end = start + PAGE_SIZE;
-  const rows = state.rows.slice(start,end);
 
-  listEl.innerHTML = rows.map(renderCard).join('');
+  listEl.innerHTML = state.rows.slice(start,end).map(renderCard).join('');
   btnPrev.classList.toggle('hidden', state.page===0);
   btnNext.classList.toggle('hidden', end>=state.rows.length);
   panelTitle.textContent = selectedCat;
 }
 
 /* ======================================================
-   LATEST
+   ✅ LATEST (ล่าสุดรายหมวด – แก้ตรงนี้)
 ====================================================== */
 function renderLatest(){
   const track = $("#latestTrack");
   if(!track) return;
 
-  const latest = [...lawsData]
-    .filter(r=>r[col('date')])
-    .sort((a,b)=> new Date(b[col('date')]) - new Date(a[col('date')]))
-    .slice(0,5);
+  const latestByCat = {};
 
-  track.innerHTML = latest.map(r=>`
-    <div class="w-full py-2 text-sm text-slate-700">
-      ${escapeHtml(r[col('title')])}
-    </div>`).join('');
-}
-
-/* ======================================================
-   LOAD
-====================================================== */
-async function loadJsonAndStart(){
-  listEl.innerHTML = "กำลังโหลดข้อมูล…";
-
-  const res = await Promise.all(
-    DATA_SOURCES.map(u=>fetch(u).then(r=>r.ok?r.json():[]).catch(()=>[]))
-  );
-  lawsData = res.flat();
-
-  FIXED_CATS.forEach(c=>CatState[c]={rows:[],page:0});
   lawsData.forEach(r=>{
     const cat = normalizeCatName(r[col('category')]||'');
-    if(CatState[cat]) CatState[cat].rows.push(r);
-  });
+    const date = r[col('date')];
+    if(!cat || !date) return;
 
-  selectedCat = FIXED_CATS[0];
-  renderChips();
-  renderLatest();
-  renderList();
-}
-
-/* ======================================================
-   EVENTS
-====================================================== */
-on(catbar,'click',e=>{
-  const b=e.target.closest('[data-cat]');
-  if(b){ selectedCat=b.dataset.cat; CatState[selectedCat].page=0; renderChips(); renderList(); }
-});
-on(listEl,'click',e=>{
-  const b=e.target.closest('.fav-add-btn');
-  if(b){ toggleFav(b.dataset.id,b.dataset.title); b.classList.toggle('active'); }
-});
-on(btnNext,'click',()=>{ CatState[selectedCat].page++; renderList(); });
-on(btnPrev,'click',()=>{ CatState[selectedCat].page--; renderList(); });
-on(elBtnSearch,'click',doSearch);
-on(elQ,'keydown',e=>e.key==='Enter'&&doSearch());
-
-function doSearch(){
-  const q=(elQ.value||'').trim();
-  if(!q) return renderList();
-  const hits=lawsData.filter(r=>Object.values(COLS).some(k=>(r[k]||'').includes(q)));
-  listEl.innerHTML = hits.map(renderCard).join('');
-  btnPrev.classList.add('hidden'); btnNext.classList.add('hidden');
-  panelTitle.textContent=`ผลการค้นหา "${q}"`;
-}
-
-/* ======================================================
-   INIT + MODAL
-====================================================== */
-document.addEventListener("DOMContentLoaded",()=>{
-  loadJsonAndStart();
-  $("#btnOpenFavs")?.addEventListener('click',()=>{
-    $("#modalFavs").style.display='flex';
-    renderFavList();
-  });
-  $("#btnCloseFavs")?.addEventListener('click',()=>{
-    $("#modalFavs").style.display='none';
-  });
-});
+    if(
+      !latestByCat[cat] ||
+      new Date(date) > new Date(latestByCa
