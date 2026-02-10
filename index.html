@@ -386,10 +386,102 @@
     </div>
 </div>
 
-<!-- Main UI Script (Loaded from external file as requested) -->
+<!-- Scripts -->
+
+<!-- 1. UI Control Script (Restore: Controls Tabs, Modals, Slider) -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Init Slider
+        initSlider();
+
+        // -- Event Listeners for UI Shell --
+        
+        // Navigation Tabs
+        const navHome = document.getElementById('nav-home');
+        const navCommunity = document.getElementById('nav-community');
+        if(navHome) navHome.addEventListener('click', () => switchTab('home'));
+        if(navCommunity) navCommunity.addEventListener('click', () => switchTab('community'));
+
+        // Chatbot Modal
+        const fabChat = document.getElementById('fab-chat');
+        const btnCloseChat = document.getElementById('btnCloseChat');
+        if(fabChat) fabChat.addEventListener('click', () => toggleModal('modalChat', true));
+        if(btnCloseChat) btnCloseChat.addEventListener('click', () => toggleModal('modalChat', false));
+
+        // Favorites Modal
+        const btnOpenFavs = document.getElementById('btnOpenFavs');
+        const btnCloseFavs = document.getElementById('btnCloseFavs');
+        if(btnOpenFavs) btnOpenFavs.addEventListener('click', () => {
+             // If app.js has openFavs function, call it. If not, just toggle.
+             if(typeof openFavs === 'function') openFavs();
+             toggleModal('modalFavs', true);
+        });
+        if(btnCloseFavs) btnCloseFavs.addEventListener('click', () => toggleModal('modalFavs', false));
+    });
+
+    // Helper: Switch Tabs
+    function switchTab(tab) {
+        const viewHome = document.getElementById('view-home');
+        const viewCommunity = document.getElementById('view-community');
+        const navHome = document.getElementById('nav-home');
+        const navCommunity = document.getElementById('nav-community');
+
+        if (tab === 'home') {
+            if(viewHome) viewHome.classList.remove('hidden');
+            if(viewCommunity) viewCommunity.classList.add('hidden');
+            if(navHome) navHome.classList.add('active');
+            if(navCommunity) navCommunity.classList.remove('active');
+        } else if (tab === 'community') {
+            if(viewHome) viewHome.classList.add('hidden');
+            if(viewCommunity) viewCommunity.classList.remove('hidden');
+            if(navHome) navHome.classList.remove('active');
+            if(navCommunity) navCommunity.classList.add('active');
+        }
+    }
+
+    // Helper: Toggle Modal
+    function toggleModal(id, show) {
+        const el = document.getElementById(id);
+        if(!el) return;
+        
+        if (show) {
+            el.classList.add('active');
+            if(id === 'modalChat') {
+                const input = document.getElementById('user-input');
+                if(input) setTimeout(() => input.focus(), 100);
+            }
+        } else {
+            el.classList.remove('active');
+        }
+    }
+
+    // Helper: Slider
+    function initSlider() {
+        let currentSlide = 0;
+        const track = document.getElementById('latestTrack');
+        const dots = document.querySelectorAll('.dot');
+        const slides = 3; 
+        
+        if(!track) return;
+
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides;
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((d, i) => {
+                d.className = `dot ${i === currentSlide ? 'active' : ''}`;
+            });
+        }, 4000);
+    }
+    
+    // Make functions global if app.js needs them (though unlikely)
+    window.switchTab = switchTab;
+    window.toggleModal = toggleModal;
+</script>
+
+<!-- 2. Law Data & Core Logic (External) -->
 <script src="./app.js"></script>
 
-<!-- Chatbot Module Script -->
+<!-- 3. Chatbot Backend Logic (Module) -->
 <script type="module">
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev'; 
     let chatHistory = [];
@@ -397,8 +489,8 @@
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
 
-    sendBtn.addEventListener('click', handleUserMessage);
-    userInput.addEventListener('keypress', (e) => {
+    if(sendBtn) sendBtn.addEventListener('click', handleUserMessage);
+    if(userInput) userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleUserMessage();
     });
 
@@ -415,7 +507,7 @@
 
         // 3. Show Loading
         const loading = document.getElementById('chatLoading');
-        loading.classList.remove('hidden');
+        if(loading) loading.classList.remove('hidden');
         scrollToBottom();
 
         // 4. Call Backend
@@ -438,7 +530,7 @@
             const data = await response.json();
             const aiReply = data.reply || data.response || data.message || JSON.stringify(data);
 
-            loading.classList.add('hidden');
+            if(loading) loading.classList.add('hidden');
             addBubble(aiReply, 'ai');
             
             // Update history
@@ -446,12 +538,13 @@
 
         } catch (error) {
             console.error('Error:', error);
-            loading.classList.add('hidden');
+            if(loading) loading.classList.add('hidden');
             addBubble("ขออภัยครับ เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบ กรุณาลองใหม่อีกครั้ง", 'ai');
         }
     }
 
     function addBubble(text, type) {
+        if(!chatHistoryEl) return;
         const bubble = document.createElement('div');
         bubble.className = `bubble bubble-${type} animate-slide-up`;
         bubble.innerHTML = text;
@@ -460,7 +553,7 @@
     }
 
     function scrollToBottom() {
-        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+        if(chatHistoryEl) chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
     }
 </script>
 
