@@ -131,7 +131,7 @@
 
         /* ปรับปรุงปุ่มบันทึกในรายการ (ไอคอนบวก มุมขวาบน) */
         .fav-btn-container {
-            position: absolute; top: 16px; right: 16px; z-index: 20;
+            position: absolute; top: 16px; right: 16px; z-index: 5;
         }
         .fav-btn { 
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -143,10 +143,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
+            width: 38px;
+            height: 38px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
         }
         .fav-btn.active { 
             color: var(--success) !important; 
@@ -545,105 +545,113 @@
     }
 
     // Auto-Transform Observer for App.js generated content
+    let listObserver = null;
     function startObserver() {
         const listEl = document.getElementById('list');
-        if(!listEl) return;
+        if (!listEl) return;
+
+        // ป้องกันสร้าง observer ซ้ำ
+        if (listObserver) return;
 
         const transformCard = (card) => {
-            if(card.dataset.transformed === "true") return;
-            
-            // Detect old button (usually contains 'favorite' icon or is a button)
-            const oldBtn = card.querySelector('button');
-            if(!oldBtn) return;
+            if (!card || card.dataset.transformed === "true") return;
 
-            // Extract ID
-            const match = oldBtn.getAttribute('onclick')?.match(/toggleFav\((['"]?)(.*?)\1\)/);
-            if(!match) return;
+            // ต้องเป็น card จริง
+            if (!card.matches('#list > div')) return;
+
+            // หา button เก่า (รูปหัวใจจาก app.js)
+            const oldBtn = card.querySelector('button');
+            if (!oldBtn) return;
+
+            const onclick = oldBtn.getAttribute('onclick');
+            if (!onclick) return;
+
+            const match = onclick.match(/toggleFav\((['"]?)(.*?)\1\)/);
+            if (!match) return;
+
             const sid = String(match[2]);
 
-            // Create New Button
-            const newContainer = document.createElement('div');
-            newContainer.className = 'fav-btn-container';
-            
-            const newBtn = document.createElement('button');
-            newBtn.className = 'fav-btn';
-            newBtn.onclick = (e) => { e.stopPropagation(); toggleFav(sid); };
-            
+            // ลบปุ่มเก่า
+            oldBtn.remove();
+
+            // สร้างปุ่มใหม่
+            const container = document.createElement('div');
+            container.className = 'fav-btn-container';
+
+            const btn = document.createElement('button');
+            btn.className = 'fav-btn';
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFav(sid);
+            };
+
             const icon = document.createElement('span');
             icon.className = 'material-symbols-rounded';
             icon.innerText = 'add_circle';
-            
-            newBtn.appendChild(icon);
-            newContainer.appendChild(newBtn);
 
-            // Apply Style & Replace
+            btn.appendChild(icon);
+            container.appendChild(btn);
+
             card.style.position = 'relative';
-            card.appendChild(newContainer);
-            oldBtn.remove();
-            
-            // Mark transformed
+            card.appendChild(container);
+
             card.dataset.transformed = "true";
 
-            // Set Initial State
+            // sync สถานะ
             const savedIds = getStored().map(s => String(s.id));
             if (savedIds.includes(sid)) {
-                newBtn.classList.add('active');
+                btn.classList.add('active');
                 icon.innerText = 'check_circle';
             }
         };
 
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach(mutation => {
-                mutation.addedNodes.forEach(node => {
-                    if(node.nodeType === 1) {
-                        if(node.matches && node.matches('div')) transformCard(node);
-                        if(node.querySelectorAll) node.querySelectorAll('div').forEach(transformCard);
+        listObserver = new MutationObserver((mutations) => {
+            mutations.forEach(m => {
+                m.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) {
+                        transformCard(node);
                     }
                 });
             });
         });
 
-        observer.observe(listEl, { childList: true, subtree: true });
-        // Initial run
-        listEl.querySelectorAll('#list > div').forEach(transformCard);
+        listObserver.observe(listEl, { childList: true });
     }
 
     window.jumpToItem = function(id) {
         const sid = String(id);
+
         toggleModal('modalFavs', false);
         switchTab('home');
 
-        const index = allLawsData.findIndex(law => {
-             const lawId = String(law.id || (law["ชื่อกฎหมาย"] + law["วันที่"]));
-             return lawId === sid;
-        });
-        
-        if (index !== -1) {
-             const targetPage = Math.floor(index / itemsPerPage) + 1;
-             if (currentPage !== targetPage) {
-                 currentPage = targetPage;
-                 renderPage();
-             }
-             
-             setTimeout(() => {
-                const safeId = sid.replace(/\s/g, '-');
-                const targetEl = document.getElementById(`law-item-${safeId}`);
-                if (targetEl) {
-                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    targetEl.classList.remove('target-highlight');
-                    void targetEl.offsetWidth; 
-                    targetEl.classList.add('target-highlight');
-                    setTimeout(() => targetEl.classList.remove('target-highlight'), 3000);
+        setTimeout(() => {
+            const index = allLawsData.findIndex(law => {
+                const lawId = String(law.id || (law["ชื่อกฎหมาย"] + law["วันที่"]));
+                return lawId === sid;
+            });
+
+            if (index !== -1) {
+                const targetPage = Math.floor(index / itemsPerPage) + 1;
+
+                if (currentPage !== targetPage) {
+                    currentPage = targetPage;
+                    renderPage();
                 }
-             }, 300);
-        } else {
-            // Pending Jump Logic
-            const allChip = document.querySelector('.chip');
-            if (allChip) {
-                pendingJumpId = sid;
-                allChip.click();
+
+                setTimeout(() => {
+                    const safeId = sid.replace(/\s/g, '-');
+                    const targetEl = document.getElementById(`law-item-${safeId}`);
+
+                    if (targetEl) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        targetEl.classList.remove('target-highlight');
+                        void targetEl.offsetWidth;
+                        targetEl.classList.add('target-highlight');
+                    }
+                }, 400);
             }
-        }
+        }, 200);
     };
 
     window.openFavs = function() {
