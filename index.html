@@ -17,7 +17,7 @@
             --primary: #1e3a8a;
             --primary-gradient: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
             --accent: #d97706;
-            --fav-red: #ef4444;
+            --success: #10b981;
             --bg-app: #f1f5f9;
             --text-main: #0f172a;
             --bottom-nav-height: 70px;
@@ -44,7 +44,6 @@
 
         .wrap { max-width: 600px; margin: 0 auto; padding: 0 16px; position: relative; }
 
-        /* ปุ่มเปิดรายการโปรดที่ Header */
         .fav-header-btn {
             position: absolute; top: 16px; right: 16px;
             background: rgba(255,255,255,0.2);
@@ -94,7 +93,6 @@
             font-weight: 600; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
         }
 
-        /* Modal Layout */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
             z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px;
@@ -114,10 +112,9 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ไฮไลท์เมื่อ Jump มาถึง */
         @keyframes target-flash {
             0% { background-color: transparent; border-color: #e2e8f0; }
-            40% { background-color: rgba(239, 68, 68, 0.08); border-color: var(--fav-red); transform: scale(1.02); }
+            40% { background-color: rgba(16, 185, 129, 0.08); border-color: var(--success); transform: scale(1.02); }
             100% { background-color: transparent; border-color: #e2e8f0; transform: scale(1); }
         }
         .target-highlight {
@@ -129,38 +126,31 @@
         .dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
         .dot.active { width: 24px; background-color: var(--accent); border-radius: 12px; }
 
-        /* ปุ่มหัวใจ - มุมขวาบน */
         .fav-btn-container {
             position: absolute; top: 16px; right: 16px; z-index: 5;
         }
         .fav-btn { 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
             cursor: pointer; 
             color: #94a3b8;
             font-size: 28px;
-            background: rgba(248, 250, 252, 0.8);
+            background: #f8fafc;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            width: 38px;
+            height: 38px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
         }
         .fav-btn.active { 
-            color: var(--fav-red) !important; 
-            background: #fff1f2;
+            color: var(--success) !important; 
+            background: #ecfdf5;
             transform: scale(1.1);
-        }
-        .fav-btn .material-symbols-rounded {
-            font-variation-settings: 'FILL' 0;
-            transition: font-variation-settings 0.2s;
-        }
-        .fav-btn.active .material-symbols-rounded {
-            font-variation-settings: 'FILL' 1;
+            border-color: #dcfce7;
         }
 
-        /* กรอบรายการกฎหมายหน้าหลัก */
         #list > div {
             border: 1px solid #e2e8f0;
             border-radius: 28px;
@@ -194,13 +184,12 @@
             </div>
         </div>
         <button id="btnOpenFavs" class="fav-header-btn" title="รายการโปรด">
-            <span class="material-symbols-rounded">favorite</span>
+            <span class="material-symbols-rounded">bookmark</span>
         </button>
     </div>
 </header>
 
 <main class="wrap">
-    <!-- Home View -->
     <div id="view-home">
         <section class="relative z-20">
             <div class="search-container">
@@ -212,7 +201,6 @@
             </div>
         </section>
 
-        <!-- Slider Section -->
         <section class="mt-8">
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
                 <div class="flex items-center gap-2 text-amber-600 font-bold text-xs mb-4">
@@ -252,13 +240,12 @@
                 <span class="w-1.5 h-6 bg-blue-700 rounded-full"></span>
                 <h2 id="panelTitle" class="font-bold text-slate-800 text-lg">รายการกฎหมายแนะนำ</h2>
             </div>
-            <div id="list" class="flex flex-col">
+            <div id="list" class="flex flex-col min-h-[300px]">
                 <div class="text-center py-20 text-slate-400 text-sm italic">กำลังโหลดรายการกฎหมาย...</div>
             </div>
         </section>
     </div>
 
-    <!-- Community View -->
     <div id="view-community" class="hidden">
         <div class="pt-6 pb-28">
             <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
@@ -296,16 +283,14 @@
     <div class="modal-box">
         <header class="p-5 border-b flex justify-between items-center bg-slate-50 shrink-0">
             <div class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-red-500" style="font-variation-settings: 'FILL' 1">favorite</span>
+                <span class="material-symbols-rounded text-blue-600">bookmark</span>
                 <span class="font-bold text-slate-800">รายการโปรดที่บันทึก</span>
             </div>
             <button id="btnCloseFavs" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-200 rounded-full transition-colors">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </header>
-        <div id="favContainer" class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-50/50 scrollbar-hide">
-            <!-- รายการจะแสดงที่นี่ -->
-        </div>
+        <div id="favContainer" class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-50/50 scrollbar-hide"></div>
     </div>
 </div>
 
@@ -343,26 +328,50 @@
 <script>
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
+    
+    // Global Data for Pagination
+    let allLawsData = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
 
     // Storage access
     const getStored = () => JSON.parse(localStorage.getItem('favLaws') || '[]');
     const saveToStorage = (data) => localStorage.setItem('favLaws', JSON.stringify(data));
 
+    // รับข้อมูลและเริ่มแสดงผล
     function renderLawsFromJson(data){
+        allLawsData = data;
+        currentPage = 1;
+        renderPage();
+    }
+
+    // ฟังก์ชันวาดหน้า (Pagination Logic)
+    function renderPage() {
         const listEl = document.getElementById('list');
         listEl.innerHTML = '';
 
-        data.forEach(law => {
+        if (!allLawsData || allLawsData.length === 0) {
+             listEl.innerHTML = '<div class="text-center py-20 text-slate-400 text-sm italic">ไม่พบข้อมูลกฎหมาย</div>';
+             return;
+        }
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageItems = allLawsData.slice(startIndex, endIndex);
+
+        pageItems.forEach(law => {
             const id = law.id || (law["ชื่อกฎหมาย"] + law["วันที่"]);
+            const safeId = String(id).replace(/\s/g, '-');
             const el = document.createElement('div');
+            el.id = `law-item-${safeId}`;
             el.innerHTML = `
                 <div class="fav-btn-container">
                     <button onclick="toggleFav('${id}')" class="fav-btn">
-                        <span class="material-symbols-rounded">favorite</span>
+                        <span class="material-symbols-rounded">add_circle</span>
                     </button>
                 </div>
 
-                <div class="font-bold text-slate-800 text-lg mb-1 pr-10 leading-tight">
+                <div class="font-bold text-slate-800 text-lg mb-1 pr-12 leading-tight">
                     ${law["ชื่อกฎหมาย"] || ''}
                 </div>
 
@@ -386,14 +395,44 @@
             listEl.appendChild(el);
         });
 
+        // ปุ่มควบคุม Pagination
+        if (allLawsData.length > itemsPerPage) {
+            const totalPages = Math.ceil(allLawsData.length / itemsPerPage);
+            const nav = document.createElement('div');
+            nav.className = 'flex justify-center items-center gap-4 mt-6 mb-8';
+            nav.innerHTML = `
+                <button onclick="changePage(-1)" class="px-4 py-2 rounded-lg border ${currentPage === 1 ? 'bg-slate-100 text-slate-400 border-transparent cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 shadow-sm hover:bg-blue-50'}" ${currentPage === 1 ? 'disabled' : ''}>
+                    ย้อนกลับ
+                </button>
+                <span class="text-sm font-medium text-slate-600">หน้า ${currentPage} / ${totalPages}</span>
+                <button onclick="changePage(1)" class="px-4 py-2 rounded-lg border ${currentPage === totalPages ? 'bg-slate-100 text-slate-400 border-transparent cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 shadow-sm hover:bg-blue-50'}" ${currentPage === totalPages ? 'disabled' : ''}>
+                    ถัดไป
+                </button>
+            `;
+            listEl.appendChild(nav);
+        }
+
         startObserver();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(allLawsData.length / itemsPerPage);
+        const newPage = currentPage + delta;
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            renderPage();
+            document.getElementById('panelTitle').scrollIntoView({ behavior: 'smooth' });
+        }
     }
 
     // Filter Logic
     function filterCat(cat, btn) {
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
-        // renderLaws(cat); // Removed old renderLaws call
+        // Logic กรองข้อมูลจริงจะถูกเรียกจาก app.js ผ่าน renderLawsFromJson ใหม่
+        if(typeof window.filterLawsData === 'function') {
+            window.filterLawsData(cat);
+        }
     }
 
     // Toggle Favorite
@@ -406,11 +445,11 @@
         if (idx > -1) {
             stored.splice(idx, 1);
             saveToStorage(stored);
-            updateUIHearts(sid, false);
+            updateUIButtons(sid, false);
         } else {
-            // Fallback scrape
+            // Find data for accurate saving
             let lawTitle = "รายการที่บันทึก";
-            const btn = document.querySelector(`[onclick*="toggleFav('${sid}')"]`);
+            const btn = document.querySelector(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
             if (btn) {
                 const card = btn.closest('div').parentElement;
                 const titleEl = card.querySelector('.font-bold');
@@ -423,46 +462,58 @@
                 time: new Date().toLocaleDateString('th-TH', {day:'2-digit', month:'short'})
             });
             saveToStorage(stored);
-            updateUIHearts(sid, true);
+            updateUIButtons(sid, true);
         }
     };
 
-    function updateUIHearts(id, active) {
+    function updateUIButtons(id, active) {
         const sid = String(id);
-        const buttons = document.querySelectorAll(`[onclick*="toggleFav('${sid}')"]`);
+        const buttons = document.querySelectorAll(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
         buttons.forEach(btn => {
-            if (active) btn.classList.add('active');
-            else btn.classList.remove('active');
+            const icon = btn.querySelector('.material-symbols-rounded');
+            if (active) {
+                btn.classList.add('active');
+                if(icon) icon.innerText = 'check_circle';
+            } else {
+                btn.classList.remove('active');
+                if(icon) icon.innerText = 'add_circle';
+            }
         });
     }
 
-    // Jump Logic
+    // Jump Logic with Auto Page Switch
     window.jumpToItem = function(id) {
         const sid = String(id);
         toggleModal('modalFavs', false);
         switchTab('home');
 
-        // Check if item exists in current list
-        const findAndScroll = () => {
-            const targetBtn = document.querySelector(`[onclick*="toggleFav('${sid}')"]`);
-            if (targetBtn) {
-                const card = targetBtn.closest('div').parentElement;
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                card.classList.remove('target-highlight');
-                void card.offsetWidth; 
-                card.classList.add('target-highlight');
-                setTimeout(() => card.classList.remove('target-highlight'), 3000);
-            } else {
-                // If filtered out, reset filter to 'all'
-                const allChip = document.querySelector('.chip');
-                if (allChip && !allChip.classList.contains('active')) {
-                    allChip.click();
-                    // Wait for render then scroll
-                    setTimeout(findAndScroll, 100);
-                }
+        // Check if item exists in data and switch page
+        if (allLawsData.length > 0) {
+             const index = allLawsData.findIndex(law => {
+                 const lawId = String(law.id || (law["ชื่อกฎหมาย"] + law["วันที่"]));
+                 return lawId === sid;
+             });
+             
+             if (index !== -1) {
+                 const targetPage = Math.floor(index / itemsPerPage) + 1;
+                 if (currentPage !== targetPage) {
+                     currentPage = targetPage;
+                     renderPage();
+                 }
+             }
+        }
+
+        setTimeout(() => {
+            const safeId = sid.replace(/\s/g, '-');
+            const targetEl = document.getElementById(`law-item-${safeId}`);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetEl.classList.remove('target-highlight');
+                void targetEl.offsetWidth; 
+                targetEl.classList.add('target-highlight');
+                setTimeout(() => targetEl.classList.remove('target-highlight'), 3000);
             }
-        };
-        setTimeout(findAndScroll, 200);
+        }, 300);
     };
 
     window.openFavs = function() {
@@ -507,13 +558,16 @@
     function startObserver() {
         const savedIds = getStored().map(s => String(s.id));
         document.querySelectorAll('[onclick*="toggleFav"]').forEach(btn => {
-            const m = btn.getAttribute('onclick').match(/toggleFav\('(.*?)'\)/);
+            const m = btn.getAttribute('onclick').match(/toggleFav\((['"]?)(.*?)\1\)/);
             if(m) {
-                const sid = String(m[1]);
+                const sid = String(m[2]);
+                const icon = btn.querySelector('.material-symbols-rounded');
                 if (savedIds.includes(sid)) {
                     btn.classList.add('active');
+                    if(icon) icon.innerText = 'check_circle';
                 } else {
                     btn.classList.remove('active');
+                    if(icon) icon.innerText = 'add_circle';
                 }
             }
         });
@@ -529,7 +583,6 @@
 
         initSlider();
         initChat();
-        // renderLaws('all'); // Removed as per request
     });
 
     function toggleModal(id, show) {
