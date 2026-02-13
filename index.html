@@ -17,7 +17,7 @@
             --primary: #1e3a8a;
             --primary-gradient: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
             --accent: #d97706;
-            --fav-red: #ef4444;
+            --success: #10b981;
             --bg-app: #f1f5f9;
             --text-main: #0f172a;
             --bottom-nav-height: 70px;
@@ -44,7 +44,7 @@
 
         .wrap { max-width: 600px; margin: 0 auto; padding: 0 16px; position: relative; }
 
-        /* ปุ่มรายการโปรดที่ Header */
+        /* ปุ่มเปิดรายการโปรดที่ Header */
         .fav-header-btn {
             position: absolute; top: 16px; right: 16px;
             background: rgba(255,255,255,0.2);
@@ -94,7 +94,7 @@
             font-weight: 600; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
         }
 
-        /* Modal Settings */
+        /* Modal Layout */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
             z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px;
@@ -114,10 +114,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ไฮไลท์เมื่อ Jump มาถึง */
+        /* เอฟเฟกต์ไฮไลท์เมื่อกระโดดไปหารายชื่อ */
         @keyframes target-flash {
             0% { background-color: transparent; border-color: #e2e8f0; }
-            40% { background-color: rgba(239, 68, 68, 0.08); border-color: var(--fav-red); transform: scale(1.02); }
+            40% { background-color: rgba(16, 185, 129, 0.08); border-color: var(--success); transform: scale(1.02); }
             100% { background-color: transparent; border-color: #e2e8f0; transform: scale(1); }
         }
         .target-highlight {
@@ -129,38 +129,33 @@
         .dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
         .dot.active { width: 24px; background-color: var(--accent); border-radius: 12px; }
 
-        /* ปรับปรุงปุ่มหัวใจ - ให้อยู่มุมขวาบนของกรอบ */
+        /* ปรับปรุงปุ่มบันทึกในรายการ (ไอคอนบวก) */
         .fav-btn-container {
             position: absolute; top: 16px; right: 16px; z-index: 5;
         }
         .fav-btn { 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
             cursor: pointer; 
             color: #94a3b8;
             font-size: 28px;
-            background: rgba(248, 250, 252, 0.8);
+            background: #f8fafc;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            width: 38px;
+            height: 38px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
         }
         .fav-btn.active { 
-            color: var(--fav-red) !important; 
-            background: #fff1f2;
+            color: var(--success) !important; 
+            background: #ecfdf5;
             transform: scale(1.1);
-        }
-        .fav-btn .material-symbols-rounded {
-            font-variation-settings: 'FILL' 0;
-            transition: font-variation-settings 0.2s;
-        }
-        .fav-btn.active .material-symbols-rounded {
-            font-variation-settings: 'FILL' 1;
+            border-color: #dcfce7;
         }
 
-        /* กรอบรายการกฎหมายหน้าหลัก ปรับให้เหมาะกับมือถือ */
+        /* กรอบรายการกฎหมายหน้าหลัก */
         #list > div {
             border: 1px solid #e2e8f0;
             border-radius: 28px;
@@ -194,7 +189,7 @@
             </div>
         </div>
         <button id="btnOpenFavs" class="fav-header-btn" title="รายการโปรด">
-            <span class="material-symbols-rounded">favorite</span>
+            <span class="material-symbols-rounded">bookmark</span>
         </button>
     </div>
 </header>
@@ -253,7 +248,7 @@
                 <h2 id="panelTitle" class="font-bold text-slate-800 text-lg">รายการกฎหมายแนะนำ</h2>
             </div>
             <div id="list" class="flex flex-col">
-                <div class="text-center py-20 text-slate-400 text-sm italic">กำลังเปิดคลังกฎหมาย...</div>
+                <div class="text-center py-20 text-slate-400 text-sm italic">กำลังโหลดรายการกฎหมาย...</div>
             </div>
         </section>
     </div>
@@ -296,7 +291,7 @@
     <div class="modal-box">
         <header class="p-5 border-b flex justify-between items-center bg-slate-50 shrink-0">
             <div class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-red-500" style="font-variation-settings: 'FILL' 1">favorite</span>
+                <span class="material-symbols-rounded text-blue-600">bookmark</span>
                 <span class="font-bold text-slate-800">รายการโปรดที่บันทึก</span>
             </div>
             <button id="btnCloseFavs" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-200 rounded-full transition-colors">
@@ -304,7 +299,7 @@
             </button>
         </header>
         <div id="favContainer" class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-50/50 scrollbar-hide">
-            <!-- Items populated by JS -->
+            <!-- รายการจะแสดงที่นี่ -->
         </div>
     </div>
 </div>
@@ -327,7 +322,7 @@
             </button>
         </header>
         <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50 gap-4">
-            <div class="bubble bubble-ai">สวัสดีครับ มีข้อสงสัยเรื่องกฎหมายสอบถามผมได้เลยครับ</div>
+            <div class="bubble bubble-ai">สวัสดีครับ ผมคือ Thai Law AI พร้อมช่วยเหลือเรื่องข้อมูลกฎหมายครับ</div>
         </div>
         <div class="p-4 border-t bg-white flex gap-2 items-center">
             <input id="user-input" type="text" class="flex-1 bg-slate-100 rounded-full px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="พิมพ์ข้อสงสัยของคุณ..." autocomplete="off">
@@ -344,11 +339,11 @@
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
 
-    // Storage Access
+    // Storage access
     const getStored = () => JSON.parse(localStorage.getItem('favLaws') || '[]');
     const saveToStorage = (data) => localStorage.setItem('favLaws', JSON.stringify(data));
 
-    // Improved Toggle (ดึงชื่อตามกฎหมายที่บันทึก)
+    // Improved Toggle (ปรับไอคอนเป็นบวก/ถูก และดึงชื่อตามกฎหมาย)
     window.toggleFav = function(id) {
         if (!id) return;
         const sid = String(id);
@@ -356,18 +351,18 @@
         const idx = stored.findIndex(s => String(s.id) === sid);
 
         if (idx > -1) {
-            // Unsave
+            // ยกเลิกบันทึก
             stored.splice(idx, 1);
             saveToStorage(stored);
-            updateUIHearts(sid, false);
+            updateUIButtons(sid, false);
         } else {
-            // Save New - ดึงข้อมูลจาก Card
+            // บันทึกใหม่ - ดึงชื่อหัวข้อจาก Card ที่ปุ่มนี้อยู่
             const btn = document.querySelector(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
             if (btn) {
                 const card = btn.closest('.bg-white') || btn.closest('div[id^="law-"]') || btn.parentElement.parentElement;
                 if (card) {
                     const clone = card.cloneNode(true);
-                    // ลบปุ่มและหัวใจออกเพื่อให้ได้ชื่อที่ถูกต้อง
+                    // ลบปุ่มและหัวใจออกก่อนดึงชื่อเพื่อให้ได้ชื่อที่ถูกต้อง
                     clone.querySelectorAll('button, .material-symbols-rounded, .icon, script, style, .fav-btn-container').forEach(el => el.remove());
                     
                     const textContent = clone.innerText.trim();
@@ -382,20 +377,23 @@
                         time: new Date().toLocaleDateString('th-TH', {day:'2-digit', month:'short'}) + " " + new Date().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})
                     });
                     saveToStorage(stored);
-                    updateUIHearts(sid, true);
+                    updateUIButtons(sid, true);
                 }
             }
         }
     };
 
-    function updateUIHearts(id, active) {
+    function updateUIButtons(id, active) {
         const sid = String(id);
         const buttons = document.querySelectorAll(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
         buttons.forEach(btn => {
+            const icon = btn.querySelector('.material-symbols-rounded') || btn;
             if (active) {
                 btn.classList.add('active');
+                icon.innerText = 'check_circle'; // เปลี่ยนเป็นเครื่องหมายถูก
             } else {
                 btn.classList.remove('active');
+                icon.innerText = 'add_circle'; // เปลี่ยนเป็นบวก
             }
         });
     }
@@ -418,15 +416,15 @@
                 // 3. เลื่อนหน้าจอไปยังเป้าหมาย
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
-                // 4. เอฟเฟกต์ไฮไลท์เพื่อระบุตำแหน่ง
+                // 4. แสดงไฮไลท์กระพริบ
                 card.classList.remove('target-highlight');
                 void card.offsetWidth; // Trigger reflow
                 card.classList.add('target-highlight');
                 
-                // ลบเอฟเฟกต์หลังจากจบ Animation
+                // ลบเอฟเฟกต์หลังจากจบ
                 setTimeout(() => card.classList.remove('target-highlight'), 3000);
             } else {
-                // ถ้าไม่เจอ (เช่น ติดฟิลเตอร์) ให้ล้างฟิลเตอร์ก่อน
+                // หากหาไม่เจอ (เช่น ติดฟิลเตอร์) ให้ล้างฟิลเตอร์ก่อน
                 const allChip = document.querySelector('.chip');
                 if (allChip) {
                     allChip.click();
@@ -435,7 +433,7 @@
             }
         };
 
-        // หน่วงเวลาเล็กน้อยเพื่อให้ Modal ปิดเสร็จ
+        // หน่วงเวลาเพื่อให้ Modal ปิดเสร็จสิ้นก่อนเริ่ม Scroll
         setTimeout(findAndScroll, 200);
     };
 
@@ -447,7 +445,7 @@
         if(list.length === 0) {
             container.innerHTML = `
                 <div class="text-center py-20 flex flex-col items-center opacity-40">
-                    <span class="material-symbols-rounded text-5xl mb-3">heart_broken</span>
+                    <span class="material-symbols-rounded text-5xl mb-3">bookmark_border</span>
                     <p class="font-medium text-sm">ยังไม่มีรายการที่บันทึกไว้</p>
                 </div>
             `;
@@ -460,7 +458,7 @@
                 };
                 div.innerHTML = `
                     <div class="flex-1 min-w-0 pointer-events-none">
-                        <div class="font-bold text-blue-800 text-sm mb-1 truncate">${item.title}</div>
+                        <div class="font-bold text-slate-800 text-sm mb-1 truncate">${item.title}</div>
                         <div class="text-[10px] text-slate-400 font-medium">บันทึกเมื่อ: ${item.time}</div>
                     </div>
                     <button onclick="removeFav('${item.id}')" class="del-btn w-10 h-10 flex items-center justify-center text-slate-300 hover:text-red-500 rounded-full hover:bg-red-50 transition-colors">
@@ -475,10 +473,10 @@
 
     window.removeFav = function(id) {
         window.toggleFav(id);
-        window.openFavs(); // Refresh the list
+        window.openFavs(); // รีเฟรชรายการในหน้าต่าง
     };
 
-    // Auto-paint hearts status
+    // ปรับปรุงปุ่มหัวใจในรายการที่โหลดมาจาก app.js ให้เป็นปุ่มบวกและย้ายตำแหน่ง
     function startObserver() {
         const listEl = document.getElementById('list');
         if(!listEl) return;
@@ -490,7 +488,7 @@
                     const sid = String(m[2]);
                     const icon = btn.querySelector('.material-symbols-rounded') || btn;
                     
-                    // จัดการโครงสร้างปุ่มหัวใจ
+                    // จัดการโครงสร้างปุ่มบันทึก (ไอคอนบวก) และย้ายตำแหน่ง
                     if(!btn.parentElement.classList.contains('fav-btn-container')) {
                         const wrapper = document.createElement('div');
                         wrapper.className = 'fav-btn-container';
@@ -498,13 +496,14 @@
                         wrapper.appendChild(btn);
                         btn.className = 'fav-btn';
                         icon.className = 'material-symbols-rounded';
-                        icon.innerText = 'favorite';
                     }
 
                     if (savedIds.includes(sid)) {
                         btn.classList.add('active');
+                        icon.innerText = 'check_circle';
                     } else {
                         btn.classList.remove('active');
+                        icon.innerText = 'add_circle';
                     }
                 }
             });
