@@ -124,14 +124,16 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Highlight Animation */
-        @keyframes flash-highlight {
-            0% { background-color: rgba(234, 179, 8, 0.3); transform: scale(1.02); }
+        /* JUMP HIGHLIGHT ANIMATION */
+        @keyframes target-flash {
+            0% { background-color: rgba(234, 179, 8, 0.1); transform: scale(1); }
+            50% { background-color: rgba(234, 179, 8, 0.3); transform: scale(1.02); box-shadow: 0 0 15px rgba(234, 179, 8, 0.3); border-color: var(--accent); }
             100% { background-color: white; transform: scale(1); }
         }
-        .highlight-row {
-            animation: flash-highlight 1.5s ease-out;
-            border-color: var(--accent) !important;
+        .target-highlight {
+            animation: target-flash 1.5s ease-in-out;
+            position: relative;
+            z-index: 50;
         }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -285,12 +287,12 @@
             </button>
         </header>
         <div id="favContainer" class="p-4 overflow-y-auto space-y-3 min-h-[200px] bg-slate-50/50">
-            <div class="text-center text-slate-400 py-10">กำลังโหลดรายการ...</div>
+            <!-- List goes here -->
         </div>
     </div>
 </div>
 
-<!-- Item Detail Modal (Internal Fallback) -->
+<!-- Modal Detail (Fallback if item not in list) -->
 <div id="modalDetail" class="modal-overlay" style="z-index: 210;">
     <div class="modal-box relative p-0 bg-white">
         <div class="bg-slate-100 p-4 border-b flex justify-between items-center">
@@ -303,7 +305,7 @@
             <!-- Content -->
         </div>
         <div class="p-3 border-t bg-slate-50 text-center">
-            <p class="text-xs text-slate-400">*ข้อมูลนี้ถูกบันทึกไว้ในอุปกรณ์ของคุณ</p>
+            <p class="text-xs text-slate-400">รายการนี้ไม่อยู่ในหน้าจอหลักปัจจุบัน</p>
         </div>
     </div>
 </div>
@@ -350,10 +352,10 @@
 <script src="./app.js"></script>
 
 <script>
-    // --- MAIN SCRIPT ---
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
 
+    // --- MAIN LOGIC ---
     window.addEventListener('load', () => {
         // 1. Override Header Button
         setTimeout(() => {
@@ -366,19 +368,17 @@
             }
         }, 800);
 
-        // 2. Override Toggle Function (Robust Save)
+        // 2. Override Toggle Function (Scrape & Save Logic)
+        // This grabs text directly from the DOM so it works with CSV/App.js generated content
         window.toggleFav = function(id) {
             let lawData = null;
-
-            // Try to find the button that was clicked to scrape data
+            
+            // Search for the button calling this function
             const btn = document.querySelector(`button[onclick*="toggleFav(${id})"], button[onclick*="toggleFav('${id}')"]`);
             
             if (btn) {
-                // Determine the row container
                 const row = btn.closest('.bg-white') || btn.parentElement;
-                
                 if (row) {
-                    // Scrape everything visible
                     const fullText = row.innerText; 
                     const textLines = fullText.split('\n').filter(t => t.trim().length > 0);
                     
@@ -386,7 +386,7 @@
                     let section = "";
                     let code = "กฎหมาย";
                     
-                    // Simple Parsing logic
+                    // Basic parsing
                     if (textLines.length >= 2) {
                         const line1 = textLines[0];
                         if(line1.includes('ม.')) {
@@ -400,12 +400,12 @@
                         title = textLines[0];
                     }
                     
+                    // Save content for internal fallback
                     lawData = { 
                         id: id, 
                         code: code, 
                         section: section, 
                         title: title,
-                        // Save the full content for the internal modal fallback
                         content: fullText.replace('delete', '').replace('bookmark_heart', '') 
                     };
                 }
@@ -415,7 +415,7 @@
                 lawData = { id: id, title: 'รายการที่บันทึก', code: 'System', section: '', content: 'ไม่สามารถดึงข้อมูลได้' };
             }
 
-            // Save/Remove Logic
+            // Save to LocalStorage
             let stored = getStoredFavs();
             const existingIndex = stored.findIndex(s => s.id == id);
             
@@ -437,27 +437,30 @@
     // --- NAVIGATION LOGIC (JUMP TO ITEM) ---
     
     window.jumpToItem = function(id) {
-        toggleModal('modalFavs', false); // Close Favs
-        switchTab('home'); // Go to list
+        // 1. Close Modal
+        toggleModal('modalFavs', false); 
+        
+        // 2. Switch to Home Tab
+        switchTab('home'); 
 
-        // Try to find the element in the main list
-        // We look for the heart button associated with this ID
+        // 3. Find the element
+        // Look for the toggle button with the matching ID
         const targetBtn = document.querySelector(`button[onclick*="toggleFav(${id})"], button[onclick*="toggleFav('${id}')"]`);
 
         if (targetBtn) {
-            // Found it! Scroll to it.
+            // Found it! Get the card container
             const row = targetBtn.closest('.bg-white') || targetBtn.parentElement;
             
-            // Smooth Scroll
+            // 4. Scroll to it
             row.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // Highlight Effect
-            row.classList.remove('highlight-row'); // Reset
+            // 5. Highlight Animation (Flash effect)
+            row.classList.remove('target-highlight');
             void row.offsetWidth; // Trigger reflow
-            row.classList.add('highlight-row');
+            row.classList.add('target-highlight');
             
         } else {
-            // Not found in list (maybe filtered out). Show Internal Detail Modal.
+            // Not found (maybe filtered out). Show Detail Modal instead.
             const stored = getStoredFavs();
             const item = stored.find(s => s.id == id);
             
@@ -469,17 +472,62 @@
                     <div class="bg-slate-50 p-4 rounded-xl border text-slate-600">
                         ${item.content || 'ไม่มีรายละเอียดเพิ่มเติม'}
                     </div>
-                    <div class="mt-4 text-center">
-                        <span class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full">รายการนี้ไม่อยู่ในหน้าจอหลักปัจจุบัน</span>
-                    </div>
                 `;
                 toggleModal('modalDetail', true);
             }
         }
     };
 
-    // --- STORAGE & VISUALS ---
+    // --- FAVORITES LIST UI ---
 
+    window.openFavs = function() {
+        const container = document.getElementById('favContainer');
+        const myFavs = getStoredFavs();
+
+        container.innerHTML = '';
+
+        if(myFavs.length === 0) {
+            container.innerHTML = `<div class="text-center text-slate-400 py-10 flex flex-col items-center gap-2">
+                <span class="material-symbols-rounded text-4xl opacity-20">bookmark_off</span>
+                <span>ยังไม่มีรายการโปรด</span>
+            </div>`;
+        } else {
+            myFavs.forEach(law => {
+                const card = document.createElement('div');
+                
+                // Click card -> Jump to item
+                card.onclick = (e) => {
+                    if(e.target.closest('.delete-btn')) return; // Don't jump if delete is clicked
+                    jumpToItem(law.id);
+                };
+                
+                card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50 transition-colors active:scale-95 group';
+                
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0 pointer-events-none">
+                        <div class="text-[10px] font-bold text-blue-600 truncate">${law.code || 'กฎหมาย'} ${law.section ? 'ม.'+law.section : ''}</div>
+                        <div class="font-bold text-sm text-slate-800 truncate mb-1">${law.title}</div>
+                        <div class="flex items-center gap-1 text-[10px] text-slate-400 group-hover:text-blue-500 transition-colors">
+                            <span class="material-symbols-rounded text-[14px]">touch_app</span>
+                            แตะเพื่อไปที่ข้อความ
+                        </div>
+                    </div>
+                    <button onclick="removeFav(${law.id})" class="delete-btn text-slate-300 hover:text-red-500 p-2 transition-colors z-10 rounded-full hover:bg-red-50">
+                        <span class="material-symbols-rounded">delete</span>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+        toggleModal('modalFavs', true);
+    };
+
+    window.removeFav = function(id) {
+        window.toggleFav(id); // Use core toggle
+        window.openFavs();    // Refresh list
+    };
+
+    // --- UTILS ---
     function getStoredFavs() {
         try {
             let stored = JSON.parse(localStorage.getItem('favLaws')) || [];
@@ -532,57 +580,7 @@
         paintHearts();
     }
 
-    // --- MODAL LOGIC (UPDATED FOR JUMP) ---
-
-    window.openFavs = function() {
-        const container = document.getElementById('favContainer');
-        const myFavs = getStoredFavs();
-
-        container.innerHTML = '';
-
-        if(myFavs.length === 0) {
-            container.innerHTML = `<div class="text-center text-slate-400 py-10 flex flex-col items-center gap-2">
-                <span class="material-symbols-rounded text-4xl opacity-20">bookmark_off</span>
-                <span>ยังไม่มีรายการโปรด</span>
-            </div>`;
-        } else {
-            myFavs.forEach(law => {
-                const card = document.createElement('div');
-                // Make the whole card clickable to jump
-                card.onclick = (e) => {
-                    // Prevent jump if delete button is clicked
-                    if(e.target.closest('.delete-btn')) return;
-                    jumpToItem(law.id);
-                };
-                
-                card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-slate-50 transition-colors active:scale-95';
-                
-                card.innerHTML = `
-                    <div class="flex-1 min-w-0">
-                        <div class="text-[10px] font-bold text-blue-600 truncate">${law.code || 'กฎหมาย'} ${law.section ? 'ม.'+law.section : ''}</div>
-                        <div class="font-bold text-sm text-slate-800 truncate mb-1">${law.title}</div>
-                        <div class="flex items-center gap-1 text-[10px] text-green-600 font-medium">
-                            <span class="material-symbols-rounded text-[14px]">near_me</span>
-                            ไปที่รายการนี้
-                        </div>
-                    </div>
-                    <button onclick="removeFav(${law.id})" class="delete-btn text-slate-300 hover:text-red-500 p-2 transition-colors z-10">
-                        <span class="material-symbols-rounded">delete</span>
-                    </button>
-                `;
-                container.appendChild(card);
-            });
-        }
-        toggleModal('modalFavs', true);
-    };
-
-    window.removeFav = function(id) {
-        window.toggleFav(id);
-        window.openFavs();
-    };
-
-    // --- OTHER HELPERS ---
-
+    // --- STANDARD UI FUNCTIONS ---
     function toggleModal(id, show) {
         const el = document.getElementById(id);
         if(!el) return;
@@ -594,7 +592,18 @@
         }
     }
     
-    // ... (Chat and Slider init code remains standard) ...
+    document.getElementById('btnCloseFavs').onclick = () => toggleModal('modalFavs', false);
+    document.getElementById('fab-chat').onclick = () => toggleModal('modalChat', true);
+    document.getElementById('btnCloseChat').onclick = () => toggleModal('modalChat', false);
+
+    function switchTab(tab) {
+        document.getElementById('view-home').classList.toggle('hidden', tab !== 'home');
+        document.getElementById('view-community').classList.toggle('hidden', tab !== 'community');
+        document.getElementById('nav-home').classList.toggle('active', tab === 'home');
+        document.getElementById('nav-community').classList.toggle('active', tab === 'community');
+    }
+
+    // --- CHAT & SLIDER ---
     function initChat() {
         const sendBtn = document.getElementById('send-btn');
         const userInput = document.getElementById('user-input');
@@ -608,15 +617,12 @@
         const input = document.getElementById('user-input');
         const text = input.value.trim();
         if (!text) return;
-
         addBubble(text, 'user');
         input.value = '';
         chatHistory.push({ role: "user", content: text });
-
         const loading = document.getElementById('chatLoading');
         loading.classList.remove('hidden');
         scrollToBottom();
-
         try {
             const response = await fetch(BACKEND_URL, {
                 method: 'POST',
@@ -648,17 +654,6 @@
         const historyEl = document.getElementById('chat-history');
         historyEl.scrollTop = historyEl.scrollHeight;
     }
-
-    window.switchTab = function(tab) {
-        document.getElementById('view-home').classList.toggle('hidden', tab !== 'home');
-        document.getElementById('view-community').classList.toggle('hidden', tab !== 'community');
-        document.getElementById('nav-home').classList.toggle('active', tab === 'home');
-        document.getElementById('nav-community').classList.toggle('active', tab === 'community');
-    }
-
-    document.getElementById('btnCloseFavs').onclick = () => toggleModal('modalFavs', false);
-    document.getElementById('fab-chat').onclick = () => toggleModal('modalChat', true);
-    document.getElementById('btnCloseChat').onclick = () => toggleModal('modalChat', false);
 
     function initSlider() {
         let current = 0;
