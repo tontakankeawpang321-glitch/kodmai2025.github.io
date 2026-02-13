@@ -180,6 +180,9 @@
             overflow-wrap: anywhere !important; /* ดีกว่า break-word สำหรับภาษาไทย */
             display: block;
             line-height: 1.4;
+            max-width: 90vw; /* กันเหนียวไม่ให้ทะลุขอบ */
+            margin-left: auto;
+            margin-right: auto;
         }
     </style>
 </head>
@@ -427,8 +430,6 @@
         if(btnCloseChat) btnCloseChat.addEventListener('click', () => toggleModal('modalChat', false));
 
         // Favorites Modal
-        // NOTE: We do NOT attach listener here for btnOpenFavs to avoid conflict with app.js
-        // We will override it in the final script block.
         const btnCloseFavs = document.getElementById('btnCloseFavs');
         if(btnCloseFavs) btnCloseFavs.addEventListener('click', () => toggleModal('modalFavs', false));
     });
@@ -494,51 +495,45 @@
 <!-- 2. Law Data & Core Logic (External) -->
 <script src="./app.js"></script>
 
-<!-- 3. Overrides & Extra Logic (This runs LAST to override app.js behavior) -->
+<!-- 3. Overrides & Extra Logic (Runs LAST and replaces the button completely to detach app.js logic) -->
 <script>
-    // Force override the Favorites Button to stop app.js from rendering "Recorded on..."
-    const oldBtn = document.getElementById('btnOpenFavs');
-    if(oldBtn) {
-        // Clone and replace to strip all existing event listeners from app.js
-        const newBtn = oldBtn.cloneNode(true);
-        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-        
-        // Attach OUR listener
-        newBtn.addEventListener('click', function() {
-            if (typeof window.openFavs === 'function') {
-                window.openFavs();
-            } else {
-                console.error("openFavs function not found");
+    document.addEventListener('DOMContentLoaded', () => {
+        // Wait a tick to ensure app.js has run
+        setTimeout(() => {
+            const oldBtn = document.getElementById('btnOpenFavs');
+            if(oldBtn) {
+                // Clone deeply and REPLACE with a new ID to effectively kill old listeners
+                const newBtn = oldBtn.cloneNode(true);
+                newBtn.id = 'btnOpenFavs_Override'; // New ID ensures app.js selectors won't find it again
+                oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+                
+                // Attach our listener
+                newBtn.addEventListener('click', function() {
+                    window.openFavs();
+                });
             }
-        });
-    }
+        }, 100);
+    });
 
-    // Define our custom openFavs function with Links
+    // Custom Open Favs
     window.openFavs = function() {
         if (typeof laws === 'undefined') {
             console.error("Database 'laws' not found.");
-            // Fallback empty UI
             const container = document.getElementById('favContainer');
             if(container) container.innerHTML = '<div class="text-center text-slate-400 py-10">ไม่พบข้อมูลกฎหมาย</div>';
             toggleModal('modalFavs', true);
             return;
         }
         
-        // Get favorites from localStorage
-        // Note: app.js might store objects or IDs. We try to parse gracefully.
         let favIds = [];
         try {
             const stored = JSON.parse(localStorage.getItem('favLaws')) || [];
-            // If stored is [1, 2]
             if (stored.length > 0 && typeof stored[0] !== 'object') {
                 favIds = stored;
             } else if (stored.length > 0 && typeof stored[0] === 'object') {
-                // If stored is [{id:1, date:...}, ...]
                 favIds = stored.map(item => item.id);
             }
-        } catch(e) {
-            console.error("Error parsing favLaws", e);
-        }
+        } catch(e) {}
 
         const favData = laws.filter(l => favIds.includes(l.id));
         const container = document.getElementById('favContainer');
@@ -554,10 +549,9 @@
                 const item = document.createElement('div');
                 item.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center gap-3';
                 
-                // Construct Link: Use law.link if exists, otherwise create a Google Search link
+                // Link Logic
                 let linkUrl = law.link;
                 if (!linkUrl) {
-                    // Create a useful search link if no direct link exists
                     linkUrl = `https://www.google.com/search?q=${encodeURIComponent(law.title + ' ' + law.code + ' มาตรา ' + law.section)}`;
                 }
                 
