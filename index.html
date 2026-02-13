@@ -53,7 +53,9 @@
             transition: transform 0.2s;
             cursor: pointer;
             border: none;
+            z-index: 30;
         }
+        .fav-header-btn:active { transform: scale(0.9); }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height);
@@ -142,6 +144,7 @@
             overflow: hidden;
             background: white;
             transition: border-color 0.2s;
+            margin-bottom: 4px;
         }
     </style>
 </head>
@@ -158,6 +161,7 @@
                 <p class="text-[11px] opacity-80 font-medium">คลังกฎหมายอัพเดทล่าสุด</p>
             </div>
         </div>
+        <!-- ปุ่มเปิดรายการโปรด -->
         <button id="btnOpenFavs" class="fav-header-btn" title="รายการโปรด">
             <span class="material-symbols-rounded">bookmark_heart</span>
         </button>
@@ -271,7 +275,7 @@
             </button>
         </header>
         <div id="favContainer" class="p-4 overflow-y-auto space-y-2 min-h-[200px] bg-slate-50/50">
-            <!-- List goes here -->
+            <!-- รายการโปรดจะมาแสดงที่นี่ -->
         </div>
     </div>
 </div>
@@ -323,12 +327,12 @@
     let chatHistory = [];
 
     window.addEventListener('load', () => {
-        // จัดการเหตุการณ์คลิกปุ่มหัวใจแบบ Global เพื่อความแม่นยำ
+        // จัดการเหตุการณ์คลิกปุ่มหัวใจแบบ Global 
         document.addEventListener('click', (e) => {
             const heartBtn = e.target.closest('button[onclick*="toggleFav"], .heart-icon');
-            if (heartBtn && !heartBtn.id?.includes('btnOpenFavs')) {
-                // หากปุ่มไม่มี onclick แต่เป็นหัวใจ ให้พยายามหา ID
-                const match = heartBtn.outerHTML.match(/toggleFav\((['"]?)(.*?)\1\)/);
+            if (heartBtn && !heartBtn.closest('.fav-header-btn') && !heartBtn.id?.includes('btnOpenFavs')) {
+                const attr = heartBtn.getAttribute('onclick') || "";
+                const match = attr.match(/toggleFav\((['"]?)(.*?)\1\)/);
                 if (match) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -337,12 +341,13 @@
             }
         });
 
-        // แทนที่ปุ่มเปิด Favs
-        const oldBtn = document.getElementById('btnOpenFavs');
-        if (oldBtn) {
-            const newBtn = oldBtn.cloneNode(true);
-            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-            newBtn.addEventListener('click', () => window.openFavs());
+        // ตั้งค่าปุ่มรายการโปรดที่ Header (ทำให้เปิดกี่รอบก็ได้)
+        const openFavBtn = document.getElementById('btnOpenFavs');
+        if (openFavBtn) {
+            openFavBtn.onclick = (e) => {
+                e.preventDefault();
+                window.openFavs();
+            };
         }
 
         initSlider();
@@ -350,46 +355,60 @@
         startFavObserver();
     });
 
-    // ฟังก์ชันบันทึกรายการโปรด (ปรับปรุงใหม่เพื่อรองรับโครงสร้างในรูป)
+    // ฟังก์ชันบันทึกรายการโปรด (ปรับปรุงให้รองรับข้อมูลจากรูปภาพที่ส่งมา)
     window.toggleFav = function(id) {
+        if (!id) return;
+        const stringId = String(id);
         let lawData = null;
-        let targetBtn = document.querySelector(`button[onclick*="toggleFav('${id}')"], button[onclick*="toggleFav(${id})"], .heart-icon[data-id="${id}"]`);
+        
+        // ค้นหาปุ่มที่ถูกกด
+        const selectors = [
+            `button[onclick*="toggleFav('${stringId}')"]`,
+            `button[onclick*="toggleFav(${stringId})"]`,
+            `.heart-icon[data-id="${stringId}"]`
+        ];
+        
+        let targetBtn = null;
+        for(let sel of selectors) {
+            targetBtn = document.querySelector(sel);
+            if(targetBtn) break;
+        }
 
         if (targetBtn) {
-            // หา Container ที่ครอบรายการทั้งหมดไว้
-            const row = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
+            // ค้นหาการ์ดกฎหมายที่ใกล้ที่สุด
+            const card = targetBtn.closest('.bg-white') || targetBtn.closest('div[class*="border"]') || targetBtn.parentElement.parentElement;
             
-            if (row) {
-                const clone = row.cloneNode(true);
-                // ลบส่วนที่ไม่ใช่ข้อความออก
-                clone.querySelectorAll('button, .material-symbols-rounded, script, style').forEach(el => el.remove());
+            if (card) {
+                const clone = card.cloneNode(true);
+                // ลบส่วนขยะออกก่อนดึงข้อความ
+                clone.querySelectorAll('button, .material-symbols-rounded, script, style, .icon').forEach(el => el.remove());
                 
-                const text = clone.innerText.trim();
-                const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                const rawText = clone.innerText.trim();
+                const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                 
-                // คาดการณ์หัวข้อจากบรรทัดแรกๆ
                 let code = lines[0] || "กฎหมาย";
                 let title = lines[1] || "";
                 
                 lawData = { 
-                    id: id, 
+                    id: stringId, 
                     code: code, 
                     title: title,
                     timestamp: new Date().toLocaleString('th-TH', { 
                         year: 'numeric', month: 'short', day: 'numeric', 
                         hour: '2-digit', minute:'2-digit'
                     }),
-                    content: text
+                    content: rawText
                 };
             }
         }
 
+        // กรณีฉุกเฉินดึงข้อมูลไม่ได้
         if (!lawData) {
-            lawData = { id: id, code: "รายการบันทึก", title: "", timestamp: new Date().toLocaleString('th-TH'), content: "" };
+            lawData = { id: stringId, code: "กฎหมาย", title: "รายการที่บันทึก", timestamp: new Date().toLocaleString('th-TH'), content: "" };
         }
 
         let stored = getStoredFavs();
-        const existingIndex = stored.findIndex(s => String(s.id) === String(id));
+        const existingIndex = stored.findIndex(s => String(s.id) === stringId);
         
         if (existingIndex > -1) {
             stored.splice(existingIndex, 1);
@@ -398,23 +417,24 @@
         }
         
         localStorage.setItem('favLaws', JSON.stringify(stored));
-        updateHeartVisuals(id, existingIndex === -1);
+        updateHeartVisuals(stringId, existingIndex === -1);
     };
 
     window.jumpToItem = function(id) {
+        const stringId = String(id);
         toggleModal('modalFavs', false); 
         switchTab('home'); 
 
-        const targetBtn = document.querySelector(`button[onclick*="toggleFav('${id}')"], button[onclick*="toggleFav(${id})"]`);
+        const targetBtn = document.querySelector(`button[onclick*="toggleFav('${stringId}')"], button[onclick*="toggleFav(${stringId})"]`);
         if (targetBtn) {
-            const row = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
-            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            row.classList.remove('target-highlight');
-            void row.offsetWidth; 
-            row.classList.add('target-highlight');
+            const card = targetBtn.closest('.bg-white') || targetBtn.closest('div[class*="border"]') || targetBtn.parentElement.parentElement;
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.classList.remove('target-highlight');
+            void card.offsetWidth; 
+            card.classList.add('target-highlight');
         } else {
             const stored = getStoredFavs();
-            const item = stored.find(s => String(s.id) === String(id));
+            const item = stored.find(s => String(s.id) === stringId);
             if (item) {
                 const detailEl = document.getElementById('detailContent');
                 detailEl.innerHTML = `
@@ -441,13 +461,13 @@
                     if(e.target.closest('.delete-btn')) return;
                     jumpToItem(law.id);
                 };
-                // รายการโปรดแบบมีกรอบ และโชว์แค่ชื่อ+วันที่
+                // รายการโปรดแบบมีกรอบชัดเจน
                 card.className = 'bg-white p-3 rounded-xl border border-slate-300 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50';
                 card.innerHTML = `
                     <div class="flex-1 min-w-0 pointer-events-none">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-bold text-blue-800 truncate">${law.code}</span>
-                            <span class="text-[9px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${law.timestamp}</span>
+                            <span class="text-[9px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded whitespace-nowrap ml-2">${law.timestamp}</span>
                         </div>
                     </div>
                     <button onclick="removeFav('${law.id}')" class="delete-btn text-slate-300 hover:text-red-500 p-1 flex items-center justify-center">
@@ -466,19 +486,26 @@
     };
 
     function getStoredFavs() {
-        try { return JSON.parse(localStorage.getItem('favLaws')) || []; } catch(e) { return []; }
+        try {
+            const data = localStorage.getItem('favLaws');
+            return data ? JSON.parse(data) : [];
+        } catch(e) { return []; }
     }
 
     function updateHeartVisuals(id, isActive) {
-        const buttons = document.querySelectorAll(`button[onclick*="toggleFav('${id}')"], button[onclick*="toggleFav(${id})"], .heart-icon[data-id="${id}"]`);
+        const stringId = String(id);
+        const buttons = document.querySelectorAll(`button[onclick*="toggleFav('${stringId}')"], button[onclick*="toggleFav(${stringId})"], .heart-icon`);
         buttons.forEach(btn => {
-            const icon = btn.querySelector('.material-symbols-rounded') || btn;
-            if (isActive) {
-                icon.classList.add('text-red-500', 'active');
-                icon.style.fontVariationSettings = "'FILL' 1";
-            } else {
-                icon.classList.remove('text-red-500', 'active');
-                icon.style.fontVariationSettings = "'FILL' 0";
+            const attr = btn.getAttribute('onclick') || "";
+            if (attr.includes(stringId)) {
+                const icon = btn.querySelector('.material-symbols-rounded') || btn;
+                if (isActive) {
+                    icon.classList.add('text-red-500', 'active');
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                } else {
+                    icon.classList.remove('text-red-500', 'active');
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                }
             }
         });
     }
@@ -489,24 +516,25 @@
         const paintHearts = () => {
             const stored = getStoredFavs();
             const storedIds = stored.map(s => String(s.id));
-            const buttons = document.querySelectorAll('button[onclick*="toggleFav"], .heart-icon');
+            const buttons = document.querySelectorAll('button[onclick*="toggleFav"]');
             buttons.forEach(btn => {
                 const attr = btn.getAttribute('onclick') || "";
                 const match = attr.match(/toggleFav\((['"]?)(.*?)\1\)/);
                 if(match && match[2]) {
-                    const id = String(match[2]);
-                    btn.classList.add('heart-icon');
-                    if (storedIds.includes(id)) {
-                        btn.classList.add('text-red-500', 'active');
-                        btn.style.fontVariationSettings = "'FILL' 1";
+                    const stringId = String(match[2]);
+                    const icon = btn.querySelector('.material-symbols-rounded') || btn;
+                    if (storedIds.includes(stringId)) {
+                        icon.classList.add('text-red-500', 'active');
+                        icon.style.fontVariationSettings = "'FILL' 1";
                     } else {
-                        btn.classList.remove('text-red-500', 'active');
-                        btn.style.fontVariationSettings = "'FILL' 0";
+                        icon.classList.remove('text-red-500', 'active');
+                        icon.style.fontVariationSettings = "'FILL' 0";
                     }
                 }
             });
         };
-        new MutationObserver(paintHearts).observe(listEl, { childList: true, subtree: true });
+        const observer = new MutationObserver(paintHearts);
+        observer.observe(listEl, { childList: true, subtree: true });
         paintHearts();
     }
 
