@@ -112,7 +112,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* เอฟเฟกต์ไฮไลท์เมื่อ Jump */
+        /* ไฮไลท์เป้าหมายเมื่อ Jump */
         @keyframes target-flash {
             0% { background-color: transparent; border-color: #e2e8f0; }
             40% { background-color: rgba(239, 68, 68, 0.08); border-color: var(--fav-red); transform: scale(1.02); }
@@ -127,31 +127,26 @@
         .dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
         .dot.active { width: 24px; background-color: var(--accent); border-radius: 12px; }
 
-        /* ปุ่มหัวใจ (Favorite) */
+        /* ปรับปรุงปุ่มหัวใจ - ให้อยู่มุมขวาบน */
         .fav-btn-container {
-            position: absolute; top: 14px; right: 14px; z-index: 5;
+            position: absolute; top: 16px; right: 16px; z-index: 5;
         }
         .fav-btn { 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
             cursor: pointer; 
             color: #94a3b8;
-            font-size: 28px;
-            background: rgba(248, 250, 252, 0.8);
-            backdrop-filter: blur(4px);
+            font-size: 26px;
+            background: rgba(248, 250, 252, 0.5);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 38px;
-            height: 38px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            border: 1px solid #f1f5f9;
+            width: 36px;
+            height: 36px;
         }
         .fav-btn.active { 
             color: var(--fav-red) !important; 
-            background: #fff1f2;
             transform: scale(1.1);
-            border-color: #fecdd3;
         }
         .fav-btn .material-symbols-rounded {
             font-variation-settings: 'FILL' 0;
@@ -161,10 +156,7 @@
             font-variation-settings: 'FILL' 1;
         }
 
-        .bubble { padding: 12px 16px; border-radius: 20px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.5; word-wrap: break-word;}
-        .bubble-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
-
+        /* กรอบรายการกฎหมายหน้าหลัก */
         #list > div {
             border: 1px solid #e2e8f0;
             border-radius: 24px;
@@ -176,6 +168,10 @@
             position: relative;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
         }
+
+        .bubble { padding: 12px 16px; border-radius: 20px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.5; word-wrap: break-word;}
+        .bubble-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
 
         .hidden { display: none !important; }
     </style>
@@ -344,11 +340,11 @@
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
 
-    // Storage Access
+    // Storage access
     const getStored = () => JSON.parse(localStorage.getItem('favLaws') || '[]');
     const saveToStorage = (data) => localStorage.setItem('favLaws', JSON.stringify(data));
 
-    // Improved Toggle (Back to Heart Icon Logic)
+    // Improved Toggle (Scrapes the exact text from the card)
     window.toggleFav = function(id) {
         if (!id) return;
         const sid = String(id);
@@ -478,10 +474,10 @@
 
     window.removeFav = function(id) {
         window.toggleFav(id);
-        window.openFavs(); // อัปเดตรายการใหม่ใน Modal
+        window.openFavs(); // Refresh the list in the modal
     };
 
-    // Auto-paint buttons status (Back to Heart Icon)
+    // Auto-paint hearts status
     function startObserver() {
         const listEl = document.getElementById('list');
         if(!listEl) return;
@@ -501,7 +497,7 @@
                         wrapper.appendChild(btn);
                         btn.className = 'fav-btn';
                         icon.className = 'material-symbols-rounded';
-                        icon.innerText = 'favorite'; // ใช้หัวใจตลอด แต่ใช้ FILL ควบคุมเอา
+                        icon.innerText = 'favorite';
                     }
 
                     if (savedIds.includes(sid)) {
