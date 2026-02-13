@@ -169,13 +169,15 @@
         #latestTrack > div {
             padding-left: 8px;
             padding-right: 8px;
+            /* บังคับขนาด flex item ให้ไม่เกินจอ */
+            width: 100vw; 
+            max-width: 100%;
         }
         /* บังคับตัดคำและบรรทัดสำหรับข้อความใน Slider ทุกตัว */
         #latestTrack span {
             white-space: normal !important;
-            word-wrap: break-word !important;
-            overflow-wrap: break-word !important;
-            max-width: 100%;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important; /* ดีกว่า break-word สำหรับภาษาไทย */
             display: block;
             line-height: 1.4;
         }
@@ -425,12 +427,9 @@
         if(btnCloseChat) btnCloseChat.addEventListener('click', () => toggleModal('modalChat', false));
 
         // Favorites Modal
-        const btnOpenFavs = document.getElementById('btnOpenFavs');
+        // NOTE: We do NOT attach listener here for btnOpenFavs to avoid conflict with app.js
+        // We will override it in the final script block.
         const btnCloseFavs = document.getElementById('btnCloseFavs');
-        if(btnOpenFavs) btnOpenFavs.addEventListener('click', () => {
-             if(typeof openFavs === 'function') openFavs();
-             toggleModal('modalFavs', true);
-        });
         if(btnCloseFavs) btnCloseFavs.addEventListener('click', () => toggleModal('modalFavs', false));
     });
 
@@ -487,20 +486,6 @@
             });
         }, 4000);
     }
-
-    // --- Favorites Logic Overwrite (To add Links) ---
-    // Note: We need to override openFavs because the original one in app.js doesn't include the link button.
-    // If app.js doesn't expose laws, this might be tricky, but usually laws is global.
-    // If laws is not global, this function depends on how app.js is structured.
-    // Assuming laws is globally available or accessible.
-    
-    // We declare this here to ensure it's available for the UI. 
-    // If app.js defines it, this will be overwritten if loaded after, but app.js is loaded AFTER this block in HTML flow.
-    // Wait, <script src="./app.js"></script> is loaded AFTER this block.
-    // So app.js will overwrite this function if it defines it.
-    // To ensure THIS function is used, we should place this block AFTER app.js or rename it/assign it window.openFavs
-    
-    // However, since I cannot edit app.js, I will place this override logic in a script block AFTER app.js load.
     
     window.switchTab = switchTab;
     window.toggleModal = toggleModal;
@@ -509,18 +494,52 @@
 <!-- 2. Law Data & Core Logic (External) -->
 <script src="./app.js"></script>
 
-<!-- 3. Overrides & Extra Logic (Must be after app.js to override openFavs if it exists there) -->
+<!-- 3. Overrides & Extra Logic (This runs LAST to override app.js behavior) -->
 <script>
-    // Override openFavs to include "Read Full" link
+    // Force override the Favorites Button to stop app.js from rendering "Recorded on..."
+    const oldBtn = document.getElementById('btnOpenFavs');
+    if(oldBtn) {
+        // Clone and replace to strip all existing event listeners from app.js
+        const newBtn = oldBtn.cloneNode(true);
+        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+        
+        // Attach OUR listener
+        newBtn.addEventListener('click', function() {
+            if (typeof window.openFavs === 'function') {
+                window.openFavs();
+            } else {
+                console.error("openFavs function not found");
+            }
+        });
+    }
+
+    // Define our custom openFavs function with Links
     window.openFavs = function() {
-        // Ensure laws and favorites are available. Assuming they are global from app.js
         if (typeof laws === 'undefined') {
             console.error("Database 'laws' not found.");
+            // Fallback empty UI
+            const container = document.getElementById('favContainer');
+            if(container) container.innerHTML = '<div class="text-center text-slate-400 py-10">ไม่พบข้อมูลกฎหมาย</div>';
+            toggleModal('modalFavs', true);
             return;
         }
         
         // Get favorites from localStorage
-        const favIds = JSON.parse(localStorage.getItem('favLaws')) || [];
+        // Note: app.js might store objects or IDs. We try to parse gracefully.
+        let favIds = [];
+        try {
+            const stored = JSON.parse(localStorage.getItem('favLaws')) || [];
+            // If stored is [1, 2]
+            if (stored.length > 0 && typeof stored[0] !== 'object') {
+                favIds = stored;
+            } else if (stored.length > 0 && typeof stored[0] === 'object') {
+                // If stored is [{id:1, date:...}, ...]
+                favIds = stored.map(item => item.id);
+            }
+        } catch(e) {
+            console.error("Error parsing favLaws", e);
+        }
+
         const favData = laws.filter(l => favIds.includes(l.id));
         const container = document.getElementById('favContainer');
         container.innerHTML = '';
@@ -535,19 +554,23 @@
                 const item = document.createElement('div');
                 item.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center gap-3';
                 
-                // Use law.link if available, otherwise #
-                const linkUrl = law.link ? law.link : '#';
+                // Construct Link: Use law.link if exists, otherwise create a Google Search link
+                let linkUrl = law.link;
+                if (!linkUrl) {
+                    // Create a useful search link if no direct link exists
+                    linkUrl = `https://www.google.com/search?q=${encodeURIComponent(law.title + ' ' + law.code + ' มาตรา ' + law.section)}`;
+                }
                 
                 item.innerHTML = `
                     <a href="${linkUrl}" target="_blank" class="flex-1 min-w-0 group block text-left">
                         <div class="text-[10px] font-bold text-blue-600 truncate">${law.code} ม.${law.section}</div>
                         <div class="font-bold text-sm text-slate-800 truncate group-hover:text-blue-700 transition-colors">${law.title}</div>
-                        <div class="flex items-center gap-1 mt-1 text-blue-500">
+                        <div class="flex items-center gap-1 mt-1 text-blue-500 hover:underline">
                              <span class="text-[10px] font-medium">อ่านฉบับเต็ม</span>
                              <span class="material-symbols-rounded text-[14px]">open_in_new</span>
                         </div>
                     </a>
-                    <button onclick="toggleFav(${law.id}, this)" class="text-red-500 hover:bg-red-50 p-2 rounded-full shrink-0 ml-2">
+                    <button onclick="toggleFav(${law.id}, this); setTimeout(window.openFavs, 50);" class="text-red-500 hover:bg-red-50 p-2 rounded-full shrink-0 ml-2">
                         <span class="material-symbols-rounded font-variation-settings-fill">delete</span>
                     </button>
                 `;
