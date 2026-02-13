@@ -338,41 +338,37 @@
     let allLawsData = [];
     let currentPage = 1;
     const itemsPerPage = 10;
-    let pendingJumpId = null;
+    let listObserver = null; // Defined explicitly
 
     const getStored = () => JSON.parse(localStorage.getItem('favLaws') || '[]');
     const saveToStorage = (data) => localStorage.setItem('favLaws', JSON.stringify(data));
 
+    // Helper for safe base64 ID
+    function getSafeId(law) {
+        if(law.id) return String(law.id);
+        const str = (law["ชื่อกฎหมาย"] || "") + (law["วันที่"] || "");
+        try {
+            return window.btoa(unescape(encodeURIComponent(str)));
+        } catch(e) {
+            return str.replace(/\s/g, '-');
+        }
+    }
+
+    // (Fix 1) Updated renderLawsFromJson with Observer Cleanup & Data Reset
     function renderLawsFromJson(data){
-        allLawsData = data;
-        
-        if (pendingJumpId) {
-            const index = allLawsData.findIndex(law => {
-                 const lawId = String(law.id || (law["ชื่อกฎหมาย"] + law["วันที่"]));
-                 return lawId === pendingJumpId;
-            });
-            
-            if (index !== -1) {
-                currentPage = Math.floor(index / itemsPerPage) + 1;
-                renderPage();
-                
-                setTimeout(() => {
-                    const safeId = pendingJumpId.replace(/\s/g, '-');
-                    const targetEl = document.getElementById(`law-item-${safeId}`);
-                    if (targetEl) {
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        targetEl.classList.remove('target-highlight');
-                        void targetEl.offsetWidth; 
-                        targetEl.classList.add('target-highlight');
-                        setTimeout(() => targetEl.classList.remove('target-highlight'), 3000);
-                    }
-                    pendingJumpId = null;
-                }, 400);
-                return;
-            }
+        // ป้องกันข้อมูลซ้ำ
+        if (!Array.isArray(data)) return;
+
+        // ถ้ามี observer เก่าให้หยุดก่อน
+        if (listObserver) {
+            listObserver.disconnect();
+            listObserver = null;
         }
 
+        // reset data ใหม่เสมอ
+        allLawsData = [...data];
         currentPage = 1;
+
         renderPage();
     }
 
@@ -390,13 +386,13 @@
         const pageItems = allLawsData.slice(startIndex, endIndex);
 
         pageItems.forEach(law => {
-            const id = law.id || (law["ชื่อกฎหมาย"] + law["วันที่"]);
-            const safeId = String(id).replace(/\s/g, '-');
+            const id = getSafeId(law); // (Fix 4) Use Safe ID
+            const safeId = id.replace(/[^a-zA-Z0-9-_]/g, ''); // Ensure HTML ID safe
+            
             const el = document.createElement('div');
             el.id = `law-item-${safeId}`;
-            // Mark as transformed internally so observer skips it
             el.dataset.transformed = "true";
-            el.style.position = 'relative'; // Ensure relative for absolute button
+            el.style.position = 'relative';
 
             el.innerHTML = `
                 <div class="fav-btn-container">
@@ -429,7 +425,7 @@
             listEl.appendChild(el);
         });
 
-        // Pagination UI
+        // Pagination Controls
         if (allLawsData.length > itemsPerPage) {
             const totalPages = Math.ceil(allLawsData.length / itemsPerPage);
             const nav = document.createElement('div');
@@ -449,7 +445,6 @@
         // Apply visual state (Green Check / Plus)
         const savedIds = getStored().map(s => String(s.id));
         listEl.querySelectorAll('.fav-btn').forEach(btn => {
-            // Find ID from onclick
             const match = btn.getAttribute('onclick')?.match(/toggleFav\((['"]?)(.*?)\1\)/);
             if(match) {
                 const sid = match[2];
@@ -464,8 +459,7 @@
             }
         });
         
-        // Also run observer for any app.js injected content
-        startObserver();
+        startObserver(); // Restart observer for app.js appended items
     }
 
     function changePage(delta) {
@@ -486,8 +480,7 @@
         }
     }
 
-    // --- Core Logic for Save & Jump ---
-
+    // (Fix 2) Toggle Favorite with Exact ID & Title Scraping
     window.toggleFav = function(id) {
         if (!id) return;
         const sid = String(id);
@@ -501,21 +494,24 @@
         } else {
             let lawTitle = "รายการที่บันทึก";
             
-            // 1. Try finding in Data first (Most Accurate)
+            // 1. Try finding in Data first
             if (allLawsData.length > 0) {
-                const item = allLawsData.find(law => String(law.id || (law["ชื่อกฎหมาย"] + law["วันที่"])) === sid);
+                const item = allLawsData.find(law => getSafeId(law) === sid);
                 if (item && item["ชื่อกฎหมาย"]) {
                     lawTitle = item["ชื่อกฎหมาย"];
                 }
             }
             
-            // 2. Fallback to DOM scraping if not found in current data page
+            // 2. Fallback to Precise DOM scraping
             if (lawTitle === "รายการที่บันทึก") {
-                const btn = document.querySelector(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
-                if (btn) {
-                    const card = btn.closest('.bg-white') || btn.parentElement.parentElement;
-                    const titleEl = card.querySelector('.font-bold'); // Tailwind bold class
-                    if (titleEl) lawTitle = titleEl.innerText.trim();
+                // Find via button onclick ID
+                const safeId = sid.replace(/[^a-zA-Z0-9-_]/g, '');
+                const card = document.getElementById(`law-item-${safeId}`);
+                if (card) {
+                    const titleEl = card.querySelector('.item-title');
+                    if (titleEl) {
+                        lawTitle = titleEl.textContent.trim();
+                    }
                 }
             }
             
@@ -544,8 +540,7 @@
         });
     }
 
-    // Auto-Transform Observer for App.js generated content
-    let listObserver = null;
+    // Auto-Transform Observer (Fix 1: Safe Observer)
     function startObserver() {
         const listEl = document.getElementById('list');
         if (!listEl) return;
@@ -555,8 +550,6 @@
 
         const transformCard = (card) => {
             if (!card || card.dataset.transformed === "true") return;
-
-            // ต้องเป็น card จริง
             if (!card.matches('#list > div')) return;
 
             // หา button เก่า (รูปหัวใจจาก app.js)
@@ -618,6 +611,7 @@
         listObserver.observe(listEl, { childList: true });
     }
 
+    // (Fix 3) Jump Logic with Auto Page Switch & Scroll
     window.jumpToItem = function(id) {
         const sid = String(id);
 
@@ -626,7 +620,7 @@
 
         setTimeout(() => {
             const index = allLawsData.findIndex(law => {
-                const lawId = String(law.id || (law["ชื่อกฎหมาย"] + law["วันที่"]));
+                const lawId = getSafeId(law);
                 return lawId === sid;
             });
 
@@ -639,7 +633,7 @@
                 }
 
                 setTimeout(() => {
-                    const safeId = sid.replace(/\s/g, '-');
+                    const safeId = sid.replace(/[^a-zA-Z0-9-_]/g, '');
                     const targetEl = document.getElementById(`law-item-${safeId}`);
 
                     if (targetEl) {
@@ -649,7 +643,14 @@
                         void targetEl.offsetWidth;
                         targetEl.classList.add('target-highlight');
                     }
-                }, 400);
+                }, 400); // Wait for page render
+            } else {
+                // If filtered out, try clearing filter
+                const allChip = document.querySelector('.chip');
+                if(allChip && !allChip.classList.contains('active')) {
+                    allChip.click();
+                    setTimeout(() => jumpToItem(id), 500); // Retry after filter cleared
+                }
             }
         }, 200);
     };
@@ -698,7 +699,7 @@
 
         initSlider();
         initChat();
-        startObserver();
+        startObserver(); // Initial observer start
     });
 
     function toggleModal(id, show) {
