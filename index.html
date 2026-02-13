@@ -487,6 +487,20 @@
             });
         }, 4000);
     }
+
+    // --- Favorites Logic Overwrite (To add Links) ---
+    // Note: We need to override openFavs because the original one in app.js doesn't include the link button.
+    // If app.js doesn't expose laws, this might be tricky, but usually laws is global.
+    // If laws is not global, this function depends on how app.js is structured.
+    // Assuming laws is globally available or accessible.
+    
+    // We declare this here to ensure it's available for the UI. 
+    // If app.js defines it, this will be overwritten if loaded after, but app.js is loaded AFTER this block in HTML flow.
+    // Wait, <script src="./app.js"></script> is loaded AFTER this block.
+    // So app.js will overwrite this function if it defines it.
+    // To ensure THIS function is used, we should place this block AFTER app.js or rename it/assign it window.openFavs
+    
+    // However, since I cannot edit app.js, I will place this override logic in a script block AFTER app.js load.
     
     window.switchTab = switchTab;
     window.toggleModal = toggleModal;
@@ -495,7 +509,56 @@
 <!-- 2. Law Data & Core Logic (External) -->
 <script src="./app.js"></script>
 
-<!-- 3. Chatbot Backend Logic (Module) -->
+<!-- 3. Overrides & Extra Logic (Must be after app.js to override openFavs if it exists there) -->
+<script>
+    // Override openFavs to include "Read Full" link
+    window.openFavs = function() {
+        // Ensure laws and favorites are available. Assuming they are global from app.js
+        if (typeof laws === 'undefined') {
+            console.error("Database 'laws' not found.");
+            return;
+        }
+        
+        // Get favorites from localStorage
+        const favIds = JSON.parse(localStorage.getItem('favLaws')) || [];
+        const favData = laws.filter(l => favIds.includes(l.id));
+        const container = document.getElementById('favContainer');
+        container.innerHTML = '';
+        
+        if (favData.length === 0) {
+            container.innerHTML = `<div class="text-center text-slate-400 py-10 flex flex-col items-center gap-2">
+                <span class="material-symbols-rounded text-4xl opacity-30">bookmark_off</span>
+                <span>ยังไม่มีรายการโปรด</span>
+            </div>`;
+        } else {
+            favData.forEach(law => {
+                const item = document.createElement('div');
+                item.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center gap-3';
+                
+                // Use law.link if available, otherwise #
+                const linkUrl = law.link ? law.link : '#';
+                
+                item.innerHTML = `
+                    <a href="${linkUrl}" target="_blank" class="flex-1 min-w-0 group block text-left">
+                        <div class="text-[10px] font-bold text-blue-600 truncate">${law.code} ม.${law.section}</div>
+                        <div class="font-bold text-sm text-slate-800 truncate group-hover:text-blue-700 transition-colors">${law.title}</div>
+                        <div class="flex items-center gap-1 mt-1 text-blue-500">
+                             <span class="text-[10px] font-medium">อ่านฉบับเต็ม</span>
+                             <span class="material-symbols-rounded text-[14px]">open_in_new</span>
+                        </div>
+                    </a>
+                    <button onclick="toggleFav(${law.id}, this)" class="text-red-500 hover:bg-red-50 p-2 rounded-full shrink-0 ml-2">
+                        <span class="material-symbols-rounded font-variation-settings-fill">delete</span>
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+        toggleModal('modalFavs', true);
+    }
+</script>
+
+<!-- 4. Chatbot Backend Logic (Module) -->
 <script type="module">
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev'; 
     let chatHistory = [];
