@@ -374,6 +374,11 @@
 
     function renderPage() {
         const listEl = document.getElementById('list');
+        // (Fix 3) Reset observer inside renderPage too
+        if (listObserver) {
+            listObserver.disconnect();
+            listObserver = null;
+        }
         listEl.innerHTML = '';
 
         if (!allLawsData || allLawsData.length === 0) {
@@ -386,8 +391,8 @@
         const pageItems = allLawsData.slice(startIndex, endIndex);
 
         pageItems.forEach(law => {
-            const id = getSafeId(law); // (Fix 4) Use Safe ID
-            const safeId = id.replace(/[^a-zA-Z0-9-_]/g, ''); // Ensure HTML ID safe
+            const id = getSafeId(law); // (Fix 1) Use ID directly
+            const safeId = id; // (Fix 1) NO replace regex
             
             const el = document.createElement('div');
             el.id = `law-item-${safeId}`;
@@ -459,7 +464,7 @@
             }
         });
         
-        startObserver(); // Restart observer for app.js appended items
+        startObserver(); // Restart observer
     }
 
     function changePage(delta) {
@@ -480,7 +485,7 @@
         }
     }
 
-    // (Fix 2) Toggle Favorite with Exact ID & Title Scraping
+    // (Fix 4) Updated Toggle with Data Priority
     window.toggleFav = function(id) {
         if (!id) return;
         const sid = String(id);
@@ -494,19 +499,13 @@
         } else {
             let lawTitle = "รายการที่บันทึก";
             
-            // 1. Try finding in Data first
-            if (allLawsData.length > 0) {
-                const item = allLawsData.find(law => getSafeId(law) === sid);
-                if (item && item["ชื่อกฎหมาย"]) {
-                    lawTitle = item["ชื่อกฎหมาย"];
-                }
-            }
-            
-            // 2. Fallback to Precise DOM scraping
-            if (lawTitle === "รายการที่บันทึก") {
-                // Find via button onclick ID
-                const safeId = sid.replace(/[^a-zA-Z0-9-_]/g, '');
-                const card = document.getElementById(`law-item-${safeId}`);
+            // 1. Try finding in Data first (Most Accurate)
+            const item = allLawsData.find(law => getSafeId(law) === sid);
+            if (item) {
+                lawTitle = item["ชื่อกฎหมาย"] || "รายการที่บันทึก";
+            } else {
+                // 2. Fallback to Precise DOM scraping
+                const card = document.getElementById(`law-item-${sid}`); // Direct ID
                 if (card) {
                     const titleEl = card.querySelector('.item-title');
                     if (titleEl) {
@@ -540,19 +539,19 @@
         });
     }
 
-    // Auto-Transform Observer (Fix 1: Safe Observer)
+    // (Fix 2) Updated Observer with Specific Element Checks
     function startObserver() {
         const listEl = document.getElementById('list');
         if (!listEl) return;
 
-        // ป้องกันสร้าง observer ซ้ำ
         if (listObserver) return;
 
         const transformCard = (card) => {
             if (!card || card.dataset.transformed === "true") return;
-            if (!card.matches('#list > div')) return;
+            
+            // (Fix 2) Check for specific class to ensure it's a card
+            if (!card.classList.contains('bg-white')) return;
 
-            // หา button เก่า (รูปหัวใจจาก app.js)
             const oldBtn = card.querySelector('button');
             if (!oldBtn) return;
 
@@ -564,10 +563,8 @@
 
             const sid = String(match[2]);
 
-            // ลบปุ่มเก่า
             oldBtn.remove();
 
-            // สร้างปุ่มใหม่
             const container = document.createElement('div');
             container.className = 'fav-btn-container';
 
@@ -590,7 +587,6 @@
 
             card.dataset.transformed = "true";
 
-            // sync สถานะ
             const savedIds = getStored().map(s => String(s.id));
             if (savedIds.includes(sid)) {
                 btn.classList.add('active');
@@ -618,41 +614,32 @@
         toggleModal('modalFavs', false);
         switchTab('home');
 
-        setTimeout(() => {
-            const index = allLawsData.findIndex(law => {
-                const lawId = getSafeId(law);
-                return lawId === sid;
-            });
+        const index = allLawsData.findIndex(law => {
+            const lawId = getSafeId(law);
+            return lawId === sid;
+        });
 
-            if (index !== -1) {
-                const targetPage = Math.floor(index / itemsPerPage) + 1;
+        if (index !== -1) {
+            const targetPage = Math.floor(index / itemsPerPage) + 1;
 
-                if (currentPage !== targetPage) {
-                    currentPage = targetPage;
-                    renderPage();
-                }
-
-                setTimeout(() => {
-                    const safeId = sid.replace(/[^a-zA-Z0-9-_]/g, '');
-                    const targetEl = document.getElementById(`law-item-${safeId}`);
-
-                    if (targetEl) {
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                        targetEl.classList.remove('target-highlight');
-                        void targetEl.offsetWidth;
-                        targetEl.classList.add('target-highlight');
-                    }
-                }, 400); // Wait for page render
-            } else {
-                // If filtered out, try clearing filter
-                const allChip = document.querySelector('.chip');
-                if(allChip && !allChip.classList.contains('active')) {
-                    allChip.click();
-                    setTimeout(() => jumpToItem(id), 500); // Retry after filter cleared
-                }
+            if (currentPage !== targetPage) {
+                currentPage = targetPage;
+                renderPage();
             }
-        }, 200);
+
+            setTimeout(() => {
+                const safeId = sid; // No regex replacement
+                const targetEl = document.getElementById(`law-item-${safeId}`);
+
+                if (targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    targetEl.classList.remove('target-highlight');
+                    void targetEl.offsetWidth;
+                    targetEl.classList.add('target-highlight');
+                }
+            }, 300);
+        }
     };
 
     window.openFavs = function() {
