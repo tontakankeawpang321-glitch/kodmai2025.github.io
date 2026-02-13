@@ -119,15 +119,14 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* เอฟเฟกต์กระพริบเมื่อ Jump มาถึง */
         @keyframes target-flash {
-            0% { background-color: rgba(234, 179, 8, 0.1); transform: scale(1); }
-            50% { background-color: rgba(234, 179, 8, 0.3); transform: scale(1.02); box-shadow: 0 0 15px rgba(234, 179, 8, 0.3); border-color: var(--accent); }
-            100% { background-color: white; transform: scale(1); }
+            0% { background-color: transparent; }
+            50% { background-color: rgba(234, 179, 8, 0.2); border-color: var(--accent); }
+            100% { background-color: transparent; }
         }
         .target-highlight {
-            animation: target-flash 1.5s ease-in-out;
-            position: relative;
-            z-index: 50;
+            animation: target-flash 1.2s ease-in-out 2;
         }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -137,14 +136,15 @@
         .heart-icon { transition: transform 0.2s, color 0.2s; font-variation-settings: 'FILL' 0; cursor: pointer; }
         .heart-icon.active { color: #ef4444 !important; font-variation-settings: 'FILL' 1 !important; transform: scale(1.2); }
 
-        /* กรอบสำหรับรายการกฎหมายในหน้าหลัก */
+        /* กรอบรายการกฎหมายหน้าหลัก */
         #list > div {
             border: 1px solid #e2e8f0;
             border-radius: 16px;
             overflow: hidden;
             background: white;
-            transition: border-color 0.2s;
-            margin-bottom: 6px;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+            position: relative;
         }
     </style>
 </head>
@@ -274,7 +274,7 @@
             </button>
         </header>
         <div id="favContainer" class="p-4 overflow-y-auto space-y-2 min-h-[200px] bg-slate-50/50">
-            <!-- รายการโปรดจะมาแสดงที่นี่ -->
+            <!-- รายการโปรดจะแสดงที่นี่ -->
         </div>
     </div>
 </div>
@@ -325,7 +325,7 @@
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
 
-    // ฟังก์ชันช่วยดึงข้อมูลรายการโปรดที่บันทึกไว้
+    // ฟังก์ชันดึงข้อมูล LocalStorage
     function getStoredFavs() {
         try {
             const data = localStorage.getItem('favLaws');
@@ -333,7 +333,7 @@
         } catch(e) { return []; }
     }
 
-    // ฟังก์ชันจัดการการคลิกหัวใจ
+    // ฟังก์ชันบันทึกรายการโปรด
     window.toggleFav = function(id) {
         if (!id) return;
         const stringId = String(id);
@@ -341,19 +341,17 @@
         const existingIndex = stored.findIndex(s => String(s.id) === stringId);
 
         if (existingIndex > -1) {
-            // ลบออก
+            // ลบรายการโปรด
             stored.splice(existingIndex, 1);
             localStorage.setItem('favLaws', JSON.stringify(stored));
             updateHeartVisuals(stringId, false);
         } else {
-            // บันทึกใหม่: ค้นหาข้อความในหน้าจอ
+            // บันทึกใหม่
             let lawData = null;
-            // ค้นหาปุ่มหรือหัวใจที่มี data-id หรือ onclick ที่ตรงกัน
-            const targetBtn = document.querySelector(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"], [data-fav-id="${stringId}"]`);
-
+            // ค้นหาการ์ดกฎหมายที่ปุ่มหัวใจถูกคลิก
+            const targetBtn = document.querySelector(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"]`);
             if (targetBtn) {
-                // หาการ์ดที่ใกล้ที่สุด (Card Container)
-                const card = targetBtn.closest('.bg-white') || targetBtn.closest('div[class*="border"]') || targetBtn.parentElement.parentElement;
+                const card = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
                 if (card) {
                     const clone = card.cloneNode(true);
                     clone.querySelectorAll('button, .material-symbols-rounded, .icon, script, style').forEach(el => el.remove());
@@ -362,8 +360,7 @@
                     
                     lawData = { 
                         id: stringId, 
-                        code: lines[0] || "กฎหมาย", 
-                        title: lines[1] || "",
+                        code: lines[0] || "กฎหมาย", // บรรทัดแรกมักเป็นหัวข้อ
                         timestamp: new Date().toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' }) + " " + new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
                         content: rawText
                     };
@@ -371,7 +368,7 @@
             }
 
             if (!lawData) {
-                lawData = { id: stringId, code: "กฎหมาย", title: "รายการที่บันทึก", timestamp: new Date().toLocaleString('th-TH'), content: "" };
+                lawData = { id: stringId, code: "กฎหมาย", timestamp: new Date().toLocaleString('th-TH'), content: "" };
             }
 
             stored.push(lawData);
@@ -380,55 +377,47 @@
         }
     };
 
-    // อัปเดตสีหัวใจให้ตรงกับสถานะ
+    // ปรับสีหัวใจตามสถานะ
     function updateHeartVisuals(id, isActive) {
         const stringId = String(id);
-        const elements = document.querySelectorAll(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"], .heart-icon`);
+        const elements = document.querySelectorAll(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"]`);
         elements.forEach(el => {
-            const attr = el.getAttribute('onclick') || "";
-            if (attr.includes(stringId) || el.dataset.favId === stringId) {
-                const icon = el.querySelector('.material-symbols-rounded') || el;
-                if (isActive) {
-                    icon.classList.add('text-red-500', 'active');
-                    icon.style.fontVariationSettings = "'FILL' 1";
-                } else {
-                    icon.classList.remove('text-red-500', 'active');
-                    icon.style.fontVariationSettings = "'FILL' 0";
-                }
+            const icon = el.querySelector('.material-symbols-rounded') || el;
+            if (isActive) {
+                icon.classList.add('text-red-500', 'active');
+                icon.style.fontVariationSettings = "'FILL' 1";
+            } else {
+                icon.classList.remove('text-red-500', 'active');
+                icon.style.fontVariationSettings = "'FILL' 0";
             }
         });
     }
 
-    // กระโดดไปยังรายการที่เลือก
+    // ฟังก์ชัน Jump ไปที่ตำแหน่งรายชื่อ
     window.jumpToItem = function(id) {
         const stringId = String(id);
-        toggleModal('modalFavs', false); 
-        switchTab('home'); 
+        toggleModal('modalFavs', false); // ปิดหน้าต่างโปรด
+        switchTab('home'); // ไปที่หน้าหลัก
 
+        // หาตำแหน่งปุ่มหรือการ์ดในหน้าจอหลัก
         const targetBtn = document.querySelector(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"]`);
         if (targetBtn) {
-            const card = targetBtn.closest('.bg-white') || targetBtn.closest('div[class*="border"]') || targetBtn.parentElement.parentElement;
+            const card = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
+            
+            // เลื่อนหน้าจอ
             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // เพิ่มเอฟเฟกต์กระพริบ
             card.classList.remove('target-highlight');
-            void card.offsetWidth; 
+            void card.offsetWidth; // Trigger reflow
             card.classList.add('target-highlight');
-        } else {
-            // หากไม่เจอกราฟิก ให้เปิดรายละเอียดแทน
-            const stored = getStoredFavs();
-            const item = stored.find(s => String(s.id) === stringId);
-            if (item) {
-                const detailEl = document.getElementById('detailContent');
-                detailEl.innerHTML = `
-                    <div class="font-bold text-blue-800 text-lg mb-1">${item.code}</div>
-                    <div class="text-[10px] text-slate-400 mb-4">บันทึกเมื่อ: ${item.timestamp}</div>
-                    <div class="bg-slate-50 p-4 rounded-xl border text-slate-600 whitespace-pre-wrap">${item.content}</div>
-                `;
-                toggleModal('modalDetail', true);
-            }
+            
+            // ลบเอฟเฟกต์หลังจากจบ Animation
+            setTimeout(() => card.classList.remove('target-highlight'), 3000);
         }
     };
 
-    // เปิดรายการโปรด
+    // แสดงรายการโปรดใน Modal
     window.openFavs = function() {
         const container = document.getElementById('favContainer');
         const myFavs = getStoredFavs();
@@ -440,12 +429,14 @@
             myFavs.forEach(law => {
                 const card = document.createElement('div');
                 card.onclick = (e) => { if(!e.target.closest('.delete-btn')) jumpToItem(law.id); };
+                
+                // รูปแบบสะอาดตา: ชื่อหัวข้อ + วันที่บันทึก
                 card.className = 'bg-white p-3 rounded-xl border border-slate-300 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50';
                 card.innerHTML = `
                     <div class="flex-1 min-w-0 pointer-events-none">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-bold text-blue-800 truncate">${law.code}</span>
-                            <span class="text-[9px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded whitespace-nowrap ml-2">${law.timestamp}</span>
+                            <span class="text-[9px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded ml-2">${law.timestamp}</span>
                         </div>
                     </div>
                     <button onclick="removeFav('${law.id}')" class="delete-btn text-slate-300 hover:text-red-500 p-1 flex items-center justify-center">
@@ -460,10 +451,10 @@
 
     window.removeFav = function(id) {
         window.toggleFav(id);
-        window.openFavs();
+        window.openFavs(); // อัปเดตรายการใหม่
     };
 
-    // ฟังก์ชันระบายสีหัวใจเมื่อมีการเปลี่ยนหน้าหรือโหลดข้อมูลใหม่
+    // สังเกตการเปลี่ยนแปลงของรายการเพื่อทาสีหัวใจ
     function startFavObserver() {
         const listEl = document.getElementById('list');
         if(!listEl) return;
@@ -476,8 +467,9 @@
                 const match = attr.match(/toggleFav\((['"]?)(.*?)\1\)/);
                 if(match && match[2]) {
                     const stringId = String(match[2]);
+                    const isActive = storedIds.includes(stringId);
                     const icon = btn.querySelector('.material-symbols-rounded') || btn;
-                    if (storedIds.includes(stringId)) {
+                    if (isActive) {
                         icon.classList.add('text-red-500', 'active');
                         icon.style.fontVariationSettings = "'FILL' 1";
                     } else {
@@ -491,9 +483,9 @@
         paintHearts();
     }
 
-    // จัดการเหตุการณ์เริ่มต้น
+    // จัดการ Event เริ่มต้น
     window.addEventListener('DOMContentLoaded', () => {
-        // แก้ไขปุ่มเปิด Favs ที่ Header
+        // ปุ่มเปิดรายการโปรดที่ Header
         const openFavBtn = document.getElementById('btnOpenFavs');
         if (openFavBtn) {
             openFavBtn.addEventListener('click', (e) => {
@@ -502,7 +494,7 @@
             });
         }
 
-        // Global click listener สำหรับหัวใจ
+        // Global click listener
         document.addEventListener('click', (e) => {
             const heartBtn = e.target.closest('button[onclick*="toggleFav"], .heart-icon');
             if (heartBtn && !heartBtn.closest('.fav-header-btn') && !heartBtn.id?.includes('btnOpenFavs')) {
@@ -520,7 +512,7 @@
         startFavObserver();
     });
 
-    // ระบบ Modal, Chat, Tab พื้นฐาน
+    // UI Logic พื้นฐาน
     function toggleModal(id, show) {
         const el = document.getElementById(id);
         if(!el) return;
