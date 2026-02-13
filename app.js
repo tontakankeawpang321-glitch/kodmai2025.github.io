@@ -8,6 +8,12 @@ const DATA_SOURCES = [
 ];
 
 /* ======================================================
+   GLOBAL STATE
+====================================================== */
+let ALL_LAWS = [];
+let CURRENT_FILTER = "all";
+
+/* ======================================================
    HELPERS
 ====================================================== */
 const $ = (s, el = document) => el.querySelector(s);
@@ -15,7 +21,8 @@ const $ = (s, el = document) => el.querySelector(s);
 function sanitizeUrl(u=''){
   try{
     const url = new URL(u);
-    if(url.protocol === 'http:' || url.protocol === 'https:') return url.href;
+    if(url.protocol === 'http:' || url.protocol === 'https:')
+      return url.href;
   }catch{}
   return '';
 }
@@ -38,6 +45,7 @@ function isFav(id){
 }
 
 function toggleFav(id, title){
+
   const sid = String(id);
   let favs = getFavs();
   const idx = favs.findIndex(f => String(f.id) === sid);
@@ -53,6 +61,8 @@ function toggleFav(id, title){
   }
 
   saveFavs(favs);
+
+  renderLawsByFilter(); // refresh state
 }
 
 /* ======================================================
@@ -69,13 +79,47 @@ async function loadJsonAndStart(){
     )
   );
 
-  const laws = res.flat();
+  ALL_LAWS = res.flat();
 
-  renderLaws(laws);
+  renderLawsByFilter();
 }
 
 /* ======================================================
-   RENDER (ใช้รูปแบบ index เดิม)
+   FILTER SYSTEM
+====================================================== */
+function filterLawsData(cat){
+  CURRENT_FILTER = cat;
+  renderLawsByFilter();
+}
+
+function renderLawsByFilter(){
+
+  if(CURRENT_FILTER === "all"){
+    renderLaws(ALL_LAWS);
+    return;
+  }
+
+  const filtered = ALL_LAWS.filter(law => {
+
+    const cat = law["หมวด"] || "";
+
+    if(CURRENT_FILTER === "code")
+      return cat.includes("ประมวล");
+
+    if(CURRENT_FILTER === "const")
+      return cat.includes("รัฐธรรมนูญ");
+
+    if(CURRENT_FILTER === "act")
+      return cat.includes("พระราชบัญญัติ");
+
+    return true;
+  });
+
+  renderLaws(filtered);
+}
+
+/* ======================================================
+   RENDER
 ====================================================== */
 function renderLaws(data){
 
@@ -103,13 +147,16 @@ function renderLaws(data){
     const active = isFav(id) ? "active" : "";
 
     const el = document.createElement("div");
+    el.id = "law-item-" + id;
 
     el.innerHTML = `
       <div class="fav-btn-container">
         <button class="fav-btn ${active}"
           data-id="${id}"
           data-title="${title}">
-          <span class="material-symbols-rounded">favorite</span>
+          <span class="material-symbols-rounded">
+            ${active ? "favorite" : "favorite_border"}
+          </span>
         </button>
       </div>
 
@@ -138,7 +185,7 @@ function renderLaws(data){
 }
 
 /* ======================================================
-   BIND FAVORITE BUTTONS
+   FAVORITE BUTTONS
 ====================================================== */
 function bindFavButtons(){
 
@@ -150,18 +197,33 @@ function bindFavButtons(){
       const title = this.dataset.title;
 
       toggleFav(id, title);
-
-      this.classList.toggle("active", isFav(id));
     };
-
   });
+}
+
+/* ======================================================
+   JUMP TO ITEM
+====================================================== */
+function jumpToItem(id){
+
+  const target = document.getElementById("law-item-" + id);
+  if(!target) return;
+
+  target.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
+  target.classList.add("target-highlight");
+
+  setTimeout(()=>{
+    target.classList.remove("target-highlight");
+  },1500);
 }
 
 /* ======================================================
    INIT
 ====================================================== */
 document.addEventListener("DOMContentLoaded", ()=>{
-
   loadJsonAndStart();
-
 });
