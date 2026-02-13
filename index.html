@@ -44,7 +44,6 @@
 
         .wrap { max-width: 600px; margin: 0 auto; padding: 0 16px; position: relative; }
 
-        /* Fav Button in Header */
         .fav-header-btn {
             position: absolute; top: 16px; right: 16px;
             background: rgba(255,255,255,0.2);
@@ -55,9 +54,7 @@
             cursor: pointer;
             border: none;
         }
-        .fav-header-btn:active { transform: scale(0.95); }
 
-        /* Bottom Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height);
             background: white; display: flex; justify-content: space-around; align-items: center;
@@ -72,7 +69,6 @@
         .nav-item.active { color: var(--primary); }
         .nav-item.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
-        /* Search Bar */
         .search-container {
             background: white; border-radius: 14px; padding: 4px 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; gap: 8px;
@@ -86,7 +82,6 @@
             border: none; cursor: pointer;
         }
 
-        /* Chips */
         .chip {
             white-space: nowrap; padding: 6px 14px; border-radius: 20px;
             font-size: 13px; color: #64748b; background: white;
@@ -97,7 +92,6 @@
             font-weight: 500; box-shadow: 0 2px 6px rgba(30, 58, 138, 0.25);
         }
 
-        /* Modals */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.6);
             z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
@@ -112,7 +106,6 @@
             animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Chat Bubbles */
         .bubble { padding: 10px 14px; border-radius: 15px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.4; word-wrap: break-word;}
         .bubble-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
@@ -124,7 +117,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* JUMP HIGHLIGHT ANIMATION */
         @keyframes target-flash {
             0% { background-color: rgba(234, 179, 8, 0.1); transform: scale(1); }
             50% { background-color: rgba(234, 179, 8, 0.3); transform: scale(1.02); box-shadow: 0 0 15px rgba(234, 179, 8, 0.3); border-color: var(--accent); }
@@ -140,9 +132,17 @@
         .dot { width: 6px; height: 6px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
         .dot.active { width: 20px; background-color: var(--accent); border-radius: 10px; }
 
-        /* Heart Animation */
-        .heart-icon { transition: transform 0.2s, color 0.2s; font-variation-settings: 'FILL' 0; }
-        .heart-icon.active { color: #ef4444 !important; font-variation-settings: 'FILL' 1 !important; transform: scale(1.1); }
+        .heart-icon { transition: transform 0.2s, color 0.2s; font-variation-settings: 'FILL' 0; cursor: pointer; }
+        .heart-icon.active { color: #ef4444 !important; font-variation-settings: 'FILL' 1 !important; transform: scale(1.2); }
+
+        /* กรอบสำหรับรายการกฎหมายในหน้าหลัก */
+        #list > div {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+            transition: border-color 0.2s;
+        }
     </style>
 </head>
 <body>
@@ -176,6 +176,7 @@
             </div>
         </section>
 
+        <!-- Slider Section -->
         <section class="mt-6">
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-3">
@@ -184,27 +185,20 @@
                         อัพเดทล่าสุดรายหมวด
                     </div>
                 </div>
-                
                 <div id="latestViewport" class="overflow-hidden relative">
                     <div id="latestTrack" class="flex transition-transform duration-500 ease-in-out w-full">
                         <div class="w-full flex flex-col gap-1 items-center text-center p-2 shrink-0">
-                            <span class="text-sm font-bold text-slate-800">พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
-                            <span class="text-xs text-slate-500">อัพเดทแนวปฏิบัติใหม่ เริ่มใช้ 1 ม.ค. 67</span>
+                            <span class="text-sm font-bold text-slate-800">พระราชบัญญัติการจัดสรรที่ดิน (ฉบับที่ 3)</span>
+                            <span class="text-xs text-slate-500">๓๑ ธ.ค. ๒๕๖๘</span>
                         </div>
                         <div class="w-full flex flex-col gap-1 items-center text-center p-2 shrink-0">
                             <span class="text-sm font-bold text-slate-800">กฎหมายจราจรใหม่</span>
                             <span class="text-xs text-slate-500">ตัดแต้มใบขับขี่ เริ่มบังคับใช้แล้ว</span>
                         </div>
-                         <div class="w-full flex flex-col gap-1 items-center text-center p-2 shrink-0">
-                            <span class="text-sm font-bold text-slate-800">ประมวลกฎหมายแพ่งฯ (ฉบับแก้ไข)</span>
-                            <span class="text-xs text-slate-500">ปรับปรุงเรื่องดอกเบี้ยผิดนัด</span>
-                        </div>
                     </div>
                 </div>
-                
                 <div id="dots" class="flex justify-center gap-1.5 mt-3">
                     <div class="dot active"></div>
-                    <div class="dot"></div>
                     <div class="dot"></div>
                 </div>
             </div>
@@ -213,11 +207,9 @@
         <section class="mt-4">
             <div id="catbar" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide px-1">
                 <button class="chip active">ทั้งหมด</button>
-                <button class="chip">แพ่ง</button>
-                <button class="chip">อาญา</button>
-                <button class="chip">ธุรกิจ</button>
-                <button class="chip">แรงงาน</button>
-                <button class="chip">จราจร</button>
+                <button class="chip">ประมวลกฎหมาย</button>
+                <button class="chip">รัฐธรรมนูญ</button>
+                <button class="chip">พระราชบัญญัติ</button>
             </div>
         </section>
 
@@ -244,16 +236,7 @@
                 <div class="p-4 flex justify-center min-h-[300px]">
                     <div id="fb-root"></div>
                     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0"></script>
-                    <div class="fb-page" 
-                         data-href="https://www.facebook.com/interesting.deka/?locale=th_TH" 
-                         data-tabs="timeline" 
-                         data-width="380" 
-                         data-height="800" 
-                         data-small-header="true" 
-                         data-adapt-container-width="true" 
-                         data-hide-cover="false" 
-                         data-show-facepile="true">
-                    </div>
+                    <div class="fb-page" data-href="https://www.facebook.com/interesting.deka/" data-tabs="timeline" data-width="380" data-height="800" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"></div>
                 </div>
             </div>
         </div>
@@ -293,21 +276,16 @@
     </div>
 </div>
 
-<!-- Modal Detail (Fallback if item not in list) -->
+<!-- Modal Detail -->
 <div id="modalDetail" class="modal-overlay" style="z-index: 210;">
     <div class="modal-box relative p-0 bg-white">
         <div class="bg-slate-100 p-4 border-b flex justify-between items-center">
-            <h3 class="font-bold text-slate-800">รายละเอียดที่บันทึกไว้</h3>
+            <h3 class="font-bold text-slate-800">รายละเอียด</h3>
             <button onclick="toggleModal('modalDetail', false)" class="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </div>
-        <div id="detailContent" class="p-5 text-sm leading-relaxed text-slate-700 max-h-[60vh] overflow-y-auto">
-            <!-- Content -->
-        </div>
-        <div class="p-3 border-t bg-slate-50 text-center">
-            <p class="text-xs text-slate-400">รายการนี้ไม่อยู่ในหน้าจอหลักปัจจุบัน</p>
-        </div>
+        <div id="detailContent" class="p-5 text-sm leading-relaxed text-slate-700 max-h-[60vh] overflow-y-auto"></div>
     </div>
 </div>
 
@@ -319,33 +297,21 @@
                 <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md">
                     <span class="material-symbols-rounded text-xl">smart_toy</span>
                 </div>
-                <div>
-                    <span class="font-bold text-slate-800 block leading-tight">Thai Law AI</span>
-                    <span class="text-[10px] text-green-500 font-medium flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> ออนไลน์
-                    </span>
+                <div class="flex flex-col">
+                    <span class="font-bold text-slate-800 text-sm leading-tight">Thai Law AI</span>
+                    <span class="text-[10px] text-green-500 font-medium">● ออนไลน์</span>
                 </div>
             </div>
             <button id="btnCloseChat" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:bg-slate-100 rounded-full">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </header>
-        
         <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50 gap-3">
-            <div class="bubble bubble-ai">
-                สวัสดีครับ มีข้อสงสัยเรื่องกฎหมายมาตราไหน สอบถามได้เลยครับ
-            </div>
+            <div class="bubble bubble-ai">สวัสดีครับ สอบถามเรื่องกฎหมายได้เลยครับ</div>
         </div>
-        
-        <div id="chatLoading" class="hidden px-4 py-2 text-center">
-            <span class="text-[10px] text-slate-400 bg-white border px-2 py-1 rounded-full shadow-sm">AI กำลังพิมพ์...</span>
-        </div>
-        
         <div class="p-3 border-t bg-white flex gap-2 items-center">
-            <input id="user-input" type="text" class="flex-1 bg-slate-100 rounded-full px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-blue-500 transition-all" placeholder="พิมพ์คำถามที่นี่..." autocomplete="off">
-            <button id="send-btn" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-all shadow-md">
-                <span class="material-symbols-rounded text-[20px] ml-0.5">send</span>
-            </button>
+            <input id="user-input" type="text" class="flex-1 bg-slate-100 rounded-full px-4 py-3 text-sm outline-none" placeholder="พิมพ์คำถามที่นี่..." autocomplete="off">
+            <button id="send-btn" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center"><span class="material-symbols-rounded text-[20px]">send</span></button>
         </div>
     </div>
 </div>
@@ -356,169 +322,118 @@
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
 
-    // --- MAIN LOGIC ---
     window.addEventListener('load', () => {
-        // 1. Override Header Button
-        setTimeout(() => {
-            const oldBtn = document.getElementById('btnOpenFavs');
-            if(oldBtn) {
-                const newBtn = oldBtn.cloneNode(true);
-                newBtn.id = 'btnOpenFavs_New';
-                oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-                newBtn.addEventListener('click', () => window.openFavs());
-            }
-        }, 800);
-
-        // 2. Override Toggle Function (Robust Scraping)
-        window.toggleFav = function(id) {
-            let lawData = null;
-            let btn = null;
-
-            // Find the button (handle quotes/no quotes)
-            const selectors = [
-                `button[onclick="toggleFav(${id})"]`,
-                `button[onclick="toggleFav('${id}')"]`,
-                `button[onclick*="toggleFav(${id})"]`
-            ];
-            
-            for(let sel of selectors) {
-                btn = document.querySelector(sel);
-                if(btn) break;
-            }
-            
-            if (btn) {
-                // Find Card Container
-                const row = btn.closest('.bg-white') || btn.closest('div[class*="rounded"]'); 
-                
-                if (row) {
-                    // Clone to scrape text without buttons
-                    const clone = row.cloneNode(true);
-                    const buttons = clone.querySelectorAll('button, .material-symbols-rounded, .icon');
-                    buttons.forEach(b => b.remove());
-
-                    const fullText = clone.innerText; 
-                    const textLines = fullText.split('\n').filter(t => t.trim().length > 0);
-                    
-                    let title = "";
-                    let section = "";
-                    let code = "กฎหมาย";
-                    
-                    if (textLines.length >= 2) {
-                        const line1 = textLines[0];
-                        if(line1.includes('ม.')) {
-                            const parts = line1.split('ม.');
-                            code = parts[0].trim();
-                            section = parts[1].trim();
-                        } else {
-                            code = line1;
-                        }
-                        title = textLines[1];
-                    } else if (textLines.length === 1) {
-                        code = textLines[0];
-                    }
-                    
-                    lawData = { 
-                        id: id, 
-                        code: code, 
-                        section: section, 
-                        title: title,
-                        timestamp: new Date().toLocaleString('th-TH', { 
-                            year: 'numeric', month: 'short', day: 'numeric', 
-                            hour: '2-digit', minute:'2-digit'
-                        }),
-                        content: clone.innerText.trim() 
-                    };
+        // จัดการเหตุการณ์คลิกปุ่มหัวใจแบบ Global เพื่อความแม่นยำ
+        document.addEventListener('click', (e) => {
+            const heartBtn = e.target.closest('button[onclick*="toggleFav"], .heart-icon');
+            if (heartBtn && !heartBtn.id?.includes('btnOpenFavs')) {
+                // หากปุ่มไม่มี onclick แต่เป็นหัวใจ ให้พยายามหา ID
+                const match = heartBtn.outerHTML.match(/toggleFav\((['"]?)(.*?)\1\)/);
+                if (match) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.toggleFav(match[2]);
                 }
             }
+        });
 
-            // Fallback
-            if (!lawData) {
-                lawData = { 
-                    id: id, 
-                    title: 'รายการที่บันทึก', 
-                    code: 'กฎหมาย', 
-                    section: '', 
-                    timestamp: new Date().toLocaleString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }),
-                    content: 'ไม่สามารถดึงรายละเอียดได้' 
-                };
-            }
-
-            // Save to LocalStorage
-            let stored = getStoredFavs();
-            const existingIndex = stored.findIndex(s => s.id == id);
-            
-            if (existingIndex > -1) {
-                stored.splice(existingIndex, 1);
-            } else {
-                stored.push(lawData);
-            }
-            
-            localStorage.setItem('favLaws', JSON.stringify(stored));
-            
-            // **Update Visuals Immediately**
-            updateHeartVisuals(id, existingIndex === -1);
-        };
+        // แทนที่ปุ่มเปิด Favs
+        const oldBtn = document.getElementById('btnOpenFavs');
+        if (oldBtn) {
+            const newBtn = oldBtn.cloneNode(true);
+            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+            newBtn.addEventListener('click', () => window.openFavs());
+        }
 
         initSlider();
         initChat();
         startFavObserver();
     });
 
-    // --- NAVIGATION LOGIC ---
+    // ฟังก์ชันบันทึกรายการโปรด (ปรับปรุงใหม่เพื่อรองรับโครงสร้างในรูป)
+    window.toggleFav = function(id) {
+        let lawData = null;
+        let targetBtn = document.querySelector(`button[onclick*="toggleFav('${id}')"], button[onclick*="toggleFav(${id})"], .heart-icon[data-id="${id}"]`);
+
+        if (targetBtn) {
+            // หา Container ที่ครอบรายการทั้งหมดไว้
+            const row = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
+            
+            if (row) {
+                const clone = row.cloneNode(true);
+                // ลบส่วนที่ไม่ใช่ข้อความออก
+                clone.querySelectorAll('button, .material-symbols-rounded, script, style').forEach(el => el.remove());
+                
+                const text = clone.innerText.trim();
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                
+                // คาดการณ์หัวข้อจากบรรทัดแรกๆ
+                let code = lines[0] || "กฎหมาย";
+                let title = lines[1] || "";
+                
+                lawData = { 
+                    id: id, 
+                    code: code, 
+                    title: title,
+                    timestamp: new Date().toLocaleString('th-TH', { 
+                        year: 'numeric', month: 'short', day: 'numeric', 
+                        hour: '2-digit', minute:'2-digit'
+                    }),
+                    content: text
+                };
+            }
+        }
+
+        if (!lawData) {
+            lawData = { id: id, code: "รายการบันทึก", title: "", timestamp: new Date().toLocaleString('th-TH'), content: "" };
+        }
+
+        let stored = getStoredFavs();
+        const existingIndex = stored.findIndex(s => String(s.id) === String(id));
+        
+        if (existingIndex > -1) {
+            stored.splice(existingIndex, 1);
+        } else {
+            stored.push(lawData);
+        }
+        
+        localStorage.setItem('favLaws', JSON.stringify(stored));
+        updateHeartVisuals(id, existingIndex === -1);
+    };
+
     window.jumpToItem = function(id) {
         toggleModal('modalFavs', false); 
         switchTab('home'); 
 
-        const selectors = [
-            `button[onclick="toggleFav(${id})"]`,
-            `button[onclick="toggleFav('${id}')"]`,
-            `button[onclick*="toggleFav(${id})"]`
-        ];
-        
-        let targetBtn = null;
-        for(let sel of selectors) {
-            targetBtn = document.querySelector(sel);
-            if(targetBtn) break;
-        }
-
+        const targetBtn = document.querySelector(`button[onclick*="toggleFav('${id}')"], button[onclick*="toggleFav(${id})"]`);
         if (targetBtn) {
-            const row = targetBtn.closest('.bg-white') || targetBtn.closest('div[class*="rounded"]');
-            if(row) {
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                row.classList.remove('target-highlight');
-                void row.offsetWidth; 
-                row.classList.add('target-highlight');
-            }
+            const row = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            row.classList.remove('target-highlight');
+            void row.offsetWidth; 
+            row.classList.add('target-highlight');
         } else {
             const stored = getStoredFavs();
-            const item = stored.find(s => s.id == id);
+            const item = stored.find(s => String(s.id) === String(id));
             if (item) {
                 const detailEl = document.getElementById('detailContent');
                 detailEl.innerHTML = `
-                    <div class="font-bold text-blue-800 text-lg mb-2">${item.code} ${item.section ? 'ม.'+item.section : ''}</div>
-                    <div class="text-xs text-slate-400 mb-2">บันทึกเมื่อ: ${item.timestamp || '-'}</div>
-                    <div class="font-bold text-slate-900 text-md mb-4">${item.title}</div>
-                    <div class="bg-slate-50 p-4 rounded-xl border text-slate-600">
-                        ${item.content || 'ไม่มีรายละเอียดเพิ่มเติม'}
-                    </div>
+                    <div class="font-bold text-blue-800 text-lg mb-1">${item.code}</div>
+                    <div class="text-[10px] text-slate-400 mb-4">บันทึกเมื่อ: ${item.timestamp}</div>
+                    <div class="bg-slate-50 p-4 rounded-xl border text-slate-600 whitespace-pre-wrap">${item.content}</div>
                 `;
                 toggleModal('modalDetail', true);
             }
         }
     };
 
-    // --- FAVORITES LIST UI (Minimal & Bordered) ---
     window.openFavs = function() {
         const container = document.getElementById('favContainer');
         const myFavs = getStoredFavs();
-
         container.innerHTML = '';
 
         if(myFavs.length === 0) {
-            container.innerHTML = `<div class="text-center text-slate-400 py-10 flex flex-col items-center gap-2">
-                <span class="material-symbols-rounded text-4xl opacity-20">bookmark_off</span>
-                <span>ยังไม่มีรายการโปรด</span>
-            </div>`;
+            container.innerHTML = `<div class="text-center text-slate-400 py-10">ยังไม่มีรายการโปรด</div>`;
         } else {
             myFavs.forEach(law => {
                 const card = document.createElement('div');
@@ -526,20 +441,16 @@
                     if(e.target.closest('.delete-btn')) return;
                     jumpToItem(law.id);
                 };
-                
-                // ADDED BORDER HERE
-                card.className = 'bg-white p-3 rounded-xl border border-slate-300 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50 transition-colors active:scale-95 group';
-                
-                const displayDate = law.timestamp || '-';
-                const displayCode = (law.code === 'System' || !law.code) ? 'รายการบันทึก' : law.code;
-
-                // REMOVED TEXT CONTENT LINE
+                // รายการโปรดแบบมีกรอบ และโชว์แค่ชื่อ+วันที่
+                card.className = 'bg-white p-3 rounded-xl border border-slate-300 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50';
                 card.innerHTML = `
-                    <div class="flex-1 min-w-0 pointer-events-none flex items-center justify-between mr-2">
-                        <span class="text-sm font-bold text-blue-800 truncate">${displayCode} ${law.section ? 'ม.'+law.section : ''}</span>
-                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md whitespace-nowrap">${displayDate}</span>
+                    <div class="flex-1 min-w-0 pointer-events-none">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-blue-800 truncate">${law.code}</span>
+                            <span class="text-[9px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${law.timestamp}</span>
+                        </div>
                     </div>
-                    <button onclick="removeFav(${law.id})" class="delete-btn text-slate-300 hover:text-red-500 p-2 transition-colors z-10 rounded-full hover:bg-red-50 flex items-center justify-center">
+                    <button onclick="removeFav('${law.id}')" class="delete-btn text-slate-300 hover:text-red-500 p-1 flex items-center justify-center">
                         <span class="material-symbols-rounded text-[20px]">delete</span>
                     </button>
                 `;
@@ -554,36 +465,21 @@
         window.openFavs();
     };
 
-    // --- UTILS ---
     function getStoredFavs() {
-        try {
-            let stored = JSON.parse(localStorage.getItem('favLaws')) || [];
-            if (stored.length > 0 && typeof stored[0] !== 'object') {
-                stored = stored.map(id => ({ id: id, title: 'Old Item', content: '' }));
-            }
-            return stored;
-        } catch(e) { return []; }
+        try { return JSON.parse(localStorage.getItem('favLaws')) || []; } catch(e) { return []; }
     }
 
     function updateHeartVisuals(id, isActive) {
-        const selectors = [
-            `button[onclick="toggleFav(${id})"]`,
-            `button[onclick="toggleFav('${id}')"]`,
-            `button[onclick*="toggleFav(${id})"]`
-        ];
-        
-        selectors.forEach(sel => {
-            const buttons = document.querySelectorAll(sel);
-            buttons.forEach(btn => {
-                const icon = btn.querySelector('.material-symbols-rounded') || btn;
-                if (isActive) {
-                    icon.classList.add('text-red-500', 'active');
-                    icon.style.fontVariationSettings = "'FILL' 1";
-                } else {
-                    icon.classList.remove('text-red-500', 'active');
-                    icon.style.fontVariationSettings = "'FILL' 0";
-                }
-            });
+        const buttons = document.querySelectorAll(`button[onclick*="toggleFav('${id}')"], button[onclick*="toggleFav(${id})"], .heart-icon[data-id="${id}"]`);
+        buttons.forEach(btn => {
+            const icon = btn.querySelector('.material-symbols-rounded') || btn;
+            if (isActive) {
+                icon.classList.add('text-red-500', 'active');
+                icon.style.fontVariationSettings = "'FILL' 1";
+            } else {
+                icon.classList.remove('text-red-500', 'active');
+                icon.style.fontVariationSettings = "'FILL' 0";
+            }
         });
     }
 
@@ -592,39 +488,32 @@
         if(!listEl) return;
         const paintHearts = () => {
             const stored = getStoredFavs();
-            const storedIds = stored.map(s => parseInt(s.id));
-            const buttons = listEl.querySelectorAll('button[onclick*="toggleFav"]');
+            const storedIds = stored.map(s => String(s.id));
+            const buttons = document.querySelectorAll('button[onclick*="toggleFav"], .heart-icon');
             buttons.forEach(btn => {
-                const match = btn.getAttribute('onclick').match(/toggleFav\((\d+)\)/);
-                if(match && match[1]) {
-                    const id = parseInt(match[1]);
-                    const icon = btn.querySelector('.material-symbols-rounded') || btn;
-                    icon.classList.add('heart-icon');
+                const attr = btn.getAttribute('onclick') || "";
+                const match = attr.match(/toggleFav\((['"]?)(.*?)\1\)/);
+                if(match && match[2]) {
+                    const id = String(match[2]);
+                    btn.classList.add('heart-icon');
                     if (storedIds.includes(id)) {
-                        icon.classList.add('text-red-500', 'active');
-                        icon.style.fontVariationSettings = "'FILL' 1";
+                        btn.classList.add('text-red-500', 'active');
+                        btn.style.fontVariationSettings = "'FILL' 1";
                     } else {
-                        icon.classList.remove('text-red-500', 'active');
-                        icon.style.fontVariationSettings = "'FILL' 0";
+                        btn.classList.remove('text-red-500', 'active');
+                        btn.style.fontVariationSettings = "'FILL' 0";
                     }
                 }
             });
         };
-        const observer = new MutationObserver(() => paintHearts());
-        observer.observe(listEl, { childList: true, subtree: true });
+        new MutationObserver(paintHearts).observe(listEl, { childList: true, subtree: true });
         paintHearts();
     }
 
-    // --- STANDARD UI FUNCTIONS ---
     function toggleModal(id, show) {
         const el = document.getElementById(id);
         if(!el) return;
-        if(show) {
-            el.classList.add('active');
-            if(id === 'modalChat') setTimeout(() => document.getElementById('user-input').focus(), 300);
-        } else {
-            el.classList.remove('active');
-        }
+        if(show) { el.classList.add('active'); } else { el.classList.remove('active'); }
     }
     
     document.getElementById('btnCloseFavs').onclick = () => toggleModal('modalFavs', false);
@@ -638,14 +527,10 @@
         document.getElementById('nav-community').classList.toggle('active', tab === 'community');
     }
 
-    // --- CHAT & SLIDER ---
     function initChat() {
         const sendBtn = document.getElementById('send-btn');
-        const userInput = document.getElementById('user-input');
-        if(sendBtn) sendBtn.addEventListener('click', handleUserMessage);
-        if(userInput) userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleUserMessage();
-        });
+        if(sendBtn) sendBtn.onclick = handleUserMessage;
+        document.getElementById('user-input').onkeypress = (e) => { if (e.key === 'Enter') handleUserMessage(); };
     }
 
     async function handleUserMessage() {
@@ -655,39 +540,26 @@
         addBubble(text, 'user');
         input.value = '';
         chatHistory.push({ role: "user", content: text });
-        const loading = document.getElementById('chatLoading');
-        loading.classList.remove('hidden');
-        scrollToBottom();
         try {
             const response = await fetch(BACKEND_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, history: chatHistory })
             });
-            if (!response.ok) throw new Error('API Error');
             const data = await response.json();
-            const aiReply = data.reply || data.response || data.message || "ระบบกำลังประมวลผล...";
-            loading.classList.add('hidden');
+            const aiReply = data.reply || "ขออภัยครับ ระบบขัดข้องชั่วคราว";
             addBubble(aiReply, 'ai');
             chatHistory.push({ role: "assistant", content: aiReply });
-        } catch (error) {
-            loading.classList.add('hidden');
-            addBubble("ขออภัยครับ เกิดข้อผิดพลาดในการเชื่อมต่อ", 'ai');
-        }
+        } catch (e) { addBubble("ขออภัยครับ เกิดข้อผิดพลาด", 'ai'); }
     }
 
     function addBubble(text, type) {
-        const historyEl = document.getElementById('chat-history');
-        const bubble = document.createElement('div');
-        bubble.className = `bubble bubble-${type} animate-slide-up`;
-        bubble.innerText = text;
-        historyEl.appendChild(bubble);
-        scrollToBottom();
-    }
-
-    function scrollToBottom() {
-        const historyEl = document.getElementById('chat-history');
-        historyEl.scrollTop = historyEl.scrollHeight;
+        const h = document.getElementById('chat-history');
+        const b = document.createElement('div');
+        b.className = `bubble bubble-${type} animate-slide-up`;
+        b.innerText = text;
+        h.appendChild(b);
+        h.scrollTop = h.scrollHeight;
     }
 
     function initSlider() {
@@ -696,7 +568,7 @@
         const dots = document.querySelectorAll('.dot');
         if(!track) return;
         setInterval(() => {
-            current = (current + 1) % 3;
+            current = (current + 1) % 2;
             track.style.transform = `translateX(-${current * 100}%)`;
             dots.forEach((d, i) => d.className = `dot ${i === current ? 'active' : ''}`);
         }, 4000);
