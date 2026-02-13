@@ -16,59 +16,27 @@ let CURRENT_FILTER = "all";
 /* ======================================================
    HELPERS
 ====================================================== */
-const $ = (s, el = document) => el.querySelector(s);
-
-function sanitizeUrl(u=''){
-  try{
-    const url = new URL(u);
-    if(url.protocol === 'http:' || url.protocol === 'https:')
-      return url.href;
-  }catch{}
-  return '';
+function $(selector, el = document){
+  return el.querySelector(selector);
 }
 
-/* ======================================================
-   FAVORITES
-====================================================== */
-const FAV_KEY = "favLaws";
-
-function getFavs(){
-  return JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
-}
-
-function saveFavs(data){
-  localStorage.setItem(FAV_KEY, JSON.stringify(data));
-}
-
-function isFav(id){
-  return getFavs().some(f => String(f.id) === String(id));
-}
-
-function toggleFav(id, title){
-
-  const sid = String(id);
-  let favs = getFavs();
-  const idx = favs.findIndex(f => String(f.id) === sid);
-
-  if(idx > -1){
-    favs.splice(idx,1);
-  }else{
-    favs.push({
-      id: sid,
-      title: title,
-      time: new Date().toLocaleDateString('th-TH')
-    });
+function showLoading(){
+  const listEl = $("#list");
+  if(listEl){
+    listEl.innerHTML = `
+      <div class="text-center py-20 text-slate-400 text-sm italic">
+        กำลังโหลดข้อมูลกฎหมาย...
+      </div>`;
   }
+}
 
-  saveFavs(favs);
-
-  // อัปเดตปุ่มเฉพาะตัว
-  const btn = document.querySelector(`.fav-btn[data-id="${sid}"]`);
-  if(btn){
-    const active = isFav(sid);
-    btn.classList.toggle("active", active);
-    btn.querySelector("span").textContent =
-      active ? "favorite" : "favorite_border";
+function showError(){
+  const listEl = $("#list");
+  if(listEl){
+    listEl.innerHTML = `
+      <div class="text-center py-20 text-red-400 text-sm">
+        โหลดข้อมูลไม่สำเร็จ
+      </div>`;
   }
 }
 
@@ -77,183 +45,121 @@ function toggleFav(id, title){
 ====================================================== */
 async function loadJsonAndStart(){
 
-  const listEl = $("#list");
-  if(listEl) listEl.innerHTML = "กำลังโหลดข้อมูล...";
+  showLoading();
 
-  const res = await Promise.all(
-    DATA_SOURCES.map(u =>
-      fetch(u).then(r=>r.ok ? r.json() : []).catch(()=>[])
-    )
-  );
+  try {
 
-  ALL_LAWS = res.flat();
+    const responses = await Promise.all(
+      DATA_SOURCES.map(url =>
+        fetch(url)
+          .then(res => res.ok ? res.json() : [])
+          .catch(() => [])
+      )
+    );
 
-  renderLawsByFilter();
+    ALL_LAWS = responses.flat();
+
+    applyFilter("all");
+
+  } catch (e) {
+    showError();
+  }
 }
 
 /* ======================================================
    FILTER SYSTEM
 ====================================================== */
-function filterCat(cat, btn){
+function applyFilter(category){
 
-  document.querySelectorAll('.chip')
-    .forEach(c => c.classList.remove('active'));
+  CURRENT_FILTER = category;
 
-  if(btn) btn.classList.add('active');
-
-  CURRENT_FILTER = cat;
-
-  renderLawsByFilter();
-}
-
-function renderLawsByFilter(){
-
-  if(CURRENT_FILTER === "all"){
-    renderLaws(ALL_LAWS);
+  if(!ALL_LAWS || ALL_LAWS.length === 0){
     return;
   }
 
-  const filtered = ALL_LAWS.filter(law => {
+  let filtered = ALL_LAWS;
 
-    const cat = law["หมวด"] || "";
+  if(category !== "all"){
 
-    if(CURRENT_FILTER === "code")
-      return cat.includes("ประมวล");
+    filtered = ALL_LAWS.filter(law => {
 
-    if(CURRENT_FILTER === "const")
-      return cat.includes("รัฐธรรมนูญ");
+      const cat = law["หมวด"] || "";
 
-    if(CURRENT_FILTER === "act")
-      return cat.includes("พระราชบัญญัติ");
+      if(category === "code")
+        return cat.includes("ประมวล");
 
-    return true;
-  });
+      if(category === "const")
+        return cat.includes("รัฐธรรมนูญ");
 
-  renderLaws(filtered);
-}
+      if(category === "act")
+        return cat.includes("พระราชบัญญัติ");
 
-/* ======================================================
-   RENDER
-====================================================== */
-function renderLaws(data){
-
-  const listEl = $("#list");
-  if(!listEl) return;
-
-  listEl.innerHTML = "";
-
-  if(!data || data.length === 0){
-    listEl.innerHTML = `
-      <div class="text-center py-20 text-slate-400">
-        ไม่พบข้อมูล
-      </div>`;
-    return;
+      return true;
+    });
   }
 
-  data.forEach(law => {
-
-    const title = law["ชื่อกฎหมาย"] || "";
-    const date  = law["วันที่"] || "";
-    const cat   = law["หมวด"] || "";
-    const url   = sanitizeUrl(law["URL_PD"] || "");
-
-    const id = encodeURIComponent(title + "_" + date);
-    const active = isFav(id);
-
-    const el = document.createElement("div");
-    el.id = "law-item-" + id;
-
-    el.innerHTML = `
-      <div class="fav-btn-container">
-        <button class="fav-btn ${active ? "active" : ""}"
-          data-id="${id}"
-          data-title="${title}">
-          <span class="material-symbols-rounded">
-            ${active ? "favorite" : "favorite_border"}
-          </span>
-        </button>
-      </div>
-
-      <div class="font-bold text-slate-800 text-lg mb-1 pr-10 leading-tight">
-        ${title}
-      </div>
-
-      <div class="text-xs text-slate-400 mb-2">
-        ${cat} ${date ? "• " + date : ""}
-      </div>
-
-      ${
-        url
-        ? `<a href="${url}" target="_blank"
-             class="text-blue-600 text-sm font-bold hover:underline">
-             อ่านฉบับเต็ม
-           </a>`
-        : ""
-      }
-    `;
-
-    listEl.appendChild(el);
-  });
-
-  bindFavButtons();
-}
-
-/* ======================================================
-   FAVORITE BUTTON BINDING
-====================================================== */
-function bindFavButtons(){
-
-  document.querySelectorAll(".fav-btn").forEach(btn => {
-
-    btn.onclick = function(){
-
-      const id = this.dataset.id;
-      const title = this.dataset.title;
-
-      toggleFav(id, title);
-    };
-
-  });
-}
-
-/* ======================================================
-   JUMP TO ITEM
-====================================================== */
-function jumpToItem(id){
-
-  // ถ้าอยู่หมวดอื่น ให้กลับ all ก่อน
-  if(CURRENT_FILTER !== "all"){
-    CURRENT_FILTER = "all";
-    document.querySelectorAll('.chip')
-      .forEach(c => c.classList.remove('active'));
-
-    const firstChip = document.querySelector('.chip');
-    if(firstChip) firstChip.classList.add('active');
-
-    renderLawsByFilter();
+  // ส่งเข้า pagination system ใน HTML
+  if(typeof renderLawsFromJson === "function"){
+    renderLawsFromJson(filtered);
   }
+}
 
-  setTimeout(()=>{
-    const target = document.getElementById("law-item-" + id);
-    if(!target) return;
+/* ======================================================
+   GLOBAL FILTER FUNCTION (HTML เรียกใช้)
+====================================================== */
+window.filterLawsData = function(cat){
+  applyFilter(cat);
+};
 
-    target.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
+/* ======================================================
+   SEARCH SYSTEM (ถ้ามีช่องค้นหา)
+====================================================== */
+function initSearch(){
+
+  const input = $("#q");
+  const btn = $("#btnSearch");
+
+  if(!input || !btn) return;
+
+  function doSearch(){
+
+    const keyword = input.value.trim();
+
+    if(!keyword){
+      applyFilter(CURRENT_FILTER);
+      return;
+    }
+
+    const result = ALL_LAWS.filter(law => {
+
+      const title = law["ชื่อกฎหมาย"] || "";
+      const cat   = law["หมวด"] || "";
+      const date  = law["วันที่"] || "";
+
+      return (
+        title.includes(keyword) ||
+        cat.includes(keyword) ||
+        date.includes(keyword)
+      );
     });
 
-    target.classList.add("target-highlight");
+    if(typeof renderLawsFromJson === "function"){
+      renderLawsFromJson(result);
+    }
+  }
 
-    setTimeout(()=>{
-      target.classList.remove("target-highlight");
-    },1500);
-
-  },100);
+  btn.onclick = doSearch;
+  input.addEventListener("keypress", e => {
+    if(e.key === "Enter") doSearch();
+  });
 }
 
 /* ======================================================
-   INIT
+   SAFE START (รอ HTML โหลดก่อน)
 ====================================================== */
-document.addEventListener("DOMContentLoaded", ()=>{
+document.addEventListener("DOMContentLoaded", () => {
+
   loadJsonAndStart();
+  initSearch();
+
 });
