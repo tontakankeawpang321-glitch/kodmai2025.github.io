@@ -329,15 +329,14 @@
 <script src="./app.js"></script>
 
 <script>
-    // --- APP LOGIC REWRITE (STABLE) ---
+    // --- ROBUST SYSTEM (CSV SUPPORT & NO HANGING) ---
 
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
 
-    // 1. Initial Load & Overrides
     window.addEventListener('load', () => {
         
-        // Fix Button Conflict: Override the header favorite button
+        // 1. Override Header Button
         setTimeout(() => {
             const oldBtn = document.getElementById('btnOpenFavs');
             if(oldBtn) {
@@ -352,96 +351,146 @@
         initSlider();
         initChat();
         
-        // START OBSERVER: Watch for app.js rendering and paint hearts immediately
+        // 2. Add Event Delegation for Favorites (Clicking on List)
+        // This bypasses specific ID lookups and works with whatever app.js renders
+        const listEl = document.getElementById('list');
+        if (listEl) {
+            // Use Capture phase to intercept clicks early
+            listEl.addEventListener('click', handleListClick, true);
+        }
+
+        // 3. Start Observer (Safe Mode)
         startFavObserver();
     });
 
-    // --- FAVORITE SYSTEM (NEW & ROBUST) ---
-
-    // 2. The Main Toggle Function (Overrides app.js logic)
-    // ฟังก์ชันนี้ถูกเรียกเมื่อกดปุ่มหัวใจในหน้าลิสต์
-    window.toggleFav = function(id) {
-        // Prevent default event bubbling if needed
-        if(event) { event.stopPropagation(); }
-
-        // Get current favorites
-        let stored = [];
-        try {
-            stored = JSON.parse(localStorage.getItem('favLaws')) || [];
-            // Normalize to array of IDs only to prevent errors
-            stored = stored.map(s => (typeof s === 'object' ? s.id : s));
-        } catch(e) { stored = []; }
-
-        const index = stored.indexOf(id);
-        const isAdding = index === -1;
-
-        if (isAdding) {
-            stored.push(id);
-        } else {
-            stored.splice(index, 1);
-        }
-
-        // Save immediately
-        localStorage.setItem('favLaws', JSON.stringify(stored));
-
-        // Update UI immediately (Don't wait for reload)
-        updateHeartVisuals(id, isAdding);
-
-        console.log(`Fav ${id}: ${isAdding ? 'Added' : 'Removed'}`);
-    };
-
-    // 3. Visual Update Helper
-    function updateHeartVisuals(id, isActive) {
-        // Find all heart icons for this ID (in case of multiples)
-        // Assuming app.js uses onclick="toggleFav(123)" on the button
-        // We look for elements related to this ID. 
-        // Best bet: Query all heart icons and check their parent/wrapper context if possible.
-        // OR simpler: app.js usually re-renders. But for instant feedback:
+    // --- NEW FAVORITE LOGIC: "SCRAPE & SAVE" ---
+    
+    // Instead of relying on window.laws (which might be empty due to CSV loading),
+    // we scrape the data directly from the DOM element that was clicked.
+    function handleListClick(e) {
+        // Find if a toggleFav button was clicked
+        const btn = e.target.closest('button[onclick*="toggleFav"]');
         
-        // Strategy: Look for buttons calling this toggleFav ID
-        const buttons = document.querySelectorAll(`button[onclick*="toggleFav(${id})"], .fav-btn-${id}`);
-        buttons.forEach(btn => {
-            const icon = btn.querySelector('.material-symbols-rounded') || btn;
-            if(isActive) {
-                icon.classList.add('text-red-500', 'active');
-                icon.style.fontVariationSettings = "'FILL' 1";
-            } else {
-                icon.classList.remove('text-red-500', 'active');
-                icon.style.fontVariationSettings = "'FILL' 0";
+        if (btn) {
+            // Stop app.js from doing its old broken logic
+            e.stopPropagation(); 
+            e.preventDefault();
+
+            // Extract ID from onclick="toggleFav(123)"
+            const match = btn.getAttribute('onclick').match(/toggleFav\((\d+)\)/);
+            if (match && match[1]) {
+                const id = parseInt(match[1]);
+                
+                // Scrape Data from the Row (Parent Element)
+                // Assuming structure: Row -> [Text Info] + [Button]
+                const row = btn.closest('.bg-white') || btn.parentElement; 
+                let title = "กฎหมาย (ไม่ระบุชื่อ)";
+                let section = "";
+                let code = "กฎหมาย";
+                let link = "";
+
+                // Try to find text content
+                // Heuristic: Look for elements with text
+                if(row) {
+                    const textLines = row.innerText.split('\n').filter(t => t.trim().length > 0);
+                    // Usually: Line 1 = Code + Section, Line 2 = Title
+                    if(textLines.length >= 2) {
+                        // Very rough parsing, but better than nothing
+                        const line1 = textLines[0];
+                        if(line1.includes('ม.')) {
+                            section = line1.split('ม.')[1].trim();
+                            code = line1.split('ม.')[0].trim();
+                        } else {
+                            code = line1;
+                        }
+                        title = textLines[1];
+                    } else if (textLines.length === 1) {
+                        title = textLines[0];
+                    }
+                    
+                    // Try to find link in the row? Usually app.js doesn't render link button in list
+                    // We will generate a Google Search link if missing
+                    link = `https://www.google.com/search?q=${encodeURIComponent(code + ' มาตรา ' + section)}`;
+                }
+
+                // Construct Object
+                const lawObj = { id, code, section, title, link };
+                
+                // Toggle Save
+                toggleFavStorage(lawObj);
+                
+                // Update Visuals Manually
+                updateHeartVisual(btn, isFav(id));
             }
-        });
+        }
     }
 
-    // 4. Observer: Automatically paint hearts when list updates
+    function toggleFavStorage(lawObj) {
+        let stored = getStoredFavs();
+        const existingIndex = stored.findIndex(s => s.id === lawObj.id);
+        
+        if (existingIndex > -1) {
+            stored.splice(existingIndex, 1); // Remove
+        } else {
+            stored.push(lawObj); // Add (Save full object!)
+        }
+        
+        localStorage.setItem('favLaws', JSON.stringify(stored));
+    }
+
+    function getStoredFavs() {
+        try {
+            let stored = JSON.parse(localStorage.getItem('favLaws')) || [];
+            // Migration: Convert old [1, 2] to [{id:1}, {id:2}]
+            if (stored.length > 0 && typeof stored[0] !== 'object') {
+                stored = stored.map(id => ({ id: id, title: 'รายการเก่า', code: '', section: '', link: '' }));
+            }
+            return stored;
+        } catch(e) { return []; }
+    }
+
+    function isFav(id) {
+        return getStoredFavs().some(s => s.id === id);
+    }
+
+    function updateHeartVisual(btn, active) {
+        const icon = btn.querySelector('.material-symbols-rounded') || btn;
+        if (active) {
+            icon.classList.add('text-red-500', 'active');
+            icon.style.fontVariationSettings = "'FILL' 1";
+        } else {
+            icon.classList.remove('text-red-500', 'active');
+            icon.style.fontVariationSettings = "'FILL' 0";
+        }
+    }
+
+    // --- OBSERVER (Visuals Only) ---
     function startFavObserver() {
         const listEl = document.getElementById('list');
         if(!listEl) return;
 
-        // Function to paint all hearts based on storage
         const paintHearts = () => {
-            let stored = JSON.parse(localStorage.getItem('favLaws')) || [];
-            stored = stored.map(s => (typeof s === 'object' ? s.id : s));
+            const stored = getStoredFavs();
+            const storedIds = stored.map(s => s.id);
             
-            // Loop through all laws in the list
-            // We assume app.js renders buttons with onclick="toggleFav(id)"
             const buttons = listEl.querySelectorAll('button[onclick*="toggleFav"]');
-            
             buttons.forEach(btn => {
-                // Extract ID from onclick string "toggleFav(101)"
                 const match = btn.getAttribute('onclick').match(/toggleFav\((\d+)\)/);
                 if(match && match[1]) {
                     const id = parseInt(match[1]);
                     const icon = btn.querySelector('.material-symbols-rounded') || btn;
                     
-                    // Add class for easy finding later
-                    btn.classList.add(`fav-btn-${id}`); 
-                    // Make icon transition smooth
+                    // Add smooth class
                     icon.classList.add('heart-icon');
 
-                    if(stored.includes(id)) {
+                    // Check and Paint (ONLY if needed to avoid loops)
+                    const shouldBeActive = storedIds.includes(id);
+                    const isActive = icon.classList.contains('active');
+
+                    if (shouldBeActive && !isActive) {
                         icon.classList.add('text-red-500', 'active');
                         icon.style.fontVariationSettings = "'FILL' 1";
-                    } else {
+                    } else if (!shouldBeActive && isActive) {
                         icon.classList.remove('text-red-500', 'active');
                         icon.style.fontVariationSettings = "'FILL' 0";
                     }
@@ -449,29 +498,20 @@
             });
         };
 
-        // Watch for changes in the list (when app.js loads data)
         const observer = new MutationObserver((mutations) => {
+            // Disconnect momentarily if complex changes, but for class/childList usually ok if logic is robust
             paintHearts();
         });
         
         observer.observe(listEl, { childList: true, subtree: true });
-        
-        // Run once immediately
-        paintHearts();
+        paintHearts(); // Run once
     }
 
-    // 5. Open Fav Modal Logic
+    // --- MODAL LOGIC (Reads from LocalStorage Objects) ---
     window.openFavs = function() {
         const container = document.getElementById('favContainer');
-        const lawData = window.laws || []; 
-        
-        let favIds = [];
-        try {
-            const stored = JSON.parse(localStorage.getItem('favLaws')) || [];
-            favIds = stored.map(item => (typeof item === 'object' ? item.id : item));
-        } catch(e) { favIds = []; }
+        const myFavs = getStoredFavs(); // Read objects directly!
 
-        const myFavs = lawData.filter(l => favIds.includes(l.id));
         container.innerHTML = '';
 
         if(myFavs.length === 0) {
@@ -484,12 +524,14 @@
                 const card = document.createElement('div');
                 card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center gap-3 animate-slide-up';
                 
-                // Link Logic
-                const link = law.link || `https://www.google.com/search?q=${encodeURIComponent(law.title + ' ม.' + law.section)}`;
+                // Fallback Link Generation
+                const link = law.link && law.link.length > 5 
+                    ? law.link 
+                    : `https://www.google.com/search?q=${encodeURIComponent((law.code||'') + ' ' + (law.title||'') + ' ' + (law.section||''))}`;
 
                 card.innerHTML = `
                     <div class="flex-1 min-w-0">
-                        <div class="text-[10px] font-bold text-blue-600 truncate">${law.code || 'กฎหมาย'} ม.${law.section}</div>
+                        <div class="text-[10px] font-bold text-blue-600 truncate">${law.code || 'กฎหมาย'} ${law.section ? 'ม.'+law.section : ''}</div>
                         <div class="font-bold text-sm text-slate-800 truncate mb-1">${law.title}</div>
                         
                         <a href="${link}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-blue-600 px-3 py-1 rounded-full hover:bg-blue-700 transition-colors">
@@ -508,14 +550,20 @@
     };
 
     window.removeFav = function(id) {
-        // Reuse toggle logic to keep it consistent
-        window.toggleFav(id); 
-        // Refresh modal content
-        window.openFavs();
+        let stored = getStoredFavs();
+        const idx = stored.findIndex(s => s.id === id);
+        if(idx > -1) {
+            stored.splice(idx, 1);
+            localStorage.setItem('favLaws', JSON.stringify(stored));
+            window.openFavs(); // Refresh UI
+            
+            // Also unpaint the heart in the list if visible
+            const listBtn = document.querySelector(`button[onclick*="toggleFav(${id})"]`);
+            if(listBtn) updateHeartVisual(listBtn, false);
+        }
     };
 
-    // --- OTHER UI LOGIC ---
-
+    // --- CHAT & UI HELPERS (Unchanged) ---
     function initChat() {
         const sendBtn = document.getElementById('send-btn');
         const userInput = document.getElementById('user-input');
@@ -544,16 +592,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, history: chatHistory })
             });
-
             if (!response.ok) throw new Error('API Error');
-
             const data = await response.json();
             const aiReply = data.reply || data.response || data.message || "ระบบกำลังประมวลผล...";
-
             loading.classList.add('hidden');
             addBubble(aiReply, 'ai');
             chatHistory.push({ role: "assistant", content: aiReply });
-
         } catch (error) {
             console.error(error);
             loading.classList.add('hidden');
@@ -575,7 +619,6 @@
         historyEl.scrollTop = historyEl.scrollHeight;
     }
 
-    // UI Helpers
     window.switchTab = function(tab) {
         document.getElementById('view-home').classList.toggle('hidden', tab !== 'home');
         document.getElementById('view-community').classList.toggle('hidden', tab !== 'community');
