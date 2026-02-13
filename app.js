@@ -1,7 +1,6 @@
 /* ======================================================
    CONFIG
 ====================================================== */
-const PAGE_SIZE = 5;
 const DATA_SOURCES = [
   "./pamon.json",
   "./ratathammanoon.json",
@@ -12,11 +11,7 @@ const DATA_SOURCES = [
    HELPERS
 ====================================================== */
 const $ = (s, el = document) => el.querySelector(s);
-const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
 
-function escapeHtml(s = "") {
-  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
 function sanitizeUrl(u=''){
   try{
     const url = new URL(u);
@@ -26,234 +21,147 @@ function sanitizeUrl(u=''){
 }
 
 /* ======================================================
-   DOM
+   FAVORITES
 ====================================================== */
-const catbar     = $("#catbar");
-const listEl     = $("#list");
-const btnNext    = $("#btnNext");
-const btnPrev    = $("#btnPrev");
-const panelTitle = $("#panelTitle");
-const elQ        = $("#q");
-const elBtnSearch= $("#btnSearch");
-
-/* ======================================================
-   FAVORITES (เสถียร)
-====================================================== */
-const FAV_KEY = "thai_law_lite_favs";
+const FAV_KEY = "favLaws";
 
 function getFavs(){
-  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
-  catch { return []; }
+  return JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
+}
+
+function saveFavs(data){
+  localStorage.setItem(FAV_KEY, JSON.stringify(data));
 }
 
 function isFav(id){
-  return getFavs().some(f => f.id === id);
+  return getFavs().some(f => String(f.id) === String(id));
 }
 
 function toggleFav(id, title){
+  const sid = String(id);
   let favs = getFavs();
-  const i = favs.findIndex(f => f.id === id);
+  const idx = favs.findIndex(f => String(f.id) === sid);
 
-  if(i > -1){
-    favs.splice(i,1);
+  if(idx > -1){
+    favs.splice(idx,1);
   }else{
     favs.push({
-      id: id,
+      id: sid,
       title: title,
-      date: new Date().toLocaleString('th-TH')
+      time: new Date().toLocaleDateString('th-TH')
     });
   }
 
-  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+  saveFavs(favs);
 }
 
-function renderFavList(){
-  const box = $("#favContainer");
-  if(!box) return;
+/* ======================================================
+   LOAD JSON
+====================================================== */
+async function loadJsonAndStart(){
 
-  const favs = getFavs();
-  if(!favs.length){
-    box.innerHTML = `
-      <div class="py-12 text-center text-slate-400 text-sm italic">
-        ยังไม่มีรายการที่บันทึกไว้
+  const listEl = $("#list");
+  if(listEl) listEl.innerHTML = "กำลังโหลดข้อมูล...";
+
+  const res = await Promise.all(
+    DATA_SOURCES.map(u =>
+      fetch(u).then(r=>r.ok ? r.json() : []).catch(()=>[])
+    )
+  );
+
+  const laws = res.flat();
+
+  renderLaws(laws);
+}
+
+/* ======================================================
+   RENDER (ใช้รูปแบบ index เดิม)
+====================================================== */
+function renderLaws(data){
+
+  const listEl = $("#list");
+  if(!listEl) return;
+
+  listEl.innerHTML = "";
+
+  if(!data || data.length === 0){
+    listEl.innerHTML = `
+      <div class="text-center py-20 text-slate-400">
+        ไม่พบข้อมูล
       </div>`;
     return;
   }
 
-  box.innerHTML = favs.map(f=>`
-    <div class="p-3 border border-slate-200 rounded-xl flex justify-between items-center">
-      <div>
-        <div class="text-sm font-bold">${escapeHtml(f.title)}</div>
-        <div class="text-[10px] text-slate-400">บันทึกเมื่อ ${f.date}</div>
+  data.forEach(law => {
+
+    const title = law["ชื่อกฎหมาย"] || "";
+    const date  = law["วันที่"] || "";
+    const cat   = law["หมวด"] || "";
+    const url   = sanitizeUrl(law["URL_PD"] || "");
+
+    const id = encodeURIComponent(title + "_" + date);
+    const active = isFav(id) ? "active" : "";
+
+    const el = document.createElement("div");
+
+    el.innerHTML = `
+      <div class="fav-btn-container">
+        <button class="fav-btn ${active}"
+          data-id="${id}"
+          data-title="${title}">
+          <span class="material-symbols-rounded">favorite</span>
+        </button>
       </div>
-      <button class="material-symbols-rounded text-slate-300 hover:text-red-500"
-        onclick="removeFav('${f.id}')">delete</button>
-    </div>
-  `).join('');
-}
 
-window.removeFav = (id)=>{
-  localStorage.setItem(
-    FAV_KEY,
-    JSON.stringify(getFavs().filter(f=>f.id!==id))
-  );
-  renderFavList();
-  document.querySelector(`.fav-add-btn[data-id="${id}"]`)
-    ?.classList.remove('active');
-};
+      <div class="font-bold text-slate-800 text-lg mb-1 pr-10 leading-tight">
+        ${title}
+      </div>
 
-/* ======================================================
-   COLUMN MAP
-====================================================== */
-const COLS = {
-  category : "หมวด",
-  title    : "ชื่อกฎหมาย",
-  date     : "วันที่",
-  url      : "URL_PD"
-};
-const col = k => COLS[k];
+      <div class="text-xs text-slate-400 mb-2">
+        ${cat} ${date ? "• " + date : ""}
+      </div>
 
-/* ======================================================
-   CATEGORY
-====================================================== */
-function normalizeCatName(raw=""){
-  if(raw.includes("ประมวล")) return "ประมวลกฎหมาย";
-  if(raw.includes("รัฐธรรมนูญ")) return "รัฐธรรมนูญ";
-  if(raw.includes("พระราชบัญญัติ")) return "พระราชบัญญัติ";
-  return raw;
-}
-const FIXED_CATS = ["ประมวลกฎหมาย","รัฐธรรมนูญ","พระราชบัญญัติ"];
-
-/* ======================================================
-   STATE
-====================================================== */
-let lawsData = [];
-const CatState = {};
-let selectedCat = null;
-
-/* ======================================================
-   RENDER
-====================================================== */
-function renderCard(r){
-  const t = r[col('title')] || '(ไม่มีชื่อ)';
-  const d = r[col('date')] || '';
-  const c = r[col('category')] || '';
-  const u = r[col('url')] || '';
-  const safe = sanitizeUrl(u);
-
-  // ✅ id ใหม่ (ไม่ใช้ btoa)
-  const id = encodeURIComponent(t + '_' + d);
-  const fav = isFav(id);
-
-  return `
-  <article class="law-card relative bg-white p-4 rounded-xl border border-slate-200">
-    <span class="fav-add-btn material-symbols-rounded ${fav?'active':''}"
-      data-id="${id}"
-      data-title="${escapeHtml(t)}">
-      favorite
-    </span>
-
-    <div class="font-semibold">${escapeHtml(t)}</div>
-    <div class="text-sm text-gray-500 mt-1">
-      ${escapeHtml(c)} ${d ? ' • '+escapeHtml(d):''}
-    </div>
-    <div class="mt-2">
-      ${safe
-        ? `<a href="${safe}" target="_blank" class="text-blue-700 font-semibold">อ่านฉบับเต็ม</a>`
-        : `<span class="text-gray-400">ไม่มีไฟล์แนบ</span>`
+      ${
+        url
+        ? `<a href="${url}" target="_blank"
+             class="text-blue-600 text-sm font-bold hover:underline">
+             อ่านฉบับเต็ม
+           </a>`
+        : ""
       }
-    </div>
-  </article>`;
-}
+    `;
 
-function renderChips(){
-  catbar.innerHTML = FIXED_CATS.map(c=>`
-    <button class="chip ${c===selectedCat?'active':''}" data-cat="${c}">
-      ${c}
-    </button>`).join('');
-}
-
-function renderList(){
-  const state = CatState[selectedCat];
-  const start = state.page * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-
-  listEl.innerHTML = state.rows.slice(start,end).map(renderCard).join('');
-  btnPrev.classList.toggle('hidden', state.page===0);
-  btnNext.classList.toggle('hidden', end>=state.rows.length);
-  panelTitle.textContent = selectedCat;
-}
-
-/* ======================================================
-   LOAD
-====================================================== */
-async function loadJsonAndStart(){
-  listEl.innerHTML = "กำลังโหลดข้อมูล…";
-
-  const res = await Promise.all(
-    DATA_SOURCES.map(u=>fetch(u).then(r=>r.ok?r.json():[]).catch(()=>[]))
-  );
-  lawsData = res.flat();
-
-  FIXED_CATS.forEach(c=>CatState[c]={rows:[],page:0});
-  lawsData.forEach(r=>{
-    const cat = normalizeCatName(r[col('category')]||'');
-    if(CatState[cat]) CatState[cat].rows.push(r);
+    listEl.appendChild(el);
   });
 
-  selectedCat = FIXED_CATS[0];
-  renderChips();
-  renderList();
+  bindFavButtons();
 }
 
 /* ======================================================
-   EVENTS
+   BIND FAVORITE BUTTONS
 ====================================================== */
-on(catbar,'click',e=>{
-  const b=e.target.closest('[data-cat]');
-  if(b){
-    selectedCat=b.dataset.cat;
-    CatState[selectedCat].page=0;
-    renderChips();
-    renderList();
-  }
-});
+function bindFavButtons(){
 
-on(listEl,'click',e=>{
-  const b=e.target.closest('.fav-add-btn');
-  if(b){
-    const id = b.dataset.id;
-    const title = b.dataset.title;
+  document.querySelectorAll(".fav-btn").forEach(btn => {
 
-    toggleFav(id,title);
+    btn.onclick = function(){
 
-    // sync กับ storage จริง
-    b.classList.toggle('active', isFav(id));
-  }
-});
+      const id = this.dataset.id;
+      const title = this.dataset.title;
 
-on(btnNext,'click',()=>{
-  CatState[selectedCat].page++;
-  renderList();
-});
+      toggleFav(id, title);
 
-on(btnPrev,'click',()=>{
-  CatState[selectedCat].page--;
-  renderList();
-});
+      this.classList.toggle("active", isFav(id));
+    };
+
+  });
+}
 
 /* ======================================================
    INIT
 ====================================================== */
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", ()=>{
+
   loadJsonAndStart();
 
-  $("#btnOpenFavs")?.addEventListener('click',()=>{
-    $("#modalFavs").style.display='flex';
-    renderFavList();
-  });
-
-  $("#btnCloseFavs")?.addEventListener('click',()=>{
-    $("#modalFavs").style.display='none';
-  });
 });
