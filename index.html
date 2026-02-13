@@ -274,16 +274,16 @@
             </button>
         </header>
         <div id="favContainer" class="p-4 overflow-y-auto space-y-2 min-h-[200px] bg-slate-50/50">
-            <!-- รายการโปรดจะแสดงที่นี่ -->
+            <!-- รายการที่บันทึกไว้จะแสดงที่นี่ -->
         </div>
     </div>
 </div>
 
-<!-- Modal Detail -->
+<!-- Modal Detail (Fallback) -->
 <div id="modalDetail" class="modal-overlay" style="z-index: 210;">
     <div class="modal-box relative p-0 bg-white">
         <div class="bg-slate-100 p-4 border-b flex justify-between items-center">
-            <h3 class="font-bold text-slate-800">รายละเอียด</h3>
+            <h3 class="font-bold text-slate-800">รายละเอียดบันทึก</h3>
             <button onclick="toggleModal('modalDetail', false)" class="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm">
                 <span class="material-symbols-rounded">close</span>
             </button>
@@ -310,7 +310,7 @@
             </button>
         </header>
         <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50 gap-3">
-            <div class="bubble bubble-ai">สวัสดีครับ สอบถามเรื่องกฎหมายได้เลยครับ</div>
+            <div class="bubble bubble-ai">สวัสดีครับ มีข้อสงสัยเรื่องกฎหมายมาตราไหน สอบถามได้เลยครับ</div>
         </div>
         <div class="p-3 border-t bg-white flex gap-2 items-center">
             <input id="user-input" type="text" class="flex-1 bg-slate-100 rounded-full px-4 py-3 text-sm outline-none" placeholder="พิมพ์คำถามที่นี่..." autocomplete="off">
@@ -325,7 +325,7 @@
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
 
-    // ฟังก์ชันดึงข้อมูล LocalStorage
+    // ฟังก์ชันดึงข้อมูลจาก LocalStorage
     function getStoredFavs() {
         try {
             const data = localStorage.getItem('favLaws');
@@ -333,7 +333,7 @@
         } catch(e) { return []; }
     }
 
-    // ฟังก์ชันบันทึกรายการโปรด
+    // ฟังก์ชันบันทึกรายการโปรด (ดึงชื่อตามกฎหมายที่บันทึก)
     window.toggleFav = function(id) {
         if (!id) return;
         const stringId = String(id);
@@ -341,34 +341,40 @@
         const existingIndex = stored.findIndex(s => String(s.id) === stringId);
 
         if (existingIndex > -1) {
-            // ลบรายการโปรด
+            // ลบออก
             stored.splice(existingIndex, 1);
             localStorage.setItem('favLaws', JSON.stringify(stored));
             updateHeartVisuals(stringId, false);
         } else {
-            // บันทึกใหม่
+            // บันทึกใหม่: พยายามดึงชื่อจากรายการที่กด
             let lawData = null;
-            // ค้นหาการ์ดกฎหมายที่ปุ่มหัวใจถูกคลิก
             const targetBtn = document.querySelector(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"]`);
+            
             if (targetBtn) {
+                // ค้นหาการ์ดกฎหมาย
                 const card = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
                 if (card) {
                     const clone = card.cloneNode(true);
+                    // ลบปุ่มและไอคอนออกเพื่อให้เหลือแต่ข้อความชื่อ
                     clone.querySelectorAll('button, .material-symbols-rounded, .icon, script, style').forEach(el => el.remove());
-                    const rawText = clone.innerText.trim();
-                    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    
+                    const textContent = clone.innerText.trim();
+                    const lines = textContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    
+                    // บรรทัดแรกมักเป็นชื่อกฎหมายหรือมาตรา
+                    const lawName = lines[0] || "กฎหมายที่บันทึก";
                     
                     lawData = { 
                         id: stringId, 
-                        code: lines[0] || "กฎหมาย", // บรรทัดแรกมักเป็นหัวข้อ
+                        code: lawName, 
                         timestamp: new Date().toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' }) + " " + new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-                        content: rawText
+                        content: textContent
                     };
                 }
             }
 
             if (!lawData) {
-                lawData = { id: stringId, code: "กฎหมาย", timestamp: new Date().toLocaleString('th-TH'), content: "" };
+                lawData = { id: stringId, code: "รายการบันทึก", timestamp: new Date().toLocaleString('th-TH'), content: "" };
             }
 
             stored.push(lawData);
@@ -377,7 +383,81 @@
         }
     };
 
-    // ปรับสีหัวใจตามสถานะ
+    // ฟังก์ชัน Jump เด้งไปยังรายการที่เลือกในหน้าหลัก
+    window.jumpToItem = function(id) {
+        const stringId = String(id);
+        toggleModal('modalFavs', false); // ปิดหน้าต่างโปรด
+        switchTab('home'); // ไปหน้าหลัก
+
+        // ค้นหาการ์ดในหน้าจอหลัก
+        const targetBtn = document.querySelector(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"]`);
+        if (targetBtn) {
+            const card = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
+            
+            // เลื่อนไปยังตำแหน่งรายการนั้น
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // เอฟเฟกต์ไฮไลท์
+            card.classList.remove('target-highlight');
+            void card.offsetWidth; // Trigger reflow
+            card.classList.add('target-highlight');
+            
+            setTimeout(() => card.classList.remove('target-highlight'), 3000);
+        } else {
+            // หากไม่เจอกราฟิกในหน้าปัจจุบัน (อาจถูกฟิลเตอร์ออก) ให้โชว์รายละเอียดแทน
+            const stored = getStoredFavs();
+            const item = stored.find(s => String(s.id) === stringId);
+            if (item) {
+                const detailEl = document.getElementById('detailContent');
+                detailEl.innerHTML = `
+                    <div class="font-bold text-blue-800 text-lg mb-1">${item.code}</div>
+                    <div class="text-[10px] text-slate-400 mb-4">บันทึกเมื่อ: ${item.timestamp}</div>
+                    <div class="bg-slate-50 p-4 rounded-xl border text-slate-600 whitespace-pre-wrap">${item.content}</div>
+                `;
+                toggleModal('modalDetail', true);
+            }
+        }
+    };
+
+    // แสดงรายการโปรดใน Modal
+    window.openFavs = function() {
+        const container = document.getElementById('favContainer');
+        const myFavs = getStoredFavs();
+        container.innerHTML = '';
+
+        if(myFavs.length === 0) {
+            container.innerHTML = `<div class="text-center text-slate-400 py-10">ยังไม่มีรายการโปรด</div>`;
+        } else {
+            myFavs.forEach(law => {
+                const card = document.createElement('div');
+                // คลิกแล้ว Jump เด้งไปหน้าหลัก
+                card.onclick = (e) => { 
+                    if(!e.target.closest('.delete-btn')) jumpToItem(law.id); 
+                };
+                
+                card.className = 'bg-white p-3 rounded-xl border border-slate-300 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50';
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0 pointer-events-none">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-blue-800 truncate">${law.code}</span>
+                            <span class="text-[9px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded whitespace-nowrap ml-2">${law.timestamp}</span>
+                        </div>
+                    </div>
+                    <button onclick="removeFav('${law.id}')" class="delete-btn text-slate-300 hover:text-red-500 p-1 flex items-center justify-center">
+                        <span class="material-symbols-rounded text-[20px]">delete</span>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+        toggleModal('modalFavs', true);
+    };
+
+    window.removeFav = function(id) {
+        window.toggleFav(id);
+        window.openFavs();
+    };
+
     function updateHeartVisuals(id, isActive) {
         const stringId = String(id);
         const elements = document.querySelectorAll(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"]`);
@@ -393,68 +473,6 @@
         });
     }
 
-    // ฟังก์ชัน Jump ไปที่ตำแหน่งรายชื่อ
-    window.jumpToItem = function(id) {
-        const stringId = String(id);
-        toggleModal('modalFavs', false); // ปิดหน้าต่างโปรด
-        switchTab('home'); // ไปที่หน้าหลัก
-
-        // หาตำแหน่งปุ่มหรือการ์ดในหน้าจอหลัก
-        const targetBtn = document.querySelector(`[onclick*="toggleFav('${stringId}')"], [onclick*="toggleFav(${stringId})"]`);
-        if (targetBtn) {
-            const card = targetBtn.closest('.bg-white') || targetBtn.parentElement.parentElement;
-            
-            // เลื่อนหน้าจอ
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // เพิ่มเอฟเฟกต์กระพริบ
-            card.classList.remove('target-highlight');
-            void card.offsetWidth; // Trigger reflow
-            card.classList.add('target-highlight');
-            
-            // ลบเอฟเฟกต์หลังจากจบ Animation
-            setTimeout(() => card.classList.remove('target-highlight'), 3000);
-        }
-    };
-
-    // แสดงรายการโปรดใน Modal
-    window.openFavs = function() {
-        const container = document.getElementById('favContainer');
-        const myFavs = getStoredFavs();
-        container.innerHTML = '';
-
-        if(myFavs.length === 0) {
-            container.innerHTML = `<div class="text-center text-slate-400 py-10">ยังไม่มีรายการโปรด</div>`;
-        } else {
-            myFavs.forEach(law => {
-                const card = document.createElement('div');
-                card.onclick = (e) => { if(!e.target.closest('.delete-btn')) jumpToItem(law.id); };
-                
-                // รูปแบบสะอาดตา: ชื่อหัวข้อ + วันที่บันทึก
-                card.className = 'bg-white p-3 rounded-xl border border-slate-300 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50';
-                card.innerHTML = `
-                    <div class="flex-1 min-w-0 pointer-events-none">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-blue-800 truncate">${law.code}</span>
-                            <span class="text-[9px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded ml-2">${law.timestamp}</span>
-                        </div>
-                    </div>
-                    <button onclick="removeFav('${law.id}')" class="delete-btn text-slate-300 hover:text-red-500 p-1 flex items-center justify-center">
-                        <span class="material-symbols-rounded text-[20px]">delete</span>
-                    </button>
-                `;
-                container.appendChild(card);
-            });
-        }
-        toggleModal('modalFavs', true);
-    };
-
-    window.removeFav = function(id) {
-        window.toggleFav(id);
-        window.openFavs(); // อัปเดตรายการใหม่
-    };
-
-    // สังเกตการเปลี่ยนแปลงของรายการเพื่อทาสีหัวใจ
     function startFavObserver() {
         const listEl = document.getElementById('list');
         if(!listEl) return;
@@ -483,9 +501,7 @@
         paintHearts();
     }
 
-    // จัดการ Event เริ่มต้น
     window.addEventListener('DOMContentLoaded', () => {
-        // ปุ่มเปิดรายการโปรดที่ Header
         const openFavBtn = document.getElementById('btnOpenFavs');
         if (openFavBtn) {
             openFavBtn.addEventListener('click', (e) => {
@@ -494,7 +510,6 @@
             });
         }
 
-        // Global click listener
         document.addEventListener('click', (e) => {
             const heartBtn = e.target.closest('button[onclick*="toggleFav"], .heart-icon');
             if (heartBtn && !heartBtn.closest('.fav-header-btn') && !heartBtn.id?.includes('btnOpenFavs')) {
@@ -512,7 +527,6 @@
         startFavObserver();
     });
 
-    // UI Logic พื้นฐาน
     function toggleModal(id, show) {
         const el = document.getElementById(id);
         if(!el) return;
