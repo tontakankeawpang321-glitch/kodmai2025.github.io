@@ -280,13 +280,13 @@
         <header class="p-4 border-b flex justify-between items-center bg-slate-50">
             <h3 class="font-bold flex items-center gap-2">
                 <span class="material-symbols-rounded text-red-500">favorite</span>
-                รายการโปรดของคุณ
+                รายการโปรด
             </h3>
             <button id="btnCloseFavs" class="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </header>
-        <div id="favContainer" class="p-4 overflow-y-auto space-y-3 min-h-[200px] bg-slate-50/50">
+        <div id="favContainer" class="p-4 overflow-y-auto space-y-2 min-h-[200px] bg-slate-50/50">
             <!-- List goes here -->
         </div>
     </div>
@@ -369,7 +369,7 @@
         }, 800);
 
         // 2. Override Toggle Function (Scrape & Save Logic)
-        // This grabs text directly from the DOM so it works with CSV/App.js generated content
+        // บันทึกแบบใหม่ เพิ่ม timestamp (วันที่)
         window.toggleFav = function(id) {
             let lawData = null;
             
@@ -400,19 +400,30 @@
                         title = textLines[0];
                     }
                     
-                    // Save content for internal fallback
+                    // Create object with Timestamp
                     lawData = { 
                         id: id, 
                         code: code, 
                         section: section, 
                         title: title,
+                        timestamp: new Date().toLocaleString('th-TH', { 
+                            year: 'numeric', month: 'short', day: 'numeric', 
+                            hour: '2-digit', minute:'2-digit'
+                        }),
                         content: fullText.replace('delete', '').replace('bookmark_heart', '') 
                     };
                 }
             }
 
             if (!lawData) {
-                lawData = { id: id, title: 'รายการที่บันทึก', code: 'System', section: '', content: 'ไม่สามารถดึงข้อมูลได้' };
+                lawData = { 
+                    id: id, 
+                    title: 'รายการที่บันทึก', 
+                    code: 'System', 
+                    section: '', 
+                    timestamp: new Date().toLocaleString('th-TH'),
+                    content: 'ไม่สามารถดึงข้อมูลได้' 
+                };
             }
 
             // Save to LocalStorage
@@ -444,7 +455,6 @@
         switchTab('home'); 
 
         // 3. Find the element
-        // Look for the toggle button with the matching ID
         const targetBtn = document.querySelector(`button[onclick*="toggleFav(${id})"], button[onclick*="toggleFav('${id}')"]`);
 
         if (targetBtn) {
@@ -468,6 +478,7 @@
                 const detailEl = document.getElementById('detailContent');
                 detailEl.innerHTML = `
                     <div class="font-bold text-blue-800 text-lg mb-2">${item.code} ${item.section ? 'ม.'+item.section : ''}</div>
+                    <div class="text-xs text-slate-400 mb-2">บันทึกเมื่อ: ${item.timestamp || '-'}</div>
                     <div class="font-bold text-slate-900 text-md mb-4">${item.title}</div>
                     <div class="bg-slate-50 p-4 rounded-xl border text-slate-600">
                         ${item.content || 'ไม่มีรายละเอียดเพิ่มเติม'}
@@ -478,7 +489,7 @@
         }
     };
 
-    // --- FAVORITES LIST UI ---
+    // --- FAVORITES LIST UI (Modified Style) ---
 
     window.openFavs = function() {
         const container = document.getElementById('favContainer');
@@ -501,19 +512,22 @@
                     jumpToItem(law.id);
                 };
                 
-                card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50 transition-colors active:scale-95 group';
+                // สไตล์ใหม่: Name + Date (Clean List)
+                card.className = 'bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50 transition-colors active:scale-95 group';
+                
+                // ใช้ timestamp ถ้าไม่มีให้โชว์ขีด
+                const displayDate = law.timestamp || '-';
                 
                 card.innerHTML = `
-                    <div class="flex-1 min-w-0 pointer-events-none">
-                        <div class="text-[10px] font-bold text-blue-600 truncate">${law.code || 'กฎหมาย'} ${law.section ? 'ม.'+law.section : ''}</div>
-                        <div class="font-bold text-sm text-slate-800 truncate mb-1">${law.title}</div>
-                        <div class="flex items-center gap-1 text-[10px] text-slate-400 group-hover:text-blue-500 transition-colors">
-                            <span class="material-symbols-rounded text-[14px]">touch_app</span>
-                            แตะเพื่อไปที่ข้อความ
+                    <div class="flex-1 min-w-0 pointer-events-none flex flex-col gap-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-blue-800">${law.code || 'กฎหมาย'} ${law.section ? 'ม.'+law.section : ''}</span>
+                            <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md">${displayDate}</span>
                         </div>
+                        <div class="text-sm text-slate-600 truncate">${law.title}</div>
                     </div>
                     <button onclick="removeFav(${law.id})" class="delete-btn text-slate-300 hover:text-red-500 p-2 transition-colors z-10 rounded-full hover:bg-red-50">
-                        <span class="material-symbols-rounded">delete</span>
+                        <span class="material-symbols-rounded text-[20px]">delete</span>
                     </button>
                 `;
                 container.appendChild(card);
