@@ -17,6 +17,7 @@
             --primary: #1e3a8a;
             --primary-gradient: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
             --accent: #d97706;
+            --success: #10b981;
             --bg-app: #f1f5f9;
             --text-main: #0f172a;
             --bottom-nav-height: 70px;
@@ -114,7 +115,7 @@
         /* เอฟเฟกต์ไฮไลท์ */
         @keyframes target-flash {
             0% { background-color: transparent; border-color: #e2e8f0; }
-            40% { background-color: rgba(217, 119, 6, 0.1); border-color: var(--accent); transform: scale(1.03); box-shadow: 0 0 20px rgba(217, 119, 6, 0.2); }
+            40% { background-color: rgba(16, 185, 129, 0.1); border-color: var(--success); transform: scale(1.02); }
             100% { background-color: transparent; border-color: #e2e8f0; transform: scale(1); }
         }
         .target-highlight {
@@ -126,21 +127,28 @@
         .dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
         .dot.active { width: 24px; background-color: var(--accent); border-radius: 12px; }
 
-        .heart-btn-container {
+        /* ปรับปรุงปุ่มบันทึก (ไอคอนบวก) */
+        .save-btn-container {
             position: absolute; top: 12px; right: 12px; z-index: 5;
         }
-        .heart-icon { 
-            transition: transform 0.2s, color 0.2s; 
-            font-variation-settings: 'FILL' 0; 
+        .save-btn { 
+            transition: all 0.2s; 
             cursor: pointer; 
             color: #94a3b8;
-            font-size: 26px;
-            padding: 4px;
+            font-size: 28px;
+            background: #f8fafc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .heart-icon.active { 
-            color: #ef4444 !important; 
-            font-variation-settings: 'FILL' 1 !important; 
-            transform: scale(1.2); 
+        .save-btn.active { 
+            color: var(--success) !important; 
+            background: #ecfdf5;
+            transform: scale(1.1);
         }
 
         .bubble { padding: 12px 16px; border-radius: 18px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.5; word-wrap: break-word;}
@@ -176,7 +184,7 @@
             </div>
         </div>
         <button id="btnOpenFavs" class="fav-header-btn" title="รายการโปรด">
-            <span class="material-symbols-rounded">bookmark_heart</span>
+            <span class="material-symbols-rounded">bookmark</span>
         </button>
     </div>
 </header>
@@ -235,7 +243,6 @@
                 <h2 id="panelTitle" class="font-bold text-slate-800 text-lg">รายการกฎหมายล่าสุด</h2>
             </div>
             <div id="list" class="flex flex-col">
-                <!-- รายการจาก app.js จะมาแสดงที่นี่ -->
                 <div class="text-center py-16 text-slate-400 text-sm italic">กำลังโหลดข้อมูลคลังกฎหมาย...</div>
             </div>
         </section>
@@ -279,15 +286,15 @@
     <div class="modal-box">
         <header class="p-5 border-b flex justify-between items-center bg-slate-50 shrink-0">
             <div class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-red-500" style="font-variation-settings: 'FILL' 1">favorite</span>
-                <span class="font-bold text-slate-800">รายการโปรด</span>
+                <span class="material-symbols-rounded text-blue-600">bookmark</span>
+                <span class="font-bold text-slate-800">รายการที่บันทึก</span>
             </div>
             <button id="btnCloseFavs" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-200 rounded-full transition-colors">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </header>
         <div id="favContainer" class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-50/50 scrollbar-hide">
-            <!-- รายการที่บันทึกไว้ -->
+            <!-- Items filled by JS -->
         </div>
     </div>
 </div>
@@ -331,7 +338,7 @@
     const getStored = () => JSON.parse(localStorage.getItem('favLaws') || '[]');
     const saveToStorage = (data) => localStorage.setItem('favLaws', JSON.stringify(data));
 
-    // Improved Favorite Toggle
+    // Improved Toggle (Changed to Plus Icon)
     window.toggleFav = function(id) {
         if (!id) return;
         const sid = String(id);
@@ -341,20 +348,19 @@
         if (idx > -1) {
             stored.splice(idx, 1);
             saveToStorage(stored);
-            updateUIHearts(sid, false);
+            updateUIButtons(sid, false);
         } else {
+            // Precise scraping
             const btn = document.querySelector(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
             if (btn) {
-                const card = btn.closest('.bg-white') || btn.parentElement.parentElement;
+                const card = btn.closest('.bg-white') || btn.closest('div[id^="law-"]') || btn.parentElement.parentElement;
                 if (card) {
                     const clone = card.cloneNode(true);
-                    // ลบปุ่มและหัวใจออกก่อนดึงชื่อ
-                    clone.querySelectorAll('button, .material-symbols-rounded, .icon, script, style, .heart-btn-container').forEach(el => el.remove());
+                    clone.querySelectorAll('button, .material-symbols-rounded, .icon, script, style, .save-btn-container').forEach(el => el.remove());
                     
                     const text = clone.innerText.trim();
                     const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                     
-                    // บรรทัดแรกคือชื่อกฎหมาย
                     const lawTitle = lines[0] || "กฎหมาย";
                     
                     stored.push({ 
@@ -363,35 +369,31 @@
                         time: new Date().toLocaleDateString('th-TH', {day:'2-digit', month:'short'}) + " " + new Date().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})
                     });
                     saveToStorage(stored);
-                    updateUIHearts(sid, true);
+                    updateUIButtons(sid, true);
                 }
             }
         }
     };
 
-    function updateUIHearts(id, active) {
+    function updateUIButtons(id, active) {
         const sid = String(id);
-        const hearts = document.querySelectorAll(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
-        hearts.forEach(h => {
-            const icon = h.querySelector('.material-symbols-rounded') || h;
+        const buttons = document.querySelectorAll(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
+        buttons.forEach(btn => {
+            const icon = btn.querySelector('.material-symbols-rounded') || btn;
             if (active) {
-                icon.classList.add('text-red-500', 'active');
-                icon.style.fontVariationSettings = "'FILL' 1";
+                btn.classList.add('active');
+                icon.innerText = 'check_circle';
             } else {
-                icon.classList.remove('text-red-500', 'active');
-                icon.style.fontVariationSettings = "'FILL' 0";
+                btn.classList.remove('active');
+                icon.innerText = 'add_circle';
             }
         });
     }
 
-    // ระบบ Jump: ปิดหน้าต่าง -> สลับหน้า -> เลื่อนจอ
+    // Jump Function
     window.jumpToItem = function(id) {
         const sid = String(id);
-        
-        // 1. ปิด Modal ทันที
         toggleModal('modalFavs', false);
-        
-        // 2. ไปหน้าหลัก
         switchTab('home');
 
         const findAndScroll = () => {
@@ -400,12 +402,10 @@
                 const card = target.closest('.bg-white') || target.parentElement.parentElement;
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
-                // 3. เอฟเฟกต์ไฮไลท์
                 card.classList.remove('target-highlight');
                 void card.offsetWidth; 
                 card.classList.add('target-highlight');
             } else {
-                // ถ้าไม่เจอ (เช่น ติดฟิลเตอร์) ให้ล้างฟิลเตอร์ก่อน
                 const allChip = document.querySelector('.chip');
                 if (allChip) {
                     allChip.click();
@@ -462,21 +462,21 @@
                     const sid = String(m[2]);
                     const icon = btn.querySelector('.material-symbols-rounded') || btn;
                     
-                    // จัดตำแหน่งหัวใจให้เหมาะสมในจอมือถือ (ขวาบน)
-                    if(!btn.parentElement.classList.contains('heart-btn-container')) {
+                    if(!btn.parentElement.classList.contains('save-btn-container')) {
                         const wrapper = document.createElement('div');
-                        wrapper.className = 'heart-btn-container';
+                        wrapper.className = 'save-btn-container';
                         btn.parentNode.insertBefore(wrapper, btn);
                         wrapper.appendChild(btn);
-                        btn.classList.add('heart-icon');
+                        btn.className = 'save-btn';
+                        icon.className = 'material-symbols-rounded';
                     }
 
                     if (savedIds.includes(sid)) {
-                        icon.classList.add('text-red-500', 'active');
-                        icon.style.fontVariationSettings = "'FILL' 1";
+                        btn.classList.add('active');
+                        icon.innerText = 'check_circle';
                     } else {
-                        icon.classList.remove('text-red-500', 'active');
-                        icon.style.fontVariationSettings = "'FILL' 0";
+                        btn.classList.remove('active');
+                        icon.innerText = 'add_circle';
                     }
                 }
             });
@@ -514,7 +514,6 @@
     function filterCat(cat, btn) {
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
-        // กรองรายการ (ถ้ามีการ Implement ใน app.js)
     }
 
     function initChat() {
