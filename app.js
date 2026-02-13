@@ -37,7 +37,7 @@ const elQ        = $("#q");
 const elBtnSearch= $("#btnSearch");
 
 /* ======================================================
-   FAVORITES
+   FAVORITES (เสถียร)
 ====================================================== */
 const FAV_KEY = "thai_law_lite_favs";
 
@@ -45,25 +45,38 @@ function getFavs(){
   try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
   catch { return []; }
 }
+
 function isFav(id){
   return getFavs().some(f => f.id === id);
 }
+
 function toggleFav(id, title){
   let favs = getFavs();
   const i = favs.findIndex(f => f.id === id);
-  if(i > -1) favs.splice(i,1);
-  else favs.push({ id, title, date: new Date().toLocaleDateString('th-TH') });
+
+  if(i > -1){
+    favs.splice(i,1);
+  }else{
+    favs.push({
+      id: id,
+      title: title,
+      date: new Date().toLocaleString('th-TH')
+    });
+  }
+
   localStorage.setItem(FAV_KEY, JSON.stringify(favs));
 }
+
 function renderFavList(){
   const box = $("#favContainer");
   if(!box) return;
 
   const favs = getFavs();
   if(!favs.length){
-    box.innerHTML = `<div class="py-12 text-center text-slate-400 text-sm italic">
-      ยังไม่มีรายการที่บันทึกไว้
-    </div>`;
+    box.innerHTML = `
+      <div class="py-12 text-center text-slate-400 text-sm italic">
+        ยังไม่มีรายการที่บันทึกไว้
+      </div>`;
     return;
   }
 
@@ -78,6 +91,7 @@ function renderFavList(){
     </div>
   `).join('');
 }
+
 window.removeFav = (id)=>{
   localStorage.setItem(
     FAV_KEY,
@@ -126,13 +140,18 @@ function renderCard(r){
   const c = r[col('category')] || '';
   const u = r[col('url')] || '';
   const safe = sanitizeUrl(u);
-  const id = btoa(unescape(encodeURIComponent(t)));
+
+  // ✅ id ใหม่ (ไม่ใช้ btoa)
+  const id = encodeURIComponent(t + '_' + d);
   const fav = isFav(id);
 
   return `
-  <article class="law-card relative">
+  <article class="law-card relative bg-white p-4 rounded-xl border border-slate-200">
     <span class="fav-add-btn material-symbols-rounded ${fav?'active':''}"
-      data-id="${id}" data-title="${escapeHtml(t)}">favorite</span>
+      data-id="${id}"
+      data-title="${escapeHtml(t)}">
+      favorite
+    </span>
 
     <div class="font-semibold">${escapeHtml(t)}</div>
     <div class="text-sm text-gray-500 mt-1">
@@ -166,88 +185,6 @@ function renderList(){
 }
 
 /* ======================================================
-   ✅ LATEST (ล่าสุดรายหมวด – แก้ตรงนี้)
-====================================================== */
-let latestIndex = 0;
-let latestTimer = null;
-
-function renderLatest(){
-  const track = document.getElementById("latestTrack");
-  const dots  = document.getElementById("dots");
-  if(!track) return;
-
-  // หาล่าสุดแยกตามหมวด
-  const latestByCat = {};
-  lawsData.forEach(r => {
-    const cat = normalizeCatName(r[col('category')] || '');
-    const date = r[col('date')];
-    if(!cat || !date) return;
-
-    if(
-      !latestByCat[cat] ||
-      new Date(date) > new Date(latestByCat[cat][col('date')])
-    ){
-      latestByCat[cat] = r;
-    }
-  });
-
-  const rows = Object.values(latestByCat);
-
-  /* ---------- render slides ---------- */
-  track.innerHTML = rows.map(r => `
-    <div class="w-full shrink-0 px-2">
-      <div class="bg-white border border-slate-200 rounded-xl p-3 h-full">
-        <div class="text-[10px] font-bold text-blue-600 mb-1">
-          ${escapeHtml(normalizeCatName(r[col('category')]))}
-        </div>
-        <div class="text-sm font-semibold text-slate-800 line-clamp-2">
-          ${escapeHtml(r[col('title')])}
-        </div>
-        <div class="text-[10px] text-slate-400 mt-1">
-          ${escapeHtml(r[col('date')])}
-        </div>
-      </div>
-    </div>
-  `).join('');
-
-  track.style.width = `${rows.length * 100}%`;
-  track.style.display = "flex";
-  track.style.transition = "transform 0.4s ease";
-
-  /* ---------- dots ---------- */
-  if(dots){
-    dots.innerHTML = rows.map((_,i)=>`
-      <div class="dot ${i===0?'active':''}"></div>
-    `).join('');
-  }
-
-  latestIndex = 0;
-  updateLatestSlide();
-  startLatestAuto(rows.length);
-}
-function updateLatestSlide(){
-  const track = document.getElementById("latestTrack");
-  const dots  = document.querySelectorAll("#dots .dot");
-  if(!track) return;
-
-  track.style.transform = `translateX(-${latestIndex * 100}%)`;
-
-  dots.forEach((d,i)=>{
-    d.classList.toggle("active", i===latestIndex);
-  });
-}
-
-function startLatestAuto(len){
-  clearInterval(latestTimer);
-  if(len <= 1) return;
-
-  latestTimer = setInterval(()=>{
-    latestIndex = (latestIndex + 1) % len;
-    updateLatestSlide();
-  }, 4000); // ทุก 4 วิ
-}
-
-/* ======================================================
    LOAD
 ====================================================== */
 async function loadJsonAndStart(){
@@ -266,7 +203,6 @@ async function loadJsonAndStart(){
 
   selectedCat = FIXED_CATS[0];
   renderChips();
-  renderLatest();
   renderList();
 }
 
@@ -282,41 +218,42 @@ on(catbar,'click',e=>{
     renderList();
   }
 });
+
 on(listEl,'click',e=>{
   const b=e.target.closest('.fav-add-btn');
   if(b){
-    toggleFav(b.dataset.id,b.dataset.title);
-    b.classList.toggle('active');
+    const id = b.dataset.id;
+    const title = b.dataset.title;
+
+    toggleFav(id,title);
+
+    // sync กับ storage จริง
+    b.classList.toggle('active', isFav(id));
   }
 });
-on(btnNext,'click',()=>{ CatState[selectedCat].page++; renderList(); });
-on(btnPrev,'click',()=>{ CatState[selectedCat].page--; renderList(); });
-on(elBtnSearch,'click',doSearch);
-on(elQ,'keydown',e=>e.key==='Enter'&&doSearch());
 
-function doSearch(){
-  const q=(elQ.value||'').trim();
-  if(!q) return renderList();
+on(btnNext,'click',()=>{
+  CatState[selectedCat].page++;
+  renderList();
+});
 
-  const hits=lawsData.filter(r=>
-    Object.values(COLS).some(k=>(r[k]||'').includes(q))
-  );
-  listEl.innerHTML = hits.map(renderCard).join('');
-  btnPrev.classList.add('hidden');
-  btnNext.classList.add('hidden');
-  panelTitle.textContent=`ผลการค้นหา "${q}"`;
-}
+on(btnPrev,'click',()=>{
+  CatState[selectedCat].page--;
+  renderList();
+});
 
 /* ======================================================
    INIT
 ====================================================== */
 document.addEventListener("DOMContentLoaded",()=>{
   loadJsonAndStart();
+
   $("#btnOpenFavs")?.addEventListener('click',()=>{
     $("#modalFavs").style.display='flex';
     renderFavList();
   });
+
   $("#btnCloseFavs")?.addEventListener('click',()=>{
     $("#modalFavs").style.display='none';
   });
-})
+});
