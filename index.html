@@ -44,7 +44,7 @@
 
         .wrap { max-width: 600px; margin: 0 auto; padding: 0 16px; position: relative; }
 
-        /* Fav Button */
+        /* Fav Button in Header */
         .fav-header-btn {
             position: absolute; top: 16px; right: 16px;
             background: rgba(255,255,255,0.2);
@@ -140,6 +140,7 @@
         .dot { width: 6px; height: 6px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
         .dot.active { width: 20px; background-color: var(--accent); border-radius: 10px; }
 
+        /* Heart Animation */
         .heart-icon { transition: transform 0.2s, color 0.2s; font-variation-settings: 'FILL' 0; }
         .heart-icon.active { color: #ef4444 !important; font-variation-settings: 'FILL' 1 !important; transform: scale(1.1); }
     </style>
@@ -368,12 +369,12 @@
             }
         }, 800);
 
-        // 2. Override Toggle Function (FIXED SCRAPING LOGIC)
+        // 2. Override Toggle Function (Robust Scraping)
         window.toggleFav = function(id) {
             let lawData = null;
             let btn = null;
 
-            // พยายามหาปุ่มที่ถูกกด (รองรับหลายรูปแบบ)
+            // Find the button (handle quotes/no quotes)
             const selectors = [
                 `button[onclick="toggleFav(${id})"]`,
                 `button[onclick="toggleFav('${id}')"]`,
@@ -386,11 +387,11 @@
             }
             
             if (btn) {
-                // หา Container ของการ์ด (รองรับหลาย Class)
+                // Find Card Container
                 const row = btn.closest('.bg-white') || btn.closest('div[class*="rounded"]'); 
                 
                 if (row) {
-                    // Clone Node เพื่อลบปุ่มออกก่อนดึงข้อความ (ป้องกันข้อความขยะ)
+                    // Clone to scrape text without buttons
                     const clone = row.cloneNode(true);
                     const buttons = clone.querySelectorAll('button, .material-symbols-rounded, .icon');
                     buttons.forEach(b => b.remove());
@@ -430,9 +431,8 @@
                 }
             }
 
-            // Fallback (ถ้าดึงข้อมูลไม่ได้จริงๆ)
+            // Fallback
             if (!lawData) {
-                // แก้ไข: ไม่ใช้คำว่า System ให้ใช้ "กฎหมาย" หรือว่างไปเลย
                 lawData = { 
                     id: id, 
                     title: 'รายการที่บันทึก', 
@@ -454,6 +454,8 @@
             }
             
             localStorage.setItem('favLaws', JSON.stringify(stored));
+            
+            // **Update Visuals Immediately**
             updateHeartVisuals(id, existingIndex === -1);
         };
 
@@ -462,12 +464,11 @@
         startFavObserver();
     });
 
-    // --- NAVIGATION LOGIC (JUMP TO ITEM) ---
+    // --- NAVIGATION LOGIC ---
     window.jumpToItem = function(id) {
         toggleModal('modalFavs', false); 
         switchTab('home'); 
 
-        // ค้นหาปุ่มด้วย Selector ที่ครอบคลุมขึ้น
         const selectors = [
             `button[onclick="toggleFav(${id})"]`,
             `button[onclick="toggleFav('${id}')"]`,
@@ -506,7 +507,7 @@
         }
     };
 
-    // --- FAVORITES LIST UI ---
+    // --- FAVORITES LIST UI (Minimal & Bordered) ---
     window.openFavs = function() {
         const container = document.getElementById('favContainer');
         const myFavs = getStoredFavs();
@@ -526,21 +527,19 @@
                     jumpToItem(law.id);
                 };
                 
-                card.className = 'bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50 transition-colors active:scale-95 group';
+                // ADDED BORDER HERE
+                card.className = 'bg-white p-3 rounded-xl border border-slate-300 shadow-sm flex justify-between items-center gap-3 animate-slide-up cursor-pointer hover:bg-blue-50 transition-colors active:scale-95 group';
                 
                 const displayDate = law.timestamp || '-';
-                // ป้องกันการแสดงคำว่า System
                 const displayCode = (law.code === 'System' || !law.code) ? 'รายการบันทึก' : law.code;
 
+                // REMOVED TEXT CONTENT LINE
                 card.innerHTML = `
-                    <div class="flex-1 min-w-0 pointer-events-none flex flex-col gap-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold text-blue-800">${displayCode} ${law.section ? 'ม.'+law.section : ''}</span>
-                            <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md">${displayDate}</span>
-                        </div>
-                        <div class="text-sm text-slate-600 truncate">${law.title}</div>
+                    <div class="flex-1 min-w-0 pointer-events-none flex items-center justify-between mr-2">
+                        <span class="text-sm font-bold text-blue-800 truncate">${displayCode} ${law.section ? 'ม.'+law.section : ''}</span>
+                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md whitespace-nowrap">${displayDate}</span>
                     </div>
-                    <button onclick="removeFav(${law.id})" class="delete-btn text-slate-300 hover:text-red-500 p-2 transition-colors z-10 rounded-full hover:bg-red-50">
+                    <button onclick="removeFav(${law.id})" class="delete-btn text-slate-300 hover:text-red-500 p-2 transition-colors z-10 rounded-full hover:bg-red-50 flex items-center justify-center">
                         <span class="material-symbols-rounded text-[20px]">delete</span>
                     </button>
                 `;
@@ -567,7 +566,6 @@
     }
 
     function updateHeartVisuals(id, isActive) {
-        // อัพเดทปุ่มทั้งหมดที่ตรงกับ ID
         const selectors = [
             `button[onclick="toggleFav(${id})"]`,
             `button[onclick="toggleFav('${id}')"]`,
