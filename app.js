@@ -62,7 +62,14 @@ function toggleFav(id, title){
 
   saveFavs(favs);
 
-  renderLawsByFilter(); // refresh state
+  // อัปเดตปุ่มเฉพาะตัว
+  const btn = document.querySelector(`.fav-btn[data-id="${sid}"]`);
+  if(btn){
+    const active = isFav(sid);
+    btn.classList.toggle("active", active);
+    btn.querySelector("span").textContent =
+      active ? "favorite" : "favorite_border";
+  }
 }
 
 /* ======================================================
@@ -87,8 +94,15 @@ async function loadJsonAndStart(){
 /* ======================================================
    FILTER SYSTEM
 ====================================================== */
-function filterLawsData(cat){
+function filterCat(cat, btn){
+
+  document.querySelectorAll('.chip')
+    .forEach(c => c.classList.remove('active'));
+
+  if(btn) btn.classList.add('active');
+
   CURRENT_FILTER = cat;
+
   renderLawsByFilter();
 }
 
@@ -144,14 +158,14 @@ function renderLaws(data){
     const url   = sanitizeUrl(law["URL_PD"] || "");
 
     const id = encodeURIComponent(title + "_" + date);
-    const active = isFav(id) ? "active" : "";
+    const active = isFav(id);
 
     const el = document.createElement("div");
     el.id = "law-item-" + id;
 
     el.innerHTML = `
       <div class="fav-btn-container">
-        <button class="fav-btn ${active}"
+        <button class="fav-btn ${active ? "active" : ""}"
           data-id="${id}"
           data-title="${title}">
           <span class="material-symbols-rounded">
@@ -185,7 +199,7 @@ function renderLaws(data){
 }
 
 /* ======================================================
-   FAVORITE BUTTONS
+   FAVORITE BUTTON BINDING
 ====================================================== */
 function bindFavButtons(){
 
@@ -198,6 +212,7 @@ function bindFavButtons(){
 
       toggleFav(id, title);
     };
+
   });
 }
 
@@ -206,19 +221,34 @@ function bindFavButtons(){
 ====================================================== */
 function jumpToItem(id){
 
-  const target = document.getElementById("law-item-" + id);
-  if(!target) return;
+  // ถ้าอยู่หมวดอื่น ให้กลับ all ก่อน
+  if(CURRENT_FILTER !== "all"){
+    CURRENT_FILTER = "all";
+    document.querySelectorAll('.chip')
+      .forEach(c => c.classList.remove('active'));
 
-  target.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
+    const firstChip = document.querySelector('.chip');
+    if(firstChip) firstChip.classList.add('active');
 
-  target.classList.add("target-highlight");
+    renderLawsByFilter();
+  }
 
   setTimeout(()=>{
-    target.classList.remove("target-highlight");
-  },1500);
+    const target = document.getElementById("law-item-" + id);
+    if(!target) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+    target.classList.add("target-highlight");
+
+    setTimeout(()=>{
+      target.classList.remove("target-highlight");
+    },1500);
+
+  },100);
 }
 
 /* ======================================================
