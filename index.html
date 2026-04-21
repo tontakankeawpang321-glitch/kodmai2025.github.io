@@ -13,28 +13,37 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <style>
-        /* ธีม น้ำเงิน-ม่วง-ชมพู (Blue, Purple, Pink Theme) */
+        /* Optimization: Enable Smooth Scrolling & GPU Acceleration */
         :root {
             --primary-blue: #1e3a8a;
             --primary-purple: #7c3aed;
             --primary-pink: #db2777;
             --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #db2777 100%);
-            --bg-app: #fdf2f8; /* ชมพูอ่อนมาก */
-            --text-main: #0f172a; /* Slate 900 - ดำ */
+            --bg-app: #fdf2f8; 
+            --text-main: #0f172a; 
             --bottom-nav-height: 70px;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
             background-color: var(--bg-app);
             color: var(--text-main);
             font-family: "Sarabun", sans-serif;
-            padding-bottom: calc(var(--bottom-nav-height) + 20px);
+            padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 20px);
             margin: 0;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Header */
+        /* Hardware Accelerated Animations */
+        .animate-slide-up {
+            will-change: transform, opacity;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
         .app-header {
             background: var(--primary-gradient);
             color: white;
@@ -42,126 +51,107 @@
             border-radius: 0 0 20px 20px;
             position: relative;
             z-index: 10;
-            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2);
+            transform: translateZ(0);
         }
 
         .wrap { max-width: 600px; margin: 0 auto; padding: 0 16px; position: relative; }
 
-        /* Sidebar Styles */
+        /* Sidebar Styles Optimized */
         .sidebar-overlay {
-            position: fixed; inset: 0; background: rgba(30, 58, 138, 0.4);
-            z-index: 300; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5);
+            z-index: 300; opacity: 0; visibility: hidden; 
+            transition: opacity 0.3s ease, visibility 0.3s;
             backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
         .sidebar-overlay.active { opacity: 1; visibility: visible; }
         
         .sidebar {
             position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
-            background: white; z-index: 301; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 10px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+            background: white; z-index: 301; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1); 
+            display: flex; flex-direction: column;
+            will-change: transform;
         }
-        .sidebar.active { left: 0; }
+        .sidebar.active { transform: translateX(300px); }
 
         .side-cat-btn {
             display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-radius: 12px;
-            color: #4b5563; font-weight: 500; transition: all 0.2s; font-size: 15px;
+            color: #4b5563; font-weight: 500; transition: background 0.2s; font-size: 15px;
             width: 100%; text-align: left; background: transparent; border: none; cursor: pointer;
             margin-bottom: 4px;
         }
-        .side-cat-btn:hover { background: #f3f4f6; color: var(--primary-purple); }
-        .side-cat-btn.active { background: var(--primary-gradient); color: white; font-weight: 600; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
-        .side-cat-btn .material-symbols-rounded { font-size: 22px; color: #9ca3af; transition: color 0.2s; }
-        .side-cat-btn.active .material-symbols-rounded { color: white; }
+        .side-cat-btn.active { background: var(--primary-gradient); color: white; font-weight: 600; }
 
-        /* Bottom Nav */
+        /* Bottom Nav Optimized */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height);
-            background: white; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.95); display: flex; justify-content: space-between; align-items: center;
             border-top: 1px solid #fce7f3; z-index: 100;
             padding: 0 12px; padding-bottom: env(safe-area-inset-bottom);
-            box-shadow: 0 -5px 20px rgba(219, 39, 119, 0.05);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         .nav-item { 
             display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
             color: #9ca3af; font-size: 12px; font-weight: 500; flex: 1; height: 100%;
-            cursor: pointer; transition: all 0.2s; border-radius: 12px; margin: 0 4px;
+            cursor: pointer; transition: color 0.2s;
         }
-        .nav-item:hover { background: #fdf2f8; color: var(--primary-pink); }
         .nav-item.active { color: var(--primary-purple); }
-        .nav-item.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
-        /* Search & Cards */
+        /* Cards & Search Optimized */
         .search-container {
             background: white; border-radius: 16px; padding: 6px 12px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.08); display: flex; gap: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06); display: flex; gap: 8px;
             margin-top: -30px; position: relative; z-index: 20;
             border: 1px solid #fce7f3; align-items: center; height: 60px;
         }
-        .search-input { flex: 1; border: none; outline: none; font-size: 15px; background: transparent; color: var(--text-main); }
-        .search-btn { 
-            background: var(--primary-blue); color: white; width: 48px; height: 48px;
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            border: none; cursor: pointer; transition: transform 0.2s;
-        }
-        .search-btn:hover { transform: scale(1.05); background: var(--primary-purple); }
-
-        /* Modal Layout */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(30, 58, 138, 0.5);
-            z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px;
-            backdrop-filter: blur(6px);
-        }
-        .modal-overlay.active { display: flex; }
+        .search-input { flex: 1; border: none; outline: none; font-size: 16px; background: transparent; color: var(--text-main); }
         
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes target-flash {
-            0% { background-color: transparent; border-color: #fce7f3; }
-            40% { background-color: #fdf2f8; border-color: var(--primary-pink); transform: scale(1.02); }
-            100% { background-color: transparent; border-color: #fce7f3; transform: scale(1); }
-        }
-        .target-highlight {
-            animation: target-flash 1.5s ease-in-out;
-            z-index: 40;
-        }
-
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .dot { width: 8px; height: 8px; background-color: #e5e7eb; border-radius: 50%; transition: all 0.3s; }
-        .dot.active { width: 24px; background-color: var(--primary-pink); border-radius: 10px; }
-
-        /* ดีไซน์ปุ่มรายการโปรด สีขาวสลับดำ */
-        .fav-btn-container { position: absolute; top: 12px; right: 12px; z-index: 5; }
         .fav-btn { 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            cursor: pointer; color: #1f2937; /* ดำ */
-            background: #ffffff; /* ขาว */
-            border-radius: 50%; display: flex;
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s; 
+            cursor: pointer; color: #1f2937;
+            background: #ffffff; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; 
             border: 1px solid #e5e7eb;
-            width: 44px; height: 44px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .fav-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 15px rgba(219, 39, 119, 0.2); 
-            border-color: var(--primary-pink);
-            color: var(--primary-pink);
+            width: 44px; height: 44px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            -webkit-appearance: none;
         }
         .fav-btn.active { 
-            color: #ffffff !important; /* ขาว */
-            background: #000000; /* ดำ */
+            color: #ffffff !important;
+            background: #000000;
             border-color: #000000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
         }
-        .fav-btn.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
+        /* List Items Optimized */
         #list > div {
             border: 1px solid #f3f4f6; border-radius: 16px; overflow: hidden;
-            background: white; transition: all 0.3s; margin-bottom: 16px;
+            background: white; margin-bottom: 16px;
             padding: 24px 20px; position: relative;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            contain: content; 
+        }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(30, 58, 138, 0.3);
+            z-index: 200; display: none; align-items: flex-end; justify-content: center; 
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active { display: flex; }
+
+        @media (min-width: 640px) {
+            .modal-overlay { align-items: center; padding: 16px; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .bubble { padding: 12px 16px; border-radius: 16px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.5; word-wrap: break-word;}
@@ -181,7 +171,7 @@
             <span class="material-symbols-rounded">category</span>
             <span class="font-bold text-lg tracking-wide">หมวดหมู่</span>
         </div>
-        <button onclick="toggleSidebar(false)" class="text-white/70 hover:text-white transition-colors">
+        <button onclick="toggleSidebar(false)" class="text-white/70 hover:text-white transition-colors p-2">
             <span class="material-symbols-rounded">close</span>
         </button>
     </div>
@@ -210,7 +200,7 @@
 <header class="app-header">
     <div class="wrap">
         <div class="flex items-center gap-4">
-            <button onclick="toggleSidebar(true)" class="w-10 h-10 flex items-center justify-center bg-white/20 border border-white/20 rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm">
+            <button onclick="toggleSidebar(true)" class="w-10 h-10 flex items-center justify-center bg-white/20 border border-white/20 rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm active:scale-90">
                 <span class="material-symbols-rounded">menu</span>
             </button>
             <div class="flex items-center gap-3">
@@ -219,7 +209,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">Thai Law</h1>
-                    <p id="live-datetime" class="text-[10px] text-pink-200 font-bold uppercase tracking-wider opacity-90"></p>
+                    <p id="live-datetime" class="text-[10px] text-pink-200 font-bold uppercase tracking-wider opacity-90 min-h-[12px]"></p>
                 </div>
             </div>
         </div>
@@ -227,13 +217,12 @@
 </header>
 
 <main class="wrap">
-    <!-- Home View -->
     <div id="view-home">
         <section class="relative z-20">
             <div class="search-container">
                 <span class="material-symbols-rounded text-gray-400 pl-2">search</span>
-                <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย หรือ มาตรา...">
-                <button id="btnSearch" class="search-btn">
+                <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย หรือ มาตรา..." enterkeyhint="search">
+                <button id="btnSearch" class="search-btn active:scale-90 transition-transform">
                     <span class="material-symbols-rounded">arrow_forward</span>
                 </button>
             </div>
@@ -246,12 +235,12 @@
                     ประกาศและอัพเดทล่าสุด
                 </div>
                 <div id="latestViewport" class="overflow-hidden relative">
-                    <div id="latestTrack" class="flex transition-transform duration-500 ease-in-out w-full">
+                    <div id="latestTrack" class="w-full">
                         <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0">
                             <span class="text-[15px] font-bold text-gray-800 leading-snug">พ.ร.บ. การจัดสรรที่ดิน (ฉบับที่ 3) พ.ศ. ...</span>
                             <span class="text-[11px] text-pink-500 bg-pink-50 px-2.5 py-1 rounded-full mt-1 border border-pink-100">ประกาศล่าสุดรายหมวด</span>
                         </div>
-                        <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0">
+                        <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0 hidden">
                             <span class="text-[15px] font-bold text-gray-800 leading-snug">ประมวลกฎหมายยาเสพติด</span>
                             <span class="text-[11px] text-purple-500 bg-purple-50 px-2.5 py-1 rounded-full mt-1 border border-purple-100">อัพเดทมาตราใหม่ล่าสุด 2567</span>
                         </div>
@@ -275,21 +264,16 @@
         </section>
     </div>
 
-    <!-- Favorites View -->
     <div id="view-fav" class="hidden">
         <div class="pt-8 pb-28">
             <div class="flex items-center gap-3 mb-5 px-1">
                 <span class="w-1.5 h-6 rounded-full bg-pink-500"></span>
                 <h2 class="font-bold text-gray-800 text-lg">รายการโปรดที่บันทึกไว้</h2>
             </div>
-            <div class="bg-white rounded-2xl border border-pink-100 overflow-hidden shadow-sm min-h-[50vh] flex flex-col">
-                <div id="favContainer" class="p-4 flex-1 space-y-3 bg-pink-50/30">
-                </div>
-            </div>
+            <div id="favContainer" class="space-y-3"></div>
         </div>
     </div>
 
-    <!-- Community View -->
     <div id="view-community" class="hidden">
         <div class="pt-8 pb-28">
             <div class="bg-white rounded-2xl border border-pink-100 overflow-hidden shadow-sm">
@@ -299,7 +283,7 @@
                     </div>
                     <span class="font-bold text-gray-800 text-lg">ชุมชนกฎหมายออนไลน์</span>
                 </div>
-                <div class="p-2 flex justify-center bg-white">
+                <div class="p-2 flex justify-center bg-white min-h-[500px]">
                     <div id="fb-root"></div>
                     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0"></script>
                     <div class="fb-page" data-href="https://www.facebook.com/interesting.deka/" data-tabs="timeline" data-width="380" data-height="700" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"></div>
@@ -309,13 +293,12 @@
     </div>
 </main>
 
-<!-- Bottom Nav -->
 <nav class="bottom-nav">
     <div id="nav-home" class="nav-item active" onclick="switchTab('home')">
         <span class="material-symbols-rounded">home</span>
         <span>หน้าหลัก</span>
     </div>
-    <div id="nav-fav" class="nav-item" onclick="window.openFavs()">
+    <div id="nav-fav" class="nav-item" onclick="openFavs()">
         <span class="material-symbols-rounded">bookmark</span>
         <span>รายการโปรด</span>
     </div>
@@ -325,13 +308,12 @@
     </div>
 </nav>
 
-<button id="fab-chat" class="fixed bottom-[90px] right-6 w-14 h-14 text-white rounded-2xl shadow-xl flex items-center justify-center z-50 hover:opacity-90 active:scale-95 transition-all" style="background: var(--primary-gradient); box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);">
+<button id="fab-chat" class="fixed bottom-[90px] right-6 w-14 h-14 text-white rounded-2xl shadow-xl flex items-center justify-center z-50 active:scale-90 transition-all" style="background: var(--primary-gradient); box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);">
     <span class="material-symbols-rounded text-3xl">smart_toy</span>
 </button>
 
-<!-- Chat Modal -->
-<div id="modalChat" class="modal-overlay flex-col !justify-end sm:!justify-center z-[250]">
-    <div class="bg-white w-full sm:max-w-[420px] h-[85vh] sm:h-[650px] rounded-t-[24px] sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl relative">
+<div id="modalChat" class="modal-overlay z-[250]">
+    <div class="bg-white w-full sm:max-w-[420px] h-[85vh] sm:h-[650px] rounded-t-[24px] sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl relative animate-slide-up">
         <header class="p-5 flex justify-between items-center shrink-0 z-10 text-white" style="background: var(--primary-gradient);">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white border border-white/20 backdrop-blur-sm">
@@ -339,10 +321,10 @@
                 </div>
                 <div>
                     <span class="font-bold text-white block leading-tight">Thai Law AI</span>
-                    <span class="text-[10px] text-pink-200 font-bold uppercase tracking-wider">Online & Active</span>
+                    <span class="text-[10px] text-pink-200 font-bold uppercase tracking-wider">Online</span>
                 </div>
             </div>
-            <button id="btnCloseChat" class="w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+            <button id="btnCloseChat" class="w-10 h-10 flex items-center justify-center text-white/70 hover:text-white p-1">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </header>
@@ -350,8 +332,8 @@
             <div class="bubble bubble-ai">สวัสดีครับ ผมคือ AI ผู้ช่วยด้านกฎหมาย ยินดีให้คำปรึกษาครับ</div>
         </div>
         <div class="p-4 border-t border-gray-100 bg-white flex gap-3 items-center">
-            <input id="user-input" type="text" class="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 transition-all text-gray-900" placeholder="พิมพ์ข้อสงสัยของคุณ..." autocomplete="off">
-            <button id="send-btn" class="text-white w-12 h-12 rounded-xl flex items-center justify-center active:scale-95 transition-all shadow-md" style="background: var(--primary-gradient);">
+            <input id="user-input" type="text" class="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-400 transition-all text-gray-900" placeholder="ถามข้อมูลกฎหมาย..." autocomplete="off">
+            <button id="send-btn" class="text-white w-12 h-12 rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-md" style="background: var(--primary-gradient);">
                 <span class="material-symbols-rounded text-[22px] ml-1">send</span>
             </button>
         </div>
@@ -363,74 +345,61 @@
 <script>
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
-    
-    // Global Data
     let allLawsData = [];
     let currentPage = 1;
-    const itemsPerPage = 10;
-    let listObserver = null; 
+    const itemsPerPage = 8;
 
-    const getStored = () => JSON.parse(localStorage.getItem('favLaws') || '[]');
+    const getStored = () => {
+        try { return JSON.parse(localStorage.getItem('favLaws') || '[]'); } 
+        catch(e) { return []; }
+    };
     const saveToStorage = (data) => localStorage.setItem('favLaws', JSON.stringify(data));
 
     function getSafeId(law) {
         if(law.id) return String(law.id);
         const str = (law["ชื่อกฎหมาย"] || "") + (law["วันที่"] || "");
-        try {
-            return window.btoa(unescape(encodeURIComponent(str)));
-        } catch(e) {
-            return str.replace(/\s/g, '-');
-        }
+        return btoa(unescape(encodeURIComponent(str))).substring(0, 16);
     }
 
-    function renderLawsFromJson(data){
+    function renderLawsFromJson(data) {
         if (!Array.isArray(data)) return;
-        if (listObserver) {
-            listObserver.disconnect();
-            listObserver = null;
-        }
-        allLawsData = [...data];
+        allLawsData = data;
         currentPage = 1;
         renderPage();
     }
 
     function renderPage() {
         const listEl = document.getElementById('list');
-        if (listObserver) {
-            listObserver.disconnect();
-            listObserver = null;
-        }
+        if (!listEl) return;
+        
         listEl.innerHTML = '';
-
-        if (!allLawsData || allLawsData.length === 0) {
-             listEl.innerHTML = '<div class="text-center py-20 text-gray-400 text-sm italic">ไม่พบข้อมูลกฎหมาย</div>';
-             return;
+        if (allLawsData.length === 0) {
+            listEl.innerHTML = '<div class="text-center py-20 text-gray-400 text-sm italic">ไม่พบข้อมูลกฎหมาย</div>';
+            return;
         }
 
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const pageItems = allLawsData.slice(startIndex, endIndex);
+        const fragment = document.createDocumentFragment();
+        const start = (currentPage - 1) * itemsPerPage;
+        const pageItems = allLawsData.slice(start, start + itemsPerPage);
+        const savedIds = new Set(getStored().map(s => String(s.id)));
 
         pageItems.forEach(law => {
-            const id = getSafeId(law); 
-            const safeId = id; 
-            
+            const id = getSafeId(law);
             const el = document.createElement('div');
-            el.id = `law-item-${safeId}`;
-            el.dataset.transformed = "true";
-            el.style.position = 'relative';
+            el.id = `law-item-${id}`;
+            el.className = 'animate-slide-up';
+            
+            const isFav = savedIds.has(id);
 
             el.innerHTML = `
                 <div class="fav-btn-container">
-                    <button onclick="toggleFav('${id}')" class="fav-btn group">
-                        <span class="material-symbols-rounded transition-transform group-active:scale-75">bookmark</span>
+                    <button onclick="toggleFav('${id}')" class="fav-btn ${isFav ? 'active' : ''}" aria-label="Favorite">
+                        <span class="material-symbols-rounded">bookmark</span>
                     </button>
                 </div>
-
                 <div class="font-bold text-gray-900 text-[17px] mb-2 pr-14 leading-tight item-title">
                     ${law["ชื่อกฎหมาย"] || ''}
                 </div>
-
                 <div class="flex items-center gap-2 mb-3">
                     <span class="bg-gray-50 text-gray-600 text-[11px] px-2.5 py-1 rounded-md font-bold border border-gray-200">
                         ${law["หมวด"] || 'ทั่วไป'}
@@ -440,174 +409,89 @@
                         ${law["วันที่"] || '-'}
                     </span>
                 </div>
-
-                ${
-                    law["URL_PD"]
-                    ? `<a href="${law["URL_PD"]}" target="_blank"
-                         class="inline-flex items-center gap-1.5 text-blue-700 text-sm font-bold hover:text-pink-600 transition-colors">
-                         <span class="material-symbols-rounded" style="font-size:18px;">picture_as_pdf</span>
-                         อ่านฉบับเต็ม
-                       </a>`
-                    : ''
-                }
+                ${law["URL_PD"] ? `
+                    <a href="${law["URL_PD"]}" target="_blank" class="inline-flex items-center gap-1.5 text-blue-700 text-sm font-bold hover:text-pink-600 transition-colors">
+                        <span class="material-symbols-rounded" style="font-size:18px;">picture_as_pdf</span>
+                        อ่านฉบับเต็ม
+                    </a>
+                ` : ''}
             `;
-            listEl.appendChild(el);
+            fragment.appendChild(el);
         });
 
-        if (allLawsData.length > itemsPerPage) {
-            const totalPages = Math.ceil(allLawsData.length / itemsPerPage);
-            const nav = document.createElement('div');
-            nav.className = 'flex justify-center items-center gap-3 mt-6 mb-8';
-            nav.innerHTML = `
-                <button onclick="changePage(-1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-transparent cursor-not-allowed' : 'bg-white text-gray-700 border-gray-200 shadow-sm hover:bg-pink-50'}" ${currentPage === 1 ? 'disabled' : ''}>
-                    <span class="material-symbols-rounded">chevron_left</span>
-                </button>
-                <span class="text-sm font-bold text-gray-700 bg-white px-4 py-2 rounded-xl border border-gray-200">หน้า ${currentPage} / ${totalPages}</span>
-                <button onclick="changePage(1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-transparent cursor-not-allowed' : 'bg-white text-gray-700 border-gray-200 shadow-sm hover:bg-pink-50'}" ${currentPage === totalPages ? 'disabled' : ''}>
-                    <span class="material-symbols-rounded">chevron_right</span>
-                </button>
-            `;
-            listEl.appendChild(nav);
-        }
+        listEl.appendChild(fragment);
+        renderPagination();
+    }
 
-        const savedIds = getStored().map(s => String(s.id));
-        listEl.querySelectorAll('.fav-btn').forEach(btn => {
-            const match = btn.getAttribute('onclick')?.match(/toggleFav\((['"]?)(.*?)\1\)/);
-            if(match) {
-                const sid = match[2];
-                if (savedIds.includes(sid)) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            }
-        });
-        
-        startObserver(); 
+    function renderPagination() {
+        const listEl = document.getElementById('list');
+        const totalPages = Math.ceil(allLawsData.length / itemsPerPage);
+        if (totalPages <= 1) return;
+
+        const nav = document.createElement('div');
+        nav.className = 'flex justify-center items-center gap-3 mt-6 mb-8';
+        nav.innerHTML = `
+            <button onclick="changePage(-1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'bg-white shadow-sm'}" ${currentPage === 1 ? 'disabled' : ''}>
+                <span class="material-symbols-rounded">chevron_left</span>
+            </button>
+            <span class="text-sm font-bold text-gray-700 bg-white px-4 py-2 rounded-xl border border-gray-200">หน้า ${currentPage} / ${totalPages}</span>
+            <button onclick="changePage(1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === totalPages ? 'opacity-30 cursor-not-allowed' : 'bg-white shadow-sm'}" ${currentPage === totalPages ? 'disabled' : ''}>
+                <span class="material-symbols-rounded">chevron_right</span>
+            </button>
+        `;
+        listEl.appendChild(nav);
     }
 
     function changePage(delta) {
-        const totalPages = Math.ceil(allLawsData.length / itemsPerPage);
-        const newPage = currentPage + delta;
-        if (newPage >= 1 && newPage <= totalPages) {
-            currentPage = newPage;
-            renderPage();
-            document.getElementById('panelTitle').scrollIntoView({ behavior: 'smooth' });
-        }
+        currentPage += delta;
+        renderPage();
+        window.scrollTo({ top: document.getElementById('panelTitle').offsetTop - 100, behavior: 'smooth' });
     }
 
-    window.toggleSidebar = function(show) {
-        document.getElementById('sidebarMenu').classList.toggle('active', show);
-        document.getElementById('sidebarOverlay').classList.toggle('active', show);
+    window.toggleSidebar = (show) => {
+        const side = document.getElementById('sidebarMenu');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (show) {
+            side.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        } else {
+            side.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     };
 
-    window.filterCat = function(cat, btn) {
+    window.filterCat = (cat, btn) => {
         document.querySelectorAll('.side-cat-btn').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
-        if(typeof window.filterLawsData === 'function') {
-            window.filterLawsData(cat);
-        }
+        if(window.filterLawsData) window.filterLawsData(cat);
     };
 
     window.toggleFav = function(id) {
-        if (!id) return;
-        const sid = String(id);
         let stored = getStored();
-        const idx = stored.findIndex(s => String(s.id) === sid);
+        const idx = stored.findIndex(s => s.id === id);
+        const card = document.getElementById(`law-item-${id}`);
+        const btn = card?.querySelector('.fav-btn') || document.querySelector(`[onclick="toggleFav('${id}')"]`);
 
         if (idx > -1) {
             stored.splice(idx, 1);
-            saveToStorage(stored);
-            updateUIButtons(sid, false);
+            btn?.classList.remove('active');
         } else {
-            let lawTitle = "รายการที่บันทึก";
-            const item = allLawsData.find(law => getSafeId(law) === sid);
-            if (item) {
-                lawTitle = item["ชื่อกฎหมาย"] || "รายการที่บันทึก";
-            } else {
-                const card = document.getElementById(`law-item-${sid}`); 
-                if (card) {
-                    const titleEl = card.querySelector('.item-title');
-                    if (titleEl) { lawTitle = titleEl.textContent.trim(); }
-                }
-            }
-            stored.push({ 
-                id: sid, 
-                title: lawTitle, 
-                time: new Date().toLocaleDateString('th-TH', {day:'2-digit', month:'short'})
-            });
-            saveToStorage(stored);
-            updateUIButtons(sid, true);
+            const lawItem = allLawsData.find(l => getSafeId(l) === id);
+            const title = lawItem ? lawItem["ชื่อกฎหมาย"] : (card?.querySelector('.item-title')?.innerText || "กฎหมาย");
+            stored.push({ id, title, time: new Date().toLocaleDateString('th-TH', {day:'2-digit', month:'short'}) });
+            btn?.classList.add('active');
         }
-    };
-
-    function updateUIButtons(id, active) {
-        const sid = String(id);
-        const buttons = document.querySelectorAll(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
-        buttons.forEach(btn => {
-            if (active) { btn.classList.add('active'); } 
-            else { btn.classList.remove('active'); }
-        });
-    }
-
-    function startObserver() {
-        const listEl = document.getElementById('list');
-        if (!listEl || listObserver) return;
-        const transformCard = (card) => {
-            if (!card || card.dataset.transformed === "true" || !card.classList.contains('bg-white')) return;
-            const oldBtn = card.querySelector('button');
-            if (!oldBtn) return;
-            const onclick = oldBtn.getAttribute('onclick');
-            if (!onclick) return;
-            const match = onclick.match(/toggleFav\((['"]?)(.*?)\1\)/);
-            if (!match) return;
-            const sid = String(match[2]);
-            oldBtn.remove();
-            const container = document.createElement('div');
-            container.className = 'fav-btn-container';
-            const btn = document.createElement('button');
-            btn.className = 'fav-btn group';
-            btn.onclick = (e) => { e.stopPropagation(); toggleFav(sid); };
-            const icon = document.createElement('span');
-            icon.className = 'material-symbols-rounded transition-transform group-active:scale-75';
-            icon.innerText = 'bookmark';
-            btn.appendChild(icon);
-            container.appendChild(btn);
-            card.style.position = 'relative';
-            card.appendChild(container);
-            card.dataset.transformed = "true";
-            const savedIds = getStored().map(s => String(s.id));
-            if (savedIds.includes(sid)) { btn.classList.add('active'); }
-        };
-        listObserver = new MutationObserver((mutations) => {
-            mutations.forEach(m => { m.addedNodes.forEach(node => { if (node.nodeType === 1) transformCard(node); }); });
-        });
-        listObserver.observe(listEl, { childList: true });
-    }
-
-    window.jumpToItem = function(id) {
-        const sid = String(id);
-        switchTab('home');
-        const index = allLawsData.findIndex(law => getSafeId(law) === sid);
-        if (index !== -1) {
-            const targetPage = Math.floor(index / itemsPerPage) + 1;
-            if (currentPage !== targetPage) { currentPage = targetPage; renderPage(); }
-            setTimeout(() => {
-                const targetEl = document.getElementById(`law-item-${sid}`);
-                if (targetEl) {
-                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    targetEl.classList.remove('target-highlight');
-                    void targetEl.offsetWidth;
-                    targetEl.classList.add('target-highlight');
-                }
-            }, 300);
-        }
+        saveToStorage(stored);
     };
 
     window.openFavs = function() {
+        switchTab('fav');
         const container = document.getElementById('favContainer');
         const list = getStored();
         container.innerHTML = '';
+
         if(list.length === 0) {
             container.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
@@ -615,71 +499,85 @@
                     <p class="text-sm font-bold">ไม่มีรายการที่บันทึกไว้</p>
                 </div>
             `;
-        } else {
-            list.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex justify-between items-center gap-3 active:scale-95 transition-all cursor-pointer hover:border-pink-300';
-                div.onclick = (e) => { if(!e.target.closest('.del-btn')) jumpToItem(item.id); };
-                div.innerHTML = `
-                    <div class="flex-1 min-w-0 pointer-events-none">
-                        <div class="font-bold text-gray-900 text-[15px] mb-1.5 leading-snug truncate">${item.title}</div>
-                        <div class="text-[11px] text-gray-400 flex items-center gap-1.5">
-                            <i class="material-symbols-rounded" style="font-size:12px;">schedule</i> 
-                            บันทึกเมื่อ: ${item.time}
-                        </div>
-                    </div>
-                    <button onclick="removeFav('${item.id}')" class="del-btn w-11 h-11 flex items-center justify-center text-gray-400 hover:text-white hover:bg-black rounded-xl transition-all">
-                        <span class="material-symbols-rounded text-[22px]">delete</span>
-                    </button>
-                `;
-                container.appendChild(div);
-            });
+            return;
         }
-        switchTab('fav');
+
+        const frag = document.createDocumentFragment();
+        list.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex justify-between items-center gap-3 active:scale-95 transition-transform cursor-pointer animate-slide-up';
+            div.onclick = (e) => { if(!e.target.closest('.del-btn')) jumpToItem(item.id); };
+            div.innerHTML = `
+                <div class="flex-1 min-w-0 pointer-events-none">
+                    <div class="font-bold text-gray-900 text-[15px] mb-1.5 leading-snug truncate">${item.title}</div>
+                    <div class="text-[11px] text-gray-400 flex items-center gap-1.5">
+                        <i class="material-symbols-rounded" style="font-size:12px;">schedule</i> 
+                        ${item.time}
+                    </div>
+                </div>
+                <button onclick="removeFav(event, '${item.id}')" class="del-btn w-11 h-11 flex items-center justify-center text-gray-400 active:text-red-500 p-2">
+                    <span class="material-symbols-rounded text-[22px]">delete</span>
+                </button>
+            `;
+            frag.appendChild(div);
+        });
+        container.appendChild(frag);
     };
 
-    window.removeFav = function(id) { window.toggleFav(id); window.openFavs(); };
+    window.removeFav = (e, id) => {
+        e.stopPropagation();
+        toggleFav(id);
+        openFavs();
+    };
 
-    window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('fab-chat').onclick = () => document.getElementById('modalChat').classList.toggle('active', true);
-        document.getElementById('btnCloseChat').onclick = () => document.getElementById('modalChat').classList.toggle('active', false);
-        initSlider();
-        initChat();
-        startObserver(); 
-    });
+    function jumpToItem(id) {
+        switchTab('home');
+        const idx = allLawsData.findIndex(l => getSafeId(l) === id);
+        if (idx !== -1) {
+            currentPage = Math.floor(idx / itemsPerPage) + 1;
+            renderPage();
+            setTimeout(() => {
+                const target = document.getElementById(`law-item-${id}`);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    target.classList.add('target-highlight');
+                }
+            }, 300);
+        }
+    }
 
     function switchTab(tab) {
         document.getElementById('view-home').classList.toggle('hidden', tab !== 'home');
         document.getElementById('view-fav').classList.toggle('hidden', tab !== 'fav');
         document.getElementById('view-community').classList.toggle('hidden', tab !== 'community');
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(`nav-${tab}`).classList.add('active');
-    }
-
-    function initChat() {
-        const btn = document.getElementById('send-btn');
-        if(btn) btn.onclick = handleChat;
-        document.getElementById('user-input').onkeypress = (e) => { if(e.key === 'Enter') handleChat(); };
+        const nav = document.getElementById(`nav-${tab}`);
+        if(nav) nav.classList.add('active');
+        window.scrollTo(0,0);
     }
 
     async function handleChat() {
         const input = document.getElementById('user-input');
         const text = input.value.trim();
         if(!text) return;
+
         addMsg(text, 'user');
         input.value = '';
         chatHistory.push({ role: "user", content: text });
+
         try {
             const res = await fetch(BACKEND_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, history: chatHistory })
+                body: JSON.stringify({ message: text, history: chatHistory.slice(-6) })
             });
             const data = await res.json();
-            const reply = data.reply || "AI กำลังคิดคำตอบให้คุณ...";
+            const reply = data.reply || "ขออภัย ผมไม่พบข้อมูลส่วนนี้ครับ";
             addMsg(reply, 'ai');
             chatHistory.push({ role: "assistant", content: reply });
-        } catch(e) { addMsg("ขออภัย การเชื่อมต่อ AI ขัดข้อง", 'ai'); }
+        } catch(e) { 
+            addMsg("การเชื่อมต่อขัดข้อง กรุณาลองใหม่ครับ", 'ai'); 
+        }
     }
 
     function addMsg(txt, type) {
@@ -691,32 +589,51 @@
         h.scrollTop = h.scrollHeight;
     }
 
-    function initSlider() {
-        let cur = 0;
-        const track = document.getElementById('latestTrack');
-        const dots = document.querySelectorAll('.dot');
-        if(!track) return;
-        setInterval(() => {
-            cur = (cur + 1) % 2;
-            track.style.transform = `translateX(-${cur * 100}%)`;
-            dots.forEach((d, i) => d.className = `dot ${i === cur ? 'active' : ''}`);
-        }, 5000);
+    function initAppUpdates() {
+        const updateTime = () => {
+            const el = document.getElementById('live-datetime');
+            if(!el) return;
+            const now = new Date();
+            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            el.innerText = `อัพเดทล่าสุด ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} น.`;
+        };
+
+        let slideIdx = 0;
+        const slider = () => {
+            const track = document.getElementById('latestTrack');
+            const dots = document.querySelectorAll('.dot');
+            if(!track || track.children.length < 2) return;
+            Array.from(track.children).forEach((c, i) => c.classList.toggle('hidden', i !== slideIdx));
+            dots.forEach((d, i) => d.classList.toggle('active', i === slideIdx));
+            slideIdx = (slideIdx + 1) % track.children.length;
+        };
+
+        setInterval(updateTime, 30000); 
+        setInterval(slider, 6000);
+        updateTime();
+        slider();
     }
 
-    function updateDateTime() {
-        const el = document.getElementById('live-datetime');
-        if(!el) return;
-        const now = new Date();
-        const day = now.getDate();
-        const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-        const month = months[now.getMonth()];
-        const year = now.getFullYear();
-        const time = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-        el.innerText = `อัพเดทล่าสุด ${day} ${month} ${year} เวลา ${time} น.`;
-    }
-    
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
+    window.addEventListener('DOMContentLoaded', () => {
+        initAppUpdates();
+        
+        // Fix: Added event to open chat modal
+        const fabChat = document.getElementById('fab-chat');
+        if(fabChat) fabChat.onclick = () => document.getElementById('modalChat').classList.add('active');
+
+        document.getElementById('btnCloseChat').onclick = () => document.getElementById('modalChat').classList.remove('active');
+        document.getElementById('send-btn').onclick = handleChat;
+        document.getElementById('user-input').onkeypress = (e) => { if(e.key === 'Enter') handleChat(); };
+
+        // Fix: Added search button event
+        const btnSearch = document.getElementById('btnSearch');
+        if(btnSearch) {
+            btnSearch.onclick = () => {
+                const query = document.getElementById('q').value;
+                if(window.filterLawsData) window.filterLawsData('search', query);
+            };
+        }
+    });
 </script>
 
 </body>
