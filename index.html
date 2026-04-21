@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <style>
-        /* Optimization: Enable Smooth Scrolling & GPU Acceleration */
         :root {
             --primary-blue: #1e3a8a;
             --primary-purple: #7c3aed;
@@ -38,7 +37,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Hardware Accelerated Animations */
         .animate-slide-up {
             will-change: transform, opacity;
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -57,7 +55,6 @@
 
         .wrap { max-width: 600px; margin: 0 auto; padding: 0 16px; position: relative; }
 
-        /* Sidebar Styles Optimized */
         .sidebar-overlay {
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5);
             z-index: 300; opacity: 0; visibility: hidden; 
@@ -85,7 +82,37 @@
         }
         .side-cat-btn.active { background: var(--primary-gradient); color: white; font-weight: 600; }
 
-        /* Bottom Nav Optimized */
+        .cat-chips-bar {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding: 4px 2px 12px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .cat-chips-bar::-webkit-scrollbar { display: none; }
+
+        .chip {
+            white-space: nowrap;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            background: white;
+            color: #64748b;
+            border: 1px solid #fce7f3;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .chip.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
+        }
+
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height);
             background: rgba(255, 255, 255, 0.95); display: flex; justify-content: space-between; align-items: center;
@@ -102,7 +129,6 @@
         }
         .nav-item.active { color: var(--primary-purple); }
 
-        /* Cards & Search Optimized */
         .search-container {
             background: white; border-radius: 16px; padding: 6px 12px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.06); display: flex; gap: 8px;
@@ -111,13 +137,19 @@
         }
         .search-input { flex: 1; border: none; outline: none; font-size: 16px; background: transparent; color: var(--text-main); }
         
+        .fav-btn-container { 
+            position: absolute; 
+            top: 20px; 
+            right: 16px; 
+            z-index: 5; 
+        }
         .fav-btn { 
-            transition: transform 0.2s, background 0.2s, box-shadow 0.2s; 
+            transition: transform 0.2s, background 0.2s; 
             cursor: pointer; color: #1f2937;
             background: #ffffff; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; 
             border: 1px solid #e5e7eb;
-            width: 44px; height: 44px;
+            width: 42px; height: 42px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             -webkit-appearance: none;
         }
@@ -127,8 +159,8 @@
             border-color: #000000;
             transform: scale(1.05);
         }
+        .fav-btn.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
-        /* List Items Optimized */
         #list > div {
             border: 1px solid #f3f4f6; border-radius: 16px; overflow: hidden;
             background: white; margin-bottom: 16px;
@@ -136,6 +168,8 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
             contain: content; 
         }
+
+        .item-title { padding-right: 3.5rem; }
 
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(30, 58, 138, 0.3);
@@ -158,6 +192,14 @@
         .bubble-user { background: var(--primary-gradient); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #f3f4f6; box-shadow: 0 2px 8px rgba(0,0,0,0.03);}
 
+        .target-highlight {
+            animation: highlight 1.5s ease-out;
+        }
+        @keyframes highlight {
+            0% { background: #fef08a; }
+            100% { background: white; }
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -176,16 +218,16 @@
         </button>
     </div>
     <div class="flex flex-col p-4 gap-1 flex-1 overflow-y-auto bg-white">
-        <button class="side-cat-btn active" onclick="filterCat('all', this); toggleSidebar(false)">
+        <button class="side-cat-btn side-all-btn active" onclick="filterCat('all', this); toggleSidebar(false)">
             <span class="material-symbols-rounded">format_list_bulleted</span> ทั้งหมด
         </button>
-        <button class="side-cat-btn" onclick="filterCat('code', this); toggleSidebar(false)">
+        <button class="side-cat-btn side-code-btn" onclick="filterCat('code', this); toggleSidebar(false)">
             <span class="material-symbols-rounded">import_contacts</span> ประมวลกฎหมาย
         </button>
-        <button class="side-cat-btn" onclick="filterCat('const', this); toggleSidebar(false)">
+        <button class="side-cat-btn side-const-btn" onclick="filterCat('const', this); toggleSidebar(false)">
             <span class="material-symbols-rounded">balance</span> รัฐธรรมนูญ
         </button>
-        <button class="side-cat-btn" onclick="filterCat('act', this); toggleSidebar(false)">
+        <button class="side-cat-btn side-act-btn" onclick="filterCat('act', this); toggleSidebar(false)">
             <span class="material-symbols-rounded">description</span> พระราชบัญญัติ
         </button>
 
@@ -253,7 +295,16 @@
             </div>
         </section>
 
-        <section class="mt-8 pb-28">
+        <section class="mt-4">
+            <div id="catChipsBar" class="cat-chips-bar">
+                <button class="chip active chip-all" onclick="filterCat('all', this)">ทั้งหมด</button>
+                <button class="chip chip-code" onclick="filterCat('code', this)">ประมวลกฎหมาย</button>
+                <button class="chip chip-const" onclick="filterCat('const', this)">รัฐธรรมนูญ</button>
+                <button class="chip chip-act" onclick="filterCat('act', this)">พระราชบัญญัติ</button>
+            </div>
+        </section>
+
+        <section class="mt-4 pb-28">
             <div class="flex items-center gap-3 mb-5 px-1">
                 <span class="w-1.5 h-6 rounded-full" style="background: var(--primary-gradient);"></span>
                 <h2 id="panelTitle" class="font-bold text-gray-800 text-lg">รายการกฎหมาย</h2>
@@ -340,12 +391,12 @@
     </div>
 </div>
 
-<script src="./app.js"></script>
-
 <script>
+    // --- APP LOGIC INTEGRATED ---
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     let chatHistory = [];
-    let allLawsData = [];
+    let allLawsData = [];       // Current filtered list
+    let originalLawsData = [];  // Master list
     let currentPage = 1;
     const itemsPerPage = 8;
 
@@ -361,12 +412,14 @@
         return btoa(unescape(encodeURIComponent(str))).substring(0, 16);
     }
 
-    function renderLawsFromJson(data) {
+    // Main Renderer
+    window.renderLawsFromJson = function(data) {
         if (!Array.isArray(data)) return;
+        originalLawsData = data;
         allLawsData = data;
         currentPage = 1;
         renderPage();
-    }
+    };
 
     function renderPage() {
         const listEl = document.getElementById('list');
@@ -397,7 +450,7 @@
                         <span class="material-symbols-rounded">bookmark</span>
                     </button>
                 </div>
-                <div class="font-bold text-gray-900 text-[17px] mb-2 pr-14 leading-tight item-title">
+                <div class="font-bold text-gray-900 text-[17px] mb-2 leading-tight item-title">
                     ${law["ชื่อกฎหมาย"] || ''}
                 </div>
                 <div class="flex items-center gap-2 mb-3">
@@ -462,10 +515,42 @@
         }
     };
 
+    // System Filter Logic
     window.filterCat = (cat, btn) => {
+        // UI Updates
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        const activeChip = document.querySelector(`.chip-${cat}`);
+        if(activeChip) activeChip.classList.add('active');
+        else if(btn && btn.classList.contains('chip')) btn.classList.add('active');
+
         document.querySelectorAll('.side-cat-btn').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        if(window.filterLawsData) window.filterLawsData(cat);
+        const activeSide = document.querySelector(`.side-${cat}-btn`);
+        if(activeSide) activeSide.classList.add('active');
+
+        // Logic
+        if (cat === 'all') {
+            allLawsData = originalLawsData;
+        } else if (cat === 'search') {
+            const query = (btn || "").toString().toLowerCase();
+            allLawsData = originalLawsData.filter(l => 
+                (l["ชื่อกฎหมาย"] || "").toLowerCase().includes(query) || 
+                (l["หมวด"] || "").toLowerCase().includes(query)
+            );
+        } else {
+            const map = { 'code': 'ประมวล', 'const': 'รัฐธรรมนูญ', 'act': 'พระราชบัญญัติ' };
+            const keyword = map[cat];
+            allLawsData = originalLawsData.filter(l => (l["หมวด"] || "").includes(keyword) || (l["ชื่อกฎหมาย"] || "").includes(keyword));
+        }
+        
+        currentPage = 1;
+        renderPage();
+    };
+
+    // Fix Search Logic
+    window.filterLawsData = function(mode, query) {
+        if (mode === 'search') {
+            window.filterCat('search', query);
+        }
     };
 
     window.toggleFav = function(id) {
@@ -478,7 +563,7 @@
             stored.splice(idx, 1);
             btn?.classList.remove('active');
         } else {
-            const lawItem = allLawsData.find(l => getSafeId(l) === id);
+            const lawItem = originalLawsData.find(l => getSafeId(l) === id);
             const title = lawItem ? lawItem["ชื่อกฎหมาย"] : (card?.querySelector('.item-title')?.innerText || "กฎหมาย");
             stored.push({ id, title, time: new Date().toLocaleDateString('th-TH', {day:'2-digit', month:'short'}) });
             btn?.classList.add('active');
@@ -493,35 +578,17 @@
         container.innerHTML = '';
 
         if(list.length === 0) {
-            container.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
-                    <span class="material-symbols-rounded text-6xl opacity-10">bookmark_add</span>
-                    <p class="text-sm font-bold">ไม่มีรายการที่บันทึกไว้</p>
-                </div>
-            `;
+            container.innerHTML = `<div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-3"><span class="material-symbols-rounded text-6xl opacity-10">bookmark_add</span><p class="text-sm font-bold">ไม่มีรายการที่บันทึกไว้</p></div>`;
             return;
         }
 
-        const frag = document.createDocumentFragment();
         list.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex justify-between items-center gap-3 active:scale-95 transition-transform cursor-pointer animate-slide-up';
+            div.className = 'bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex justify-between items-center gap-3 active:scale-95 transition-transform cursor-pointer relative animate-slide-up';
             div.onclick = (e) => { if(!e.target.closest('.del-btn')) jumpToItem(item.id); };
-            div.innerHTML = `
-                <div class="flex-1 min-w-0 pointer-events-none">
-                    <div class="font-bold text-gray-900 text-[15px] mb-1.5 leading-snug truncate">${item.title}</div>
-                    <div class="text-[11px] text-gray-400 flex items-center gap-1.5">
-                        <i class="material-symbols-rounded" style="font-size:12px;">schedule</i> 
-                        ${item.time}
-                    </div>
-                </div>
-                <button onclick="removeFav(event, '${item.id}')" class="del-btn w-11 h-11 flex items-center justify-center text-gray-400 active:text-red-500 p-2">
-                    <span class="material-symbols-rounded text-[22px]">delete</span>
-                </button>
-            `;
-            frag.appendChild(div);
+            div.innerHTML = `<div class="flex-1 min-w-0 pointer-events-none pr-12"><div class="font-bold text-gray-900 text-[15px] mb-1.5 leading-snug truncate">${item.title}</div><div class="text-[11px] text-gray-400 flex items-center gap-1.5"><i class="material-symbols-rounded" style="font-size:12px;">schedule</i>${item.time}</div></div><button onclick="removeFav(event, '${item.id}')" class="del-btn w-11 h-11 flex items-center justify-center text-gray-400 active:text-red-500 absolute top-4 right-4"><span class="material-symbols-rounded text-[22px]">delete</span></button>`;
+            container.appendChild(div);
         });
-        container.appendChild(frag);
     };
 
     window.removeFav = (e, id) => {
@@ -532,8 +599,9 @@
 
     function jumpToItem(id) {
         switchTab('home');
-        const idx = allLawsData.findIndex(l => getSafeId(l) === id);
+        const idx = originalLawsData.findIndex(l => getSafeId(l) === id);
         if (idx !== -1) {
+            allLawsData = originalLawsData; // Reset filter
             currentPage = Math.floor(idx / itemsPerPage) + 1;
             renderPage();
             setTimeout(() => {
@@ -575,9 +643,7 @@
             const reply = data.reply || "ขออภัย ผมไม่พบข้อมูลส่วนนี้ครับ";
             addMsg(reply, 'ai');
             chatHistory.push({ role: "assistant", content: reply });
-        } catch(e) { 
-            addMsg("การเชื่อมต่อขัดข้อง กรุณาลองใหม่ครับ", 'ai'); 
-        }
+        } catch(e) { addMsg("การเชื่อมต่อขัดข้อง กรุณาลองใหม่ครับ", 'ai'); }
     }
 
     function addMsg(txt, type) {
@@ -617,20 +683,25 @@
     window.addEventListener('DOMContentLoaded', () => {
         initAppUpdates();
         
-        // Fix: Added event to open chat modal
         const fabChat = document.getElementById('fab-chat');
         if(fabChat) fabChat.onclick = () => document.getElementById('modalChat').classList.add('active');
 
         document.getElementById('btnCloseChat').onclick = () => document.getElementById('modalChat').classList.remove('active');
         document.getElementById('send-btn').onclick = handleChat;
-        document.getElementById('user-input').onkeypress = (e) => { if(e.key === 'Enter') handleChat(); };
+        
+        // Fix: Search on Enter Key
+        const searchInput = document.getElementById('q');
+        searchInput.onkeypress = (e) => {
+            if(e.key === 'Enter') {
+                window.filterLawsData('search', searchInput.value);
+                searchInput.blur(); // Close keyboard on mobile
+            }
+        };
 
-        // Fix: Added search button event
         const btnSearch = document.getElementById('btnSearch');
         if(btnSearch) {
             btnSearch.onclick = () => {
-                const query = document.getElementById('q').value;
-                if(window.filterLawsData) window.filterLawsData('search', query);
+                window.filterLawsData('search', searchInput.value);
             };
         }
     });
