@@ -55,12 +55,12 @@
 
         .wrap { max-width: 600px; margin: 0 auto; padding: 0 16px; position: relative; }
 
+        /* Sidebar Optimized */
         .sidebar-overlay {
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5);
             z-index: 300; opacity: 0; visibility: hidden; 
-            transition: opacity 0.3s ease, visibility 0.3s;
+            transition: opacity 0.3s ease;
             backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
         }
         .sidebar-overlay.active { opacity: 1; visibility: visible; }
         
@@ -70,7 +70,6 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 10px 0 30px rgba(0,0,0,0.1); 
             display: flex; flex-direction: column;
-            will-change: transform;
         }
         .sidebar.active { transform: translateX(300px); }
 
@@ -82,20 +81,20 @@
         }
         .side-cat-btn.active { background: var(--primary-gradient); color: white; font-weight: 600; }
 
+        /* Sliding Chips */
         .cat-chips-bar {
             display: flex;
             overflow-x: auto;
             gap: 8px;
-            padding: 4px 2px 12px;
+            padding: 12px 2px;
             scrollbar-width: none;
-            -ms-overflow-style: none;
             -webkit-overflow-scrolling: touch;
         }
         .cat-chips-bar::-webkit-scrollbar { display: none; }
 
         .chip {
             white-space: nowrap;
-            padding: 8px 16px;
+            padding: 8px 18px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
@@ -120,15 +119,15 @@
             padding: 0 12px; padding-bottom: env(safe-area-inset-bottom);
             box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
         .nav-item { 
             display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
             color: #9ca3af; font-size: 12px; font-weight: 500; flex: 1; height: 100%;
-            cursor: pointer; transition: color 0.2s;
+            cursor: pointer;
         }
         .nav-item.active { color: var(--primary-purple); }
 
+        /* Search Container */
         .search-container {
             background: white; border-radius: 16px; padding: 6px 12px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.06); display: flex; gap: 8px;
@@ -136,29 +135,20 @@
             border: 1px solid #fce7f3; align-items: center; height: 60px;
         }
         .search-input { flex: 1; border: none; outline: none; font-size: 16px; background: transparent; color: var(--text-main); }
-        
-        .fav-btn-container { 
-            position: absolute; 
-            top: 20px; 
-            right: 16px; 
-            z-index: 5; 
+        .search-btn {
+            background: var(--primary-blue); color: white; width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
         }
+
+        /* Favorite Button - Absolute Top Right */
+        .fav-btn-container { position: absolute; top: 20px; right: 16px; z-index: 5; }
         .fav-btn { 
-            transition: transform 0.2s, background 0.2s; 
-            cursor: pointer; color: #1f2937;
+            transition: all 0.2s; cursor: pointer; color: #1f2937;
             background: #ffffff; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; 
-            border: 1px solid #e5e7eb;
-            width: 42px; height: 42px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            -webkit-appearance: none;
+            align-items: center; justify-content: center; border: 1px solid #e5e7eb;
+            width: 42px; height: 42px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .fav-btn.active { 
-            color: #ffffff !important;
-            background: #000000;
-            border-color: #000000;
-            transform: scale(1.05);
-        }
+        .fav-btn.active { color: #ffffff !important; background: #000000; border-color: #000000; transform: scale(1.05); }
         .fav-btn.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
         #list > div {
@@ -171,11 +161,11 @@
 
         .item-title { padding-right: 3.5rem; }
 
+        /* Modal Chat Styles */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(30, 58, 138, 0.3);
             z-index: 200; display: none; align-items: flex-end; justify-content: center; 
             backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
         }
         .modal-overlay.active { display: flex; }
 
@@ -183,22 +173,12 @@
             .modal-overlay { align-items: center; padding: 16px; }
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .bubble { padding: 12px 16px; border-radius: 16px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.5; word-wrap: break-word;}
         .bubble-user { background: var(--primary-gradient); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #f3f4f6; box-shadow: 0 2px 8px rgba(0,0,0,0.03);}
 
-        .target-highlight {
-            animation: highlight 1.5s ease-out;
-        }
-        @keyframes highlight {
-            0% { background: #fef08a; }
-            100% { background: white; }
-        }
+        .target-highlight { animation: highlight 1.5s ease-out; }
+        @keyframes highlight { 0% { background: #fef08a; } 100% { background: white; } }
 
         .hidden { display: none !important; }
     </style>
@@ -217,20 +197,11 @@
             <span class="material-symbols-rounded">close</span>
         </button>
     </div>
-    <div class="flex flex-col p-4 gap-1 flex-1 overflow-y-auto bg-white">
+    <div id="sidebarList" class="flex flex-col p-4 gap-1 flex-1 overflow-y-auto bg-white">
         <button class="side-cat-btn side-all-btn active" onclick="filterCat('all', this); toggleSidebar(false)">
             <span class="material-symbols-rounded">format_list_bulleted</span> ทั้งหมด
         </button>
-        <button class="side-cat-btn side-code-btn" onclick="filterCat('code', this); toggleSidebar(false)">
-            <span class="material-symbols-rounded">import_contacts</span> ประมวลกฎหมาย
-        </button>
-        <button class="side-cat-btn side-const-btn" onclick="filterCat('const', this); toggleSidebar(false)">
-            <span class="material-symbols-rounded">balance</span> รัฐธรรมนูญ
-        </button>
-        <button class="side-cat-btn side-act-btn" onclick="filterCat('act', this); toggleSidebar(false)">
-            <span class="material-symbols-rounded">description</span> พระราชบัญญัติ
-        </button>
-
+        <div id="dynamicSidebarContainer"></div>
         <div class="mt-auto pt-4 border-t border-pink-50">
             <a href="https://pdpa.pro/policies/view/th/4FM1QqDBTJkGBBva4fZvhvQ1" target="_blank" class="side-cat-btn" style="text-decoration: none;">
                 <span class="material-symbols-rounded">privacy_tip</span> นโยบายส่วนตัว
@@ -263,8 +234,8 @@
         <section class="relative z-20">
             <div class="search-container">
                 <span class="material-symbols-rounded text-gray-400 pl-2">search</span>
-                <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย หรือ มาตรา..." enterkeyhint="search">
-                <button id="btnSearch" class="search-btn active:scale-90 transition-transform">
+                <input id="q" class="search-input" type="search" placeholder="ค้นชื่อกฎหมาย หรือ มาตรา..." enterkeyhint="search">
+                <button id="btnSearch" class="search-btn">
                     <span class="material-symbols-rounded">arrow_forward</span>
                 </button>
             </div>
@@ -274,17 +245,17 @@
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-pink-100">
                 <div class="flex items-center gap-2 text-pink-600 font-bold text-sm mb-5 pb-3 border-b border-pink-50">
                     <span class="material-symbols-rounded text-lg">campaign</span>
-                    ประกาศและอัพเดทล่าสุด
+                    ประกาศล่าสุด
                 </div>
                 <div id="latestViewport" class="overflow-hidden relative">
                     <div id="latestTrack" class="w-full">
                         <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0">
-                            <span class="text-[15px] font-bold text-gray-800 leading-snug">พ.ร.บ. การจัดสรรที่ดิน (ฉบับที่ 3) พ.ศ. ...</span>
-                            <span class="text-[11px] text-pink-500 bg-pink-50 px-2.5 py-1 rounded-full mt-1 border border-pink-100">ประกาศล่าสุดรายหมวด</span>
+                            <span id="update-banner-1" class="text-[15px] font-bold text-gray-800 leading-snug">กำลังโหลดข้อมูล...</span>
+                            <span class="text-[11px] text-pink-500 bg-pink-50 px-2.5 py-1 rounded-full mt-1 border border-pink-100">อัปเดตล่าสุดวันนี้</span>
                         </div>
                         <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0 hidden">
-                            <span class="text-[15px] font-bold text-gray-800 leading-snug">ประมวลกฎหมายยาเสพติด</span>
-                            <span class="text-[11px] text-purple-500 bg-purple-50 px-2.5 py-1 rounded-full mt-1 border border-purple-100">อัพเดทมาตราใหม่ล่าสุด 2567</span>
+                            <span id="update-banner-2" class="text-[15px] font-bold text-gray-800 leading-snug">ค้นหากฎหมายไทย</span>
+                            <span class="text-[11px] text-purple-500 bg-purple-50 px-2.5 py-1 rounded-full mt-1 border border-purple-100">ระบบ AI ช่วยหา</span>
                         </div>
                     </div>
                 </div>
@@ -298,9 +269,6 @@
         <section class="mt-4">
             <div id="catChipsBar" class="cat-chips-bar">
                 <button class="chip active chip-all" onclick="filterCat('all', this)">ทั้งหมด</button>
-                <button class="chip chip-code" onclick="filterCat('code', this)">ประมวลกฎหมาย</button>
-                <button class="chip chip-const" onclick="filterCat('const', this)">รัฐธรรมนูญ</button>
-                <button class="chip chip-act" onclick="filterCat('act', this)">พระราชบัญญัติ</button>
             </div>
         </section>
 
@@ -310,7 +278,7 @@
                 <h2 id="panelTitle" class="font-bold text-gray-800 text-lg">รายการกฎหมาย</h2>
             </div>
             <div id="list" class="flex flex-col min-h-[300px]">
-                <div class="text-center py-20 text-gray-400 text-sm italic">กำลังโหลดข้อมูลกฎหมาย...</div>
+                <div class="text-center py-20 text-gray-400 text-sm italic">กำลังโหลดข้อมูลจาก Google Sheets...</div>
             </div>
         </section>
     </div>
@@ -359,10 +327,12 @@
     </div>
 </nav>
 
+<!-- ปุ่มแชทบอท -->
 <button id="fab-chat" class="fixed bottom-[90px] right-6 w-14 h-14 text-white rounded-2xl shadow-xl flex items-center justify-center z-50 active:scale-90 transition-all" style="background: var(--primary-gradient); box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);">
     <span class="material-symbols-rounded text-3xl">smart_toy</span>
 </button>
 
+<!-- หน้าต่างแชทบอท -->
 <div id="modalChat" class="modal-overlay z-[250]">
     <div class="bg-white w-full sm:max-w-[420px] h-[85vh] sm:h-[650px] rounded-t-[24px] sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl relative animate-slide-up">
         <header class="p-5 flex justify-between items-center shrink-0 z-10 text-white" style="background: var(--primary-gradient);">
@@ -371,8 +341,8 @@
                     <span class="material-symbols-rounded text-xl">smart_toy</span>
                 </div>
                 <div>
-                    <span class="font-bold text-white block leading-tight">Thai Law AI</span>
-                    <span class="text-[10px] text-pink-200 font-bold uppercase tracking-wider">Online</span>
+                    <span class="font-bold text-white block leading-tight">Thai Law AI Assistant</span>
+                    <span class="text-[10px] text-pink-200 font-bold uppercase tracking-wider">Online & Active</span>
                 </div>
             </div>
             <button id="btnCloseChat" class="w-10 h-10 flex items-center justify-center text-white/70 hover:text-white p-1">
@@ -380,11 +350,11 @@
             </button>
         </header>
         <div id="chat-history" class="flex-1 overflow-y-auto p-5 flex flex-col bg-gray-50 gap-4">
-            <div class="bubble bubble-ai">สวัสดีครับ ผมคือ AI ผู้ช่วยด้านกฎหมาย ยินดีให้คำปรึกษาครับ</div>
+            <div class="bubble bubble-ai">สวัสดีครับ ผมคือ AI ผู้ช่วยด้านกฎหมาย มีอะไรให้ช่วยแนะนำไหมครับ?</div>
         </div>
         <div class="p-4 border-t border-gray-100 bg-white flex gap-3 items-center">
-            <input id="user-input" type="text" class="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-400 transition-all text-gray-900" placeholder="ถามข้อมูลกฎหมาย..." autocomplete="off">
-            <button id="send-btn" class="text-white w-12 h-12 rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-md" style="background: var(--primary-gradient);">
+            <input id="chat-user-input" type="text" class="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-400 transition-all text-gray-900" placeholder="ถามข้อมูลกฎหมาย..." autocomplete="off">
+            <button id="chat-send-btn" class="text-white w-12 h-12 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-md" style="background: var(--primary-gradient);">
                 <span class="material-symbols-rounded text-[22px] ml-1">send</span>
             </button>
         </div>
@@ -392,40 +362,75 @@
 </div>
 
 <script>
-    // --- APP LOGIC INTEGRATED ---
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS-0uk2O6y9VxyIReWBrN9mBNeYE7Mjh7Fgbbn8RzpBXSzUMmqUQlIUyFdsHtYj9Q/pub?output=csv';
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
+    
+    let masterData = []; 
+    let allLawsData = []; 
     let chatHistory = [];
-    let allLawsData = [];       // Current filtered list
-    let originalLawsData = [];  // Master list
     let currentPage = 1;
     const itemsPerPage = 8;
 
-    const getStored = () => {
-        try { return JSON.parse(localStorage.getItem('favLaws') || '[]'); } 
-        catch(e) { return []; }
-    };
+    const getStored = () => { try { return JSON.parse(localStorage.getItem('favLaws') || '[]'); } catch(e) { return []; } };
     const saveToStorage = (data) => localStorage.setItem('favLaws', JSON.stringify(data));
 
     function getSafeId(law) {
-        if(law.id) return String(law.id);
-        const str = (law["ชื่อกฎหมาย"] || "") + (law["วันที่"] || "");
-        return btoa(unescape(encodeURIComponent(str))).substring(0, 16);
+        const idSource = law.id || (law["ชื่อกฎหมาย"] || "") + (law["วันที่"] || "");
+        return btoa(unescape(encodeURIComponent(idSource))).substring(0, 16);
     }
 
-    // Main Renderer
-    window.renderLawsFromJson = function(data) {
-        if (!Array.isArray(data)) return;
-        originalLawsData = data;
-        allLawsData = data;
-        currentPage = 1;
-        renderPage();
-    };
+    // --- CSV ENGINE ---
+    async function loadDataFromCSV() {
+        try {
+            const response = await fetch(CSV_URL);
+            const csvText = await response.text();
+            const rows = csvText.split('\n').filter(row => row.trim() !== '');
+            const headers = rows[0].split(',').map(h => h.trim().replace(/^"(.*)"$/, '$1'));
+            
+            masterData = rows.slice(1).map(row => {
+                const values = row.split(',').map(v => v.trim().replace(/^"(.*)"$/, '$1'));
+                const obj = {};
+                headers.forEach((h, i) => { obj[h] = values[i] || ''; });
+                return obj;
+            });
+
+            if(masterData[0]) document.getElementById('update-banner-1').innerText = masterData[0]["ชื่อกฎหมาย"];
+            
+            initializeDynamicCategories();
+            allLawsData = masterData;
+            renderPage();
+        } catch (error) {
+            console.error('CSV Error:', error);
+            document.getElementById('list').innerHTML = '<div class="text-center py-20 text-red-400">การโหลดข้อมูลขัดข้อง</div>';
+        }
+    }
+
+    function initializeDynamicCategories() {
+        const categories = [...new Set(masterData.map(item => item["หมวด"]).filter(Boolean))];
+        const chipsContainer = document.getElementById('catChipsBar');
+        const sidebarDynamic = document.getElementById('dynamicSidebarContainer');
+        sidebarDynamic.innerHTML = '';
+
+        categories.forEach(catName => {
+            const chipBtn = document.createElement('button');
+            chipBtn.className = `chip chip-${catName}`;
+            chipBtn.innerText = catName;
+            chipBtn.onclick = () => filterCat(catName, chipBtn);
+            chipsContainer.appendChild(chipBtn);
+
+            const sideBtn = document.createElement('button');
+            sideBtn.className = `side-cat-btn side-${catName}-btn`;
+            sideBtn.innerHTML = `<span class="material-symbols-rounded">label</span> ${catName}`;
+            sideBtn.onclick = () => { filterCat(catName, sideBtn); toggleSidebar(false); };
+            sidebarDynamic.appendChild(sideBtn);
+        });
+    }
 
     function renderPage() {
         const listEl = document.getElementById('list');
         if (!listEl) return;
-        
         listEl.innerHTML = '';
+        
         if (allLawsData.length === 0) {
             listEl.innerHTML = '<div class="text-center py-20 text-gray-400 text-sm italic">ไม่พบข้อมูลกฎหมาย</div>';
             return;
@@ -441,22 +446,22 @@
             const el = document.createElement('div');
             el.id = `law-item-${id}`;
             el.className = 'animate-slide-up';
-            
             const isFav = savedIds.has(id);
 
             el.innerHTML = `
                 <div class="fav-btn-container">
-                    <button onclick="toggleFav('${id}')" class="fav-btn ${isFav ? 'active' : ''}" aria-label="Favorite">
+                    <button onclick="toggleFav('${id}')" class="fav-btn ${isFav ? 'active' : ''}">
                         <span class="material-symbols-rounded">bookmark</span>
                     </button>
                 </div>
                 <div class="font-bold text-gray-900 text-[17px] mb-2 leading-tight item-title">
                     ${law["ชื่อกฎหมาย"] || ''}
                 </div>
-                <div class="flex items-center gap-2 mb-3">
+                <div class="flex flex-wrap items-center gap-2 mb-3">
                     <span class="bg-gray-50 text-gray-600 text-[11px] px-2.5 py-1 rounded-md font-bold border border-gray-200">
                         ${law["หมวด"] || 'ทั่วไป'}
                     </span>
+                    ${law["เล่มตอน"] ? `<span class="bg-purple-50 text-purple-600 text-[11px] px-2.5 py-1 rounded-md font-bold border border-purple-200">เล่ม: ${law["เล่มตอน"]}</span>` : ''}
                     <span class="text-[11px] text-gray-400">
                         <i class="material-symbols-rounded" style="font-size:12px; vertical-align:middle;">calendar_today</i>
                         ${law["วันที่"] || '-'}
@@ -471,7 +476,6 @@
             `;
             fragment.appendChild(el);
         });
-
         listEl.appendChild(fragment);
         renderPagination();
     }
@@ -480,17 +484,12 @@
         const listEl = document.getElementById('list');
         const totalPages = Math.ceil(allLawsData.length / itemsPerPage);
         if (totalPages <= 1) return;
-
         const nav = document.createElement('div');
         nav.className = 'flex justify-center items-center gap-3 mt-6 mb-8';
         nav.innerHTML = `
-            <button onclick="changePage(-1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'bg-white shadow-sm'}" ${currentPage === 1 ? 'disabled' : ''}>
-                <span class="material-symbols-rounded">chevron_left</span>
-            </button>
+            <button onclick="changePage(-1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'bg-white shadow-sm'}" ${currentPage === 1 ? 'disabled' : ''}><span class="material-symbols-rounded">chevron_left</span></button>
             <span class="text-sm font-bold text-gray-700 bg-white px-4 py-2 rounded-xl border border-gray-200">หน้า ${currentPage} / ${totalPages}</span>
-            <button onclick="changePage(1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === totalPages ? 'opacity-30 cursor-not-allowed' : 'bg-white shadow-sm'}" ${currentPage === totalPages ? 'disabled' : ''}>
-                <span class="material-symbols-rounded">chevron_right</span>
-            </button>
+            <button onclick="changePage(1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === totalPages ? 'opacity-30 cursor-not-allowed' : 'bg-white shadow-sm'}" ${currentPage === totalPages ? 'disabled' : ''}><span class="material-symbols-rounded">chevron_right</span></button>
         `;
         listEl.appendChild(nav);
     }
@@ -504,68 +503,40 @@
     window.toggleSidebar = (show) => {
         const side = document.getElementById('sidebarMenu');
         const overlay = document.getElementById('sidebarOverlay');
-        if (show) {
-            side.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        } else {
-            side.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        if (show) { side.classList.add('active'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; } 
+        else { side.classList.remove('active'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
     };
 
-    // System Filter Logic
     window.filterCat = (cat, btn) => {
-        // UI Updates
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        const activeChip = document.querySelector(`.chip-${cat}`);
-        if(activeChip) activeChip.classList.add('active');
-        else if(btn && btn.classList.contains('chip')) btn.classList.add('active');
-
-        document.querySelectorAll('.side-cat-btn').forEach(c => c.classList.remove('active'));
-        const activeSide = document.querySelector(`.side-${cat}-btn`);
-        if(activeSide) activeSide.classList.add('active');
-
-        // Logic
+        document.querySelectorAll('.chip, .side-cat-btn').forEach(c => c.classList.remove('active'));
         if (cat === 'all') {
-            allLawsData = originalLawsData;
+            document.querySelector('.chip-all').classList.add('active');
+            document.querySelector('.side-all-btn').classList.add('active');
+            allLawsData = masterData;
         } else if (cat === 'search') {
-            const query = (btn || "").toString().toLowerCase();
-            allLawsData = originalLawsData.filter(l => 
-                (l["ชื่อกฎหมาย"] || "").toLowerCase().includes(query) || 
-                (l["หมวด"] || "").toLowerCase().includes(query)
-            );
+            const query = (btn || document.getElementById('q').value).toString().toLowerCase();
+            allLawsData = masterData.filter(l => (l["ชื่อกฎหมาย"] || "").toLowerCase().includes(query) || (l["หมวด"] || "").toLowerCase().includes(query));
         } else {
-            const map = { 'code': 'ประมวล', 'const': 'รัฐธรรมนูญ', 'act': 'พระราชบัญญัติ' };
-            const keyword = map[cat];
-            allLawsData = originalLawsData.filter(l => (l["หมวด"] || "").includes(keyword) || (l["ชื่อกฎหมาย"] || "").includes(keyword));
+            const activeChips = document.querySelectorAll(`.chip-${cat}`);
+            const activeSides = document.querySelectorAll(`.side-${cat}-btn`);
+            activeChips.forEach(c => c.classList.add('active'));
+            activeSides.forEach(s => s.classList.add('active'));
+            allLawsData = masterData.filter(l => l["หมวด"] === cat);
         }
-        
         currentPage = 1;
         renderPage();
-    };
-
-    // Fix Search Logic
-    window.filterLawsData = function(mode, query) {
-        if (mode === 'search') {
-            window.filterCat('search', query);
-        }
     };
 
     window.toggleFav = function(id) {
         let stored = getStored();
         const idx = stored.findIndex(s => s.id === id);
-        const card = document.getElementById(`law-item-${id}`);
-        const btn = card?.querySelector('.fav-btn') || document.querySelector(`[onclick="toggleFav('${id}')"]`);
-
+        const btn = document.querySelector(`[onclick="toggleFav('${id}')"]`);
         if (idx > -1) {
             stored.splice(idx, 1);
             btn?.classList.remove('active');
         } else {
-            const lawItem = originalLawsData.find(l => getSafeId(l) === id);
-            const title = lawItem ? lawItem["ชื่อกฎหมาย"] : (card?.querySelector('.item-title')?.innerText || "กฎหมาย");
-            stored.push({ id, title, time: new Date().toLocaleDateString('th-TH', {day:'2-digit', month:'short'}) });
+            const item = masterData.find(l => getSafeId(l) === id);
+            stored.push({ id, title: item ? item["ชื่อกฎหมาย"] : "กฎหมาย", time: new Date().toLocaleDateString('th-TH', {day:'2-digit', month:'short'}) });
             btn?.classList.add('active');
         }
         saveToStorage(stored);
@@ -576,12 +547,10 @@
         const container = document.getElementById('favContainer');
         const list = getStored();
         container.innerHTML = '';
-
         if(list.length === 0) {
             container.innerHTML = `<div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-3"><span class="material-symbols-rounded text-6xl opacity-10">bookmark_add</span><p class="text-sm font-bold">ไม่มีรายการที่บันทึกไว้</p></div>`;
             return;
         }
-
         list.forEach(item => {
             const div = document.createElement('div');
             div.className = 'bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex justify-between items-center gap-3 active:scale-95 transition-transform cursor-pointer relative animate-slide-up';
@@ -591,27 +560,16 @@
         });
     };
 
-    window.removeFav = (e, id) => {
-        e.stopPropagation();
-        toggleFav(id);
-        openFavs();
-    };
+    window.removeFav = (e, id) => { e.stopPropagation(); toggleFav(id); openFavs(); };
 
     function jumpToItem(id) {
         switchTab('home');
-        const idx = originalLawsData.findIndex(l => getSafeId(l) === id);
-        if (idx !== -1) {
-            allLawsData = originalLawsData; // Reset filter
-            currentPage = Math.floor(idx / itemsPerPage) + 1;
-            renderPage();
-            setTimeout(() => {
-                const target = document.getElementById(`law-item-${id}`);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    target.classList.add('target-highlight');
-                }
-            }, 300);
-        }
+        allLawsData = masterData; 
+        renderPage();
+        setTimeout(() => {
+            const target = document.getElementById(`law-item-${id}`);
+            if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.classList.add('target-highlight'); }
+        }, 300);
     }
 
     function switchTab(tab) {
@@ -624,11 +582,12 @@
         window.scrollTo(0,0);
     }
 
+    // --- CHATBOT ENGINE FIX ---
     async function handleChat() {
-        const input = document.getElementById('user-input');
+        const input = document.getElementById('chat-user-input');
         const text = input.value.trim();
         if(!text) return;
-
+        
         addMsg(text, 'user');
         input.value = '';
         chatHistory.push({ role: "user", content: text });
@@ -640,10 +599,12 @@
                 body: JSON.stringify({ message: text, history: chatHistory.slice(-6) })
             });
             const data = await res.json();
-            const reply = data.reply || "ขออภัย ผมไม่พบข้อมูลส่วนนี้ครับ";
+            const reply = data.reply || "ขออภัยครับ ผมไม่พบข้อมูลในส่วนนี้";
             addMsg(reply, 'ai');
             chatHistory.push({ role: "assistant", content: reply });
-        } catch(e) { addMsg("การเชื่อมต่อขัดข้อง กรุณาลองใหม่ครับ", 'ai'); }
+        } catch(e) { 
+            addMsg("ขออภัย การเชื่อมต่อ AI ขัดข้อง กรุณาลองใหม่ภายหลังครับ", 'ai'); 
+        }
     }
 
     function addMsg(txt, type) {
@@ -663,7 +624,6 @@
             const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
             el.innerText = `อัพเดทล่าสุด ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} น.`;
         };
-
         let slideIdx = 0;
         const slider = () => {
             const track = document.getElementById('latestTrack');
@@ -673,37 +633,33 @@
             dots.forEach((d, i) => d.classList.toggle('active', i === slideIdx));
             slideIdx = (slideIdx + 1) % track.children.length;
         };
-
         setInterval(updateTime, 30000); 
         setInterval(slider, 6000);
-        updateTime();
-        slider();
+        updateTime(); slider();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
         initAppUpdates();
+        loadDataFromCSV();
         
+        // Modal Event Listeners
         const fabChat = document.getElementById('fab-chat');
-        if(fabChat) fabChat.onclick = () => document.getElementById('modalChat').classList.add('active');
+        const btnCloseChat = document.getElementById('btnCloseChat');
+        const chatModal = document.getElementById('modalChat');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatInput = document.getElementById('chat-user-input');
 
-        document.getElementById('btnCloseChat').onclick = () => document.getElementById('modalChat').classList.remove('active');
-        document.getElementById('send-btn').onclick = handleChat;
-        
-        // Fix: Search on Enter Key
-        const searchInput = document.getElementById('q');
-        searchInput.onkeypress = (e) => {
-            if(e.key === 'Enter') {
-                window.filterLawsData('search', searchInput.value);
-                searchInput.blur(); // Close keyboard on mobile
-            }
-        };
-
-        const btnSearch = document.getElementById('btnSearch');
-        if(btnSearch) {
-            btnSearch.onclick = () => {
-                window.filterLawsData('search', searchInput.value);
-            };
+        if(fabChat) fabChat.onclick = () => chatModal.classList.add('active');
+        if(btnCloseChat) btnCloseChat.onclick = () => chatModal.classList.remove('active');
+        if(chatSendBtn) chatSendBtn.onclick = handleChat;
+        if(chatInput) {
+            chatInput.onkeypress = (e) => { if(e.key === 'Enter') handleChat(); };
         }
+
+        const qInput = document.getElementById('q');
+        const btnSearch = document.getElementById('btnSearch');
+        if(qInput) qInput.onkeypress = (e) => { if(e.key === 'Enter') { window.filterCat('search', qInput.value); qInput.blur(); } };
+        if(btnSearch) btnSearch.onclick = () => window.filterCat('search', qInput.value);
     });
 </script>
 
