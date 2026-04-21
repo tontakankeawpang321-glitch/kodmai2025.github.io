@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
-    <title>กฎหมายไทยฉบับล่าสุด (Thai Law Lite)</title>
+    <title>กฎหมายไทยฉบับล่าสุด (Thai Law)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,13 +13,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <style>
+        /* ธีม น้ำเงิน-ม่วง-ชมพู (Blue, Purple, Pink Theme) */
         :root {
-            --primary: #1e3a8a;
-            --primary-gradient: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
-            --accent: #d97706;
-            --success: #10b981;
-            --bg-app: #f1f5f9;
-            --text-main: #0f172a;
+            --primary-blue: #1e3a8a;
+            --primary-purple: #7c3aed;
+            --primary-pink: #db2777;
+            --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #db2777 100%);
+            --bg-app: #fdf2f8; /* ชมพูอ่อนมาก */
+            --text-main: #0f172a; /* Slate 900 - ดำ */
             --bottom-nav-height: 70px;
         }
 
@@ -33,92 +34,94 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* Header */
         .app-header {
             background: var(--primary-gradient);
             color: white;
             padding: 16px 16px 45px;
-            border-radius: 0 0 32px 32px;
+            border-radius: 0 0 20px 20px;
             position: relative;
             z-index: 10;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
         }
 
         .wrap { max-width: 600px; margin: 0 auto; padding: 0 16px; position: relative; }
 
-        /* ปุ่มเปิดรายการโปรดที่ Header */
-        .fav-header-btn {
-            position: absolute; top: 16px; right: 16px;
-            background: rgba(255,255,255,0.2);
-            color: white; width: 44px; height: 44px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(8px);
-            transition: transform 0.2s;
-            cursor: pointer;
-            border: none;
-            z-index: 30;
+        /* Sidebar Styles */
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(30, 58, 138, 0.4);
+            z-index: 300; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
         }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        
+        .sidebar {
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
+            background: white; z-index: 301; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+        }
+        .sidebar.active { left: 0; }
 
+        .side-cat-btn {
+            display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-radius: 12px;
+            color: #4b5563; font-weight: 500; transition: all 0.2s; font-size: 15px;
+            width: 100%; text-align: left; background: transparent; border: none; cursor: pointer;
+            margin-bottom: 4px;
+        }
+        .side-cat-btn:hover { background: #f3f4f6; color: var(--primary-purple); }
+        .side-cat-btn.active { background: var(--primary-gradient); color: white; font-weight: 600; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+        .side-cat-btn .material-symbols-rounded { font-size: 22px; color: #9ca3af; transition: color 0.2s; }
+        .side-cat-btn.active .material-symbols-rounded { color: white; }
+
+        /* Bottom Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height);
-            background: white; display: flex; justify-content: space-around; align-items: center;
-            border-top: 1px solid #cbd5e1; z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom);
+            background: white; display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid #fce7f3; z-index: 100;
+            padding: 0 12px; padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -5px 20px rgba(219, 39, 119, 0.05);
         }
         .nav-item { 
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: #64748b; font-size: 12px; font-weight: 500; flex: 1;
-            cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+            color: #9ca3af; font-size: 12px; font-weight: 500; flex: 1; height: 100%;
+            cursor: pointer; transition: all 0.2s; border-radius: 12px; margin: 0 4px;
         }
-        .nav-item.active { color: var(--primary); }
+        .nav-item:hover { background: #fdf2f8; color: var(--primary-pink); }
+        .nav-item.active { color: var(--primary-purple); }
         .nav-item.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
+        /* Search & Cards */
         .search-container {
-            background: white; border-radius: 20px; padding: 4px 12px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); display: flex; gap: 8px;
+            background: white; border-radius: 16px; padding: 6px 12px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08); display: flex; gap: 8px;
             margin-top: -30px; position: relative; z-index: 20;
-            border: 1px solid #e2e8f0; align-items: center; height: 60px;
+            border: 1px solid #fce7f3; align-items: center; height: 60px;
         }
-        .search-input { flex: 1; border: none; outline: none; font-size: 16px; background: transparent; color: var(--text-main); }
+        .search-input { flex: 1; border: none; outline: none; font-size: 15px; background: transparent; color: var(--text-main); }
         .search-btn { 
-            background: var(--accent); color: white; width: 48px; height: 48px;
-            border-radius: 16px; display: flex; align-items: center; justify-content: center;
-            border: none; cursor: pointer;
+            background: var(--primary-blue); color: white; width: 48px; height: 48px;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            border: none; cursor: pointer; transition: transform 0.2s;
         }
-
-        .chip {
-            white-space: nowrap; padding: 10px 20px; border-radius: 24px;
-            font-size: 14px; color: #64748b; background: white;
-            border: 1px solid #e2e8f0; transition: all 0.2s; cursor: pointer;
-        }
-        .chip.active {
-            background: var(--primary); color: white; border-color: var(--primary);
-            font-weight: 600; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-        }
+        .search-btn:hover { transform: scale(1.05); background: var(--primary-purple); }
 
         /* Modal Layout */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            position: fixed; inset: 0; background: rgba(30, 58, 138, 0.5);
             z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(6px);
         }
         .modal-overlay.active { display: flex; }
         
-        .modal-box {
-            background: white; width: 100%; max-width: 450px; border-radius: 32px;
-            max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* เอฟเฟกต์ไฮไลท์เมื่อกระโดดไปหารายชื่อ */
         @keyframes target-flash {
-            0% { background-color: transparent; border-color: #e2e8f0; }
-            40% { background-color: rgba(16, 185, 129, 0.08); border-color: var(--success); transform: scale(1.02); }
-            100% { background-color: transparent; border-color: #e2e8f0; transform: scale(1); }
+            0% { background-color: transparent; border-color: #fce7f3; }
+            40% { background-color: #fdf2f8; border-color: var(--primary-pink); transform: scale(1.02); }
+            100% { background-color: transparent; border-color: #fce7f3; transform: scale(1); }
         }
         .target-highlight {
             animation: target-flash 1.5s ease-in-out;
@@ -126,80 +129,110 @@
         }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .dot { width: 8px; height: 8px; background-color: #cbd5e1; border-radius: 50%; transition: all 0.3s; }
-        .dot.active { width: 24px; background-color: var(--accent); border-radius: 12px; }
+        .dot { width: 8px; height: 8px; background-color: #e5e7eb; border-radius: 50%; transition: all 0.3s; }
+        .dot.active { width: 24px; background-color: var(--primary-pink); border-radius: 10px; }
 
-        /* ปรับปรุงปุ่มบันทึกในรายการ (ไอคอนบวก มุมขวาบน) */
-        .fav-btn-container {
-            position: absolute; top: 16px; right: 16px; z-index: 5;
-        }
+        /* ดีไซน์ปุ่มรายการโปรด สีขาวสลับดำ */
+        .fav-btn-container { position: absolute; top: 12px; right: 12px; z-index: 5; }
         .fav-btn { 
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
-            cursor: pointer; 
-            color: #94a3b8;
-            font-size: 28px;
-            background: #f8fafc;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 38px;
-            height: 38px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid #f1f5f9;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            cursor: pointer; color: #1f2937; /* ดำ */
+            background: #ffffff; /* ขาว */
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; 
+            border: 1px solid #e5e7eb;
+            width: 44px; height: 44px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .fav-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 15px rgba(219, 39, 119, 0.2); 
+            border-color: var(--primary-pink);
+            color: var(--primary-pink);
         }
         .fav-btn.active { 
-            color: var(--success) !important; 
-            background: #ecfdf5;
-            transform: scale(1.1);
-            border-color: #dcfce7;
+            color: #ffffff !important; /* ขาว */
+            background: #000000; /* ดำ */
+            border-color: #000000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
+        .fav-btn.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
-        /* กรอบรายการกฎหมายหน้าหลัก */
         #list > div {
-            border: 1px solid #e2e8f0;
-            border-radius: 28px;
-            overflow: hidden;
-            background: white;
-            transition: all 0.3s;
-            margin-bottom: 16px;
-            padding: 24px 20px;
-            position: relative;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            border: 1px solid #f3f4f6; border-radius: 16px; overflow: hidden;
+            background: white; transition: all 0.3s; margin-bottom: 16px;
+            padding: 24px 20px; position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         }
 
-        .bubble { padding: 12px 16px; border-radius: 20px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.5; word-wrap: break-word;}
-        .bubble-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
+        .bubble { padding: 12px 16px; border-radius: 16px; font-size: 15px; max-width: 85%; margin-bottom: 8px; line-height: 1.5; word-wrap: break-word;}
+        .bubble-user { background: var(--primary-gradient); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #f3f4f6; box-shadow: 0 2px 8px rgba(0,0,0,0.03);}
 
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
+<!-- Sidebar Menu -->
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+<aside id="sidebarMenu" class="sidebar">
+    <div class="p-6 text-white flex justify-between items-center shrink-0" style="background: var(--primary-gradient);">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-rounded">category</span>
+            <span class="font-bold text-lg tracking-wide">หมวดหมู่</span>
+        </div>
+        <button onclick="toggleSidebar(false)" class="text-white/70 hover:text-white transition-colors">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+    </div>
+    <div class="flex flex-col p-4 gap-1 flex-1 overflow-y-auto bg-white">
+        <button class="side-cat-btn active" onclick="filterCat('all', this); toggleSidebar(false)">
+            <span class="material-symbols-rounded">format_list_bulleted</span> ทั้งหมด
+        </button>
+        <button class="side-cat-btn" onclick="filterCat('code', this); toggleSidebar(false)">
+            <span class="material-symbols-rounded">import_contacts</span> ประมวลกฎหมาย
+        </button>
+        <button class="side-cat-btn" onclick="filterCat('const', this); toggleSidebar(false)">
+            <span class="material-symbols-rounded">balance</span> รัฐธรรมนูญ
+        </button>
+        <button class="side-cat-btn" onclick="filterCat('act', this); toggleSidebar(false)">
+            <span class="material-symbols-rounded">description</span> พระราชบัญญัติ
+        </button>
+
+        <div class="mt-auto pt-4 border-t border-pink-50">
+            <a href="https://pdpa.pro/policies/view/th/4FM1QqDBTJkGBBva4fZvhvQ1" target="_blank" class="side-cat-btn" style="text-decoration: none;">
+                <span class="material-symbols-rounded">privacy_tip</span> นโยบายส่วนตัว
+            </a>
+        </div>
+    </div>
+</aside>
+
 <header class="app-header">
     <div class="wrap">
-        <div class="flex items-center gap-3">
-            <div class="bg-white/20 p-2 rounded-2xl backdrop-blur-sm shadow-inner">
-                <span class="material-symbols-rounded" style="font-size: 32px;">balance</span>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-tight">Thai Law Lite</h1>
-                <p class="text-[10px] opacity-80 font-bold uppercase tracking-widest">Premium Member</p>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar(true)" class="w-10 h-10 flex items-center justify-center bg-white/20 border border-white/20 rounded-xl hover:bg-white/30 transition-colors backdrop-blur-sm">
+                <span class="material-symbols-rounded">menu</span>
+            </button>
+            <div class="flex items-center gap-3">
+                <div class="bg-white text-blue-900 p-2.5 rounded-xl shadow-lg flex items-center justify-center">
+                    <span class="material-symbols-rounded" style="font-size: 26px;">balance</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Thai Law</h1>
+                    <p id="live-datetime" class="text-[10px] text-pink-200 font-bold uppercase tracking-wider opacity-90"></p>
+                </div>
             </div>
         </div>
-        <button id="btnOpenFavs" class="fav-header-btn" title="รายการโปรด">
-            <span class="material-symbols-rounded">bookmark</span>
-        </button>
     </div>
 </header>
 
 <main class="wrap">
+    <!-- Home View -->
     <div id="view-home">
         <section class="relative z-20">
             <div class="search-container">
-                <span class="material-symbols-rounded text-slate-400">search</span>
-                <input id="q" class="search-input" type="search" placeholder="ชื่อกฎหมาย หรือ มาตรา...">
+                <span class="material-symbols-rounded text-gray-400 pl-2">search</span>
+                <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย หรือ มาตรา...">
                 <button id="btnSearch" class="search-btn">
                     <span class="material-symbols-rounded">arrow_forward</span>
                 </button>
@@ -207,20 +240,20 @@
         </section>
 
         <section class="mt-8">
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-                <div class="flex items-center gap-2 text-amber-600 font-bold text-xs mb-4">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-pink-100">
+                <div class="flex items-center gap-2 text-pink-600 font-bold text-sm mb-5 pb-3 border-b border-pink-50">
                     <span class="material-symbols-rounded text-lg">campaign</span>
-                    อัพเดทกฎหมายล่าสุด
+                    ประกาศและอัพเดทล่าสุด
                 </div>
                 <div id="latestViewport" class="overflow-hidden relative">
                     <div id="latestTrack" class="flex transition-transform duration-500 ease-in-out w-full">
-                        <div class="w-full flex flex-col gap-2 items-center text-center px-2 shrink-0">
-                            <span class="text-base font-bold text-slate-800 leading-tight">พ.ร.บ. การจัดสรรที่ดิน (ฉบับที่ 3) พ.ศ. ...</span>
-                            <span class="text-xs text-slate-400">ประกาศล่าสุดรายหมวด</span>
+                        <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0">
+                            <span class="text-[15px] font-bold text-gray-800 leading-snug">พ.ร.บ. การจัดสรรที่ดิน (ฉบับที่ 3) พ.ศ. ...</span>
+                            <span class="text-[11px] text-pink-500 bg-pink-50 px-2.5 py-1 rounded-full mt-1 border border-pink-100">ประกาศล่าสุดรายหมวด</span>
                         </div>
-                        <div class="w-full flex flex-col gap-2 items-center text-center px-2 shrink-0">
-                            <span class="text-base font-bold text-slate-800 leading-tight">ประมวลกฎหมายยาเสพติด</span>
-                            <span class="text-xs text-slate-400">อัพเดทมาตราใหม่ล่าสุด 2567</span>
+                        <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0">
+                            <span class="text-[15px] font-bold text-gray-800 leading-snug">ประมวลกฎหมายยาเสพติด</span>
+                            <span class="text-[11px] text-purple-500 bg-purple-50 px-2.5 py-1 rounded-full mt-1 border border-purple-100">อัพเดทมาตราใหม่ล่าสุด 2567</span>
                         </div>
                     </div>
                 </div>
@@ -231,34 +264,42 @@
             </div>
         </section>
 
-        <section class="mt-6">
-            <div id="catbar" class="flex overflow-x-auto gap-3 pb-3 scrollbar-hide px-1">
-                <button class="chip active" onclick="filterCat('all', this)">ทั้งหมด</button>
-                <button class="chip" onclick="filterCat('code', this)">ประมวลกฎหมาย</button>
-                <button class="chip" onclick="filterCat('const', this)">รัฐธรรมนูญ</button>
-                <button class="chip" onclick="filterCat('act', this)">พระราชบัญญัติ</button>
-            </div>
-        </section>
-
-        <section class="mt-6 pb-28">
-            <div class="flex items-center gap-2 mb-5 px-1">
-                <span class="w-1.5 h-6 bg-blue-700 rounded-full"></span>
-                <h2 id="panelTitle" class="font-bold text-slate-800 text-lg">รายการกฎหมายแนะนำ</h2>
+        <section class="mt-8 pb-28">
+            <div class="flex items-center gap-3 mb-5 px-1">
+                <span class="w-1.5 h-6 rounded-full" style="background: var(--primary-gradient);"></span>
+                <h2 id="panelTitle" class="font-bold text-gray-800 text-lg">รายการกฎหมาย</h2>
             </div>
             <div id="list" class="flex flex-col min-h-[300px]">
-                <div class="text-center py-20 text-slate-400 text-sm italic">กำลังโหลดข้อมูลกฎหมาย...</div>
+                <div class="text-center py-20 text-gray-400 text-sm italic">กำลังโหลดข้อมูลกฎหมาย...</div>
             </div>
         </section>
     </div>
 
-    <div id="view-community" class="hidden">
-        <div class="pt-6 pb-28">
-            <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
-                <div class="p-5 border-b border-slate-100 flex items-center gap-2 bg-slate-50">
-                    <span class="material-symbols-rounded text-blue-600">forum</span>
-                    <span class="font-bold text-slate-800">ชุมชนกฎหมายออนไลน์</span>
+    <!-- Favorites View -->
+    <div id="view-fav" class="hidden">
+        <div class="pt-8 pb-28">
+            <div class="flex items-center gap-3 mb-5 px-1">
+                <span class="w-1.5 h-6 rounded-full bg-pink-500"></span>
+                <h2 class="font-bold text-gray-800 text-lg">รายการโปรดที่บันทึกไว้</h2>
+            </div>
+            <div class="bg-white rounded-2xl border border-pink-100 overflow-hidden shadow-sm min-h-[50vh] flex flex-col">
+                <div id="favContainer" class="p-4 flex-1 space-y-3 bg-pink-50/30">
                 </div>
-                <div class="p-2 flex justify-center">
+            </div>
+        </div>
+    </div>
+
+    <!-- Community View -->
+    <div id="view-community" class="hidden">
+        <div class="pt-8 pb-28">
+            <div class="bg-white rounded-2xl border border-pink-100 overflow-hidden shadow-sm">
+                <div class="p-5 border-b border-pink-100 flex items-center gap-3 bg-pink-50/50">
+                    <div class="w-8 h-8 rounded-lg text-white flex items-center justify-center" style="background: var(--primary-gradient);">
+                        <span class="material-symbols-rounded text-xl">forum</span>
+                    </div>
+                    <span class="font-bold text-gray-800 text-lg">ชุมชนกฎหมายออนไลน์</span>
+                </div>
+                <div class="p-2 flex justify-center bg-white">
                     <div id="fb-root"></div>
                     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0"></script>
                     <div class="fb-page" data-href="https://www.facebook.com/interesting.deka/" data-tabs="timeline" data-width="380" data-height="700" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"></div>
@@ -268,10 +309,15 @@
     </div>
 </main>
 
+<!-- Bottom Nav -->
 <nav class="bottom-nav">
     <div id="nav-home" class="nav-item active" onclick="switchTab('home')">
         <span class="material-symbols-rounded">home</span>
         <span>หน้าหลัก</span>
+    </div>
+    <div id="nav-fav" class="nav-item" onclick="window.openFavs()">
+        <span class="material-symbols-rounded">bookmark</span>
+        <span>รายการโปรด</span>
     </div>
     <div id="nav-community" class="nav-item" onclick="switchTab('community')">
         <span class="material-symbols-rounded">forum</span>
@@ -279,49 +325,33 @@
     </div>
 </nav>
 
-<button id="fab-chat" class="fixed bottom-[90px] right-6 w-14 h-14 bg-amber-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-50 hover:bg-amber-700 active:scale-90 transition-transform">
+<button id="fab-chat" class="fixed bottom-[90px] right-6 w-14 h-14 text-white rounded-2xl shadow-xl flex items-center justify-center z-50 hover:opacity-90 active:scale-95 transition-all" style="background: var(--primary-gradient); box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);">
     <span class="material-symbols-rounded text-3xl">smart_toy</span>
 </button>
 
-<!-- Favorites Modal -->
-<div id="modalFavs" class="modal-overlay">
-    <div class="modal-box">
-        <header class="p-5 border-b flex justify-between items-center bg-slate-50 shrink-0">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-blue-600">bookmark</span>
-                <span class="font-bold text-slate-800">รายการโปรดที่บันทึก</span>
-            </div>
-            <button id="btnCloseFavs" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-200 rounded-full transition-colors">
-                <span class="material-symbols-rounded">close</span>
-            </button>
-        </header>
-        <div id="favContainer" class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-50/50 scrollbar-hide"></div>
-    </div>
-</div>
-
 <!-- Chat Modal -->
 <div id="modalChat" class="modal-overlay flex-col !justify-end sm:!justify-center z-[250]">
-    <div class="bg-white w-full sm:max-w-[420px] h-[85vh] sm:h-[650px] rounded-t-[32px] sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl relative">
-        <header class="p-5 border-b flex justify-between items-center bg-white shrink-0 shadow-sm z-10">
+    <div class="bg-white w-full sm:max-w-[420px] h-[85vh] sm:h-[650px] rounded-t-[24px] sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl relative">
+        <header class="p-5 flex justify-between items-center shrink-0 z-10 text-white" style="background: var(--primary-gradient);">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white border border-white/20 backdrop-blur-sm">
                     <span class="material-symbols-rounded text-xl">smart_toy</span>
                 </div>
                 <div>
-                    <span class="font-bold text-slate-800 block leading-tight">Thai Law AI</span>
-                    <span class="text-[10px] text-green-500 font-bold uppercase tracking-wider">Online Now</span>
+                    <span class="font-bold text-white block leading-tight">Thai Law AI</span>
+                    <span class="text-[10px] text-pink-200 font-bold uppercase tracking-wider">Online & Active</span>
                 </div>
             </div>
-            <button id="btnCloseChat" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-100 rounded-full">
+            <button id="btnCloseChat" class="w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </header>
-        <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/50 gap-4">
-            <div class="bubble bubble-ai">สวัสดีครับ ผมคือ Thai Law AI พร้อมช่วยเหลือเรื่องข้อมูลกฎหมายครับ</div>
+        <div id="chat-history" class="flex-1 overflow-y-auto p-5 flex flex-col bg-gray-50 gap-4">
+            <div class="bubble bubble-ai">สวัสดีครับ ผมคือ AI ผู้ช่วยด้านกฎหมาย ยินดีให้คำปรึกษาครับ</div>
         </div>
-        <div class="p-4 border-t bg-white flex gap-2 items-center">
-            <input id="user-input" type="text" class="flex-1 bg-slate-100 rounded-full px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="พิมพ์ข้อสงสัยของคุณ..." autocomplete="off">
-            <button id="send-btn" class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-700 active:scale-90 transition-all shadow-md">
+        <div class="p-4 border-t border-gray-100 bg-white flex gap-3 items-center">
+            <input id="user-input" type="text" class="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 transition-all text-gray-900" placeholder="พิมพ์ข้อสงสัยของคุณ..." autocomplete="off">
+            <button id="send-btn" class="text-white w-12 h-12 rounded-xl flex items-center justify-center active:scale-95 transition-all shadow-md" style="background: var(--primary-gradient);">
                 <span class="material-symbols-rounded text-[22px] ml-1">send</span>
             </button>
         </div>
@@ -338,12 +368,11 @@
     let allLawsData = [];
     let currentPage = 1;
     const itemsPerPage = 10;
-    let listObserver = null; // Defined explicitly
+    let listObserver = null; 
 
     const getStored = () => JSON.parse(localStorage.getItem('favLaws') || '[]');
     const saveToStorage = (data) => localStorage.setItem('favLaws', JSON.stringify(data));
 
-    // Helper for safe base64 ID
     function getSafeId(law) {
         if(law.id) return String(law.id);
         const str = (law["ชื่อกฎหมาย"] || "") + (law["วันที่"] || "");
@@ -354,27 +383,19 @@
         }
     }
 
-    // (Fix 1) Updated renderLawsFromJson with Observer Cleanup & Data Reset
     function renderLawsFromJson(data){
-        // ป้องกันข้อมูลซ้ำ
         if (!Array.isArray(data)) return;
-
-        // ถ้ามี observer เก่าให้หยุดก่อน
         if (listObserver) {
             listObserver.disconnect();
             listObserver = null;
         }
-
-        // reset data ใหม่เสมอ
         allLawsData = [...data];
         currentPage = 1;
-
         renderPage();
     }
 
     function renderPage() {
         const listEl = document.getElementById('list');
-        // (Fix 3) Reset observer inside renderPage too
         if (listObserver) {
             listObserver.disconnect();
             listObserver = null;
@@ -382,7 +403,7 @@
         listEl.innerHTML = '';
 
         if (!allLawsData || allLawsData.length === 0) {
-             listEl.innerHTML = '<div class="text-center py-20 text-slate-400 text-sm italic">ไม่พบข้อมูลกฎหมาย</div>';
+             listEl.innerHTML = '<div class="text-center py-20 text-gray-400 text-sm italic">ไม่พบข้อมูลกฎหมาย</div>';
              return;
         }
 
@@ -391,8 +412,8 @@
         const pageItems = allLawsData.slice(startIndex, endIndex);
 
         pageItems.forEach(law => {
-            const id = getSafeId(law); // (Fix 1) Use ID directly
-            const safeId = id; // (Fix 1) NO replace regex
+            const id = getSafeId(law); 
+            const safeId = id; 
             
             const el = document.createElement('div');
             el.id = `law-item-${safeId}`;
@@ -401,27 +422,30 @@
 
             el.innerHTML = `
                 <div class="fav-btn-container">
-                    <button onclick="toggleFav('${id}')" class="fav-btn">
-                        <span class="material-symbols-rounded">add_circle</span>
+                    <button onclick="toggleFav('${id}')" class="fav-btn group">
+                        <span class="material-symbols-rounded transition-transform group-active:scale-75">bookmark</span>
                     </button>
                 </div>
 
-                <div class="font-bold text-slate-800 text-lg mb-1 pr-12 leading-tight item-title">
+                <div class="font-bold text-gray-900 text-[17px] mb-2 pr-14 leading-tight item-title">
                     ${law["ชื่อกฎหมาย"] || ''}
                 </div>
 
-                <div class="text-xs text-slate-400 mb-3">
-                    วันที่: ${law["วันที่"] || ''}
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="bg-gray-50 text-gray-600 text-[11px] px-2.5 py-1 rounded-md font-bold border border-gray-200">
+                        ${law["หมวด"] || 'ทั่วไป'}
+                    </span>
+                    <span class="text-[11px] text-gray-400">
+                        <i class="material-symbols-rounded" style="font-size:12px; vertical-align:middle;">calendar_today</i>
+                        ${law["วันที่"] || '-'}
+                    </span>
                 </div>
-
-                <p class="text-sm text-slate-600 mb-3">
-                    ${law["หมวด"] || ''}
-                </p>
 
                 ${
                     law["URL_PD"]
                     ? `<a href="${law["URL_PD"]}" target="_blank"
-                         class="text-blue-600 text-sm font-bold hover:underline">
+                         class="inline-flex items-center gap-1.5 text-blue-700 text-sm font-bold hover:text-pink-600 transition-colors">
+                         <span class="material-symbols-rounded" style="font-size:18px;">picture_as_pdf</span>
                          อ่านฉบับเต็ม
                        </a>`
                     : ''
@@ -430,41 +454,36 @@
             listEl.appendChild(el);
         });
 
-        // Pagination Controls
         if (allLawsData.length > itemsPerPage) {
             const totalPages = Math.ceil(allLawsData.length / itemsPerPage);
             const nav = document.createElement('div');
-            nav.className = 'flex justify-center items-center gap-4 mt-6 mb-8';
+            nav.className = 'flex justify-center items-center gap-3 mt-6 mb-8';
             nav.innerHTML = `
-                <button onclick="changePage(-1)" class="px-4 py-2 rounded-lg border ${currentPage === 1 ? 'bg-slate-100 text-slate-400 border-transparent cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 shadow-sm hover:bg-blue-50'}" ${currentPage === 1 ? 'disabled' : ''}>
-                    ย้อนกลับ
+                <button onclick="changePage(-1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === 1 ? 'bg-gray-50 text-gray-300 border-transparent cursor-not-allowed' : 'bg-white text-gray-700 border-gray-200 shadow-sm hover:bg-pink-50'}" ${currentPage === 1 ? 'disabled' : ''}>
+                    <span class="material-symbols-rounded">chevron_left</span>
                 </button>
-                <span class="text-sm font-medium text-slate-600">หน้า ${currentPage} / ${totalPages}</span>
-                <button onclick="changePage(1)" class="px-4 py-2 rounded-lg border ${currentPage === totalPages ? 'bg-slate-100 text-slate-400 border-transparent cursor-not-allowed' : 'bg-white text-blue-600 border-blue-200 shadow-sm hover:bg-blue-50'}" ${currentPage === totalPages ? 'disabled' : ''}>
-                    ถัดไป
+                <span class="text-sm font-bold text-gray-700 bg-white px-4 py-2 rounded-xl border border-gray-200">หน้า ${currentPage} / ${totalPages}</span>
+                <button onclick="changePage(1)" class="w-10 h-10 flex items-center justify-center rounded-xl border ${currentPage === totalPages ? 'bg-gray-50 text-gray-300 border-transparent cursor-not-allowed' : 'bg-white text-gray-700 border-gray-200 shadow-sm hover:bg-pink-50'}" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <span class="material-symbols-rounded">chevron_right</span>
                 </button>
             `;
             listEl.appendChild(nav);
         }
 
-        // Apply visual state (Green Check / Plus)
         const savedIds = getStored().map(s => String(s.id));
         listEl.querySelectorAll('.fav-btn').forEach(btn => {
             const match = btn.getAttribute('onclick')?.match(/toggleFav\((['"]?)(.*?)\1\)/);
             if(match) {
                 const sid = match[2];
-                const icon = btn.querySelector('.material-symbols-rounded');
                 if (savedIds.includes(sid)) {
                     btn.classList.add('active');
-                    if(icon) icon.innerText = 'check_circle';
                 } else {
                     btn.classList.remove('active');
-                    if(icon) icon.innerText = 'add_circle';
                 }
             }
         });
         
-        startObserver(); // Restart observer
+        startObserver(); 
     }
 
     function changePage(delta) {
@@ -477,15 +496,19 @@
         }
     }
 
-    function filterCat(cat, btn) {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    window.toggleSidebar = function(show) {
+        document.getElementById('sidebarMenu').classList.toggle('active', show);
+        document.getElementById('sidebarOverlay').classList.toggle('active', show);
+    };
+
+    window.filterCat = function(cat, btn) {
+        document.querySelectorAll('.side-cat-btn').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
         if(typeof window.filterLawsData === 'function') {
             window.filterLawsData(cat);
         }
-    }
+    };
 
-    // (Fix 4) Updated Toggle with Data Priority
     window.toggleFav = function(id) {
         if (!id) return;
         const sid = String(id);
@@ -498,22 +521,16 @@
             updateUIButtons(sid, false);
         } else {
             let lawTitle = "รายการที่บันทึก";
-            
-            // 1. Try finding in Data first (Most Accurate)
             const item = allLawsData.find(law => getSafeId(law) === sid);
             if (item) {
                 lawTitle = item["ชื่อกฎหมาย"] || "รายการที่บันทึก";
             } else {
-                // 2. Fallback to Precise DOM scraping
-                const card = document.getElementById(`law-item-${sid}`); // Direct ID
+                const card = document.getElementById(`law-item-${sid}`); 
                 if (card) {
                     const titleEl = card.querySelector('.item-title');
-                    if (titleEl) {
-                        lawTitle = titleEl.textContent.trim();
-                    }
+                    if (titleEl) { lawTitle = titleEl.textContent.trim(); }
                 }
             }
-            
             stored.push({ 
                 id: sid, 
                 title: lawTitle, 
@@ -528,112 +545,57 @@
         const sid = String(id);
         const buttons = document.querySelectorAll(`[onclick*="toggleFav('${sid}')"], [onclick*="toggleFav(${sid})"]`);
         buttons.forEach(btn => {
-            const icon = btn.querySelector('.material-symbols-rounded');
-            if (active) {
-                btn.classList.add('active');
-                if(icon) icon.innerText = 'check_circle';
-            } else {
-                btn.classList.remove('active');
-                if(icon) icon.innerText = 'add_circle';
-            }
+            if (active) { btn.classList.add('active'); } 
+            else { btn.classList.remove('active'); }
         });
     }
 
-    // (Fix 2) Updated Observer with Specific Element Checks
     function startObserver() {
         const listEl = document.getElementById('list');
-        if (!listEl) return;
-
-        if (listObserver) return;
-
+        if (!listEl || listObserver) return;
         const transformCard = (card) => {
-            if (!card || card.dataset.transformed === "true") return;
-            
-            // (Fix 2) Check for specific class to ensure it's a card
-            if (!card.classList.contains('bg-white')) return;
-
+            if (!card || card.dataset.transformed === "true" || !card.classList.contains('bg-white')) return;
             const oldBtn = card.querySelector('button');
             if (!oldBtn) return;
-
             const onclick = oldBtn.getAttribute('onclick');
             if (!onclick) return;
-
             const match = onclick.match(/toggleFav\((['"]?)(.*?)\1\)/);
             if (!match) return;
-
             const sid = String(match[2]);
-
             oldBtn.remove();
-
             const container = document.createElement('div');
             container.className = 'fav-btn-container';
-
             const btn = document.createElement('button');
-            btn.className = 'fav-btn';
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                toggleFav(sid);
-            };
-
+            btn.className = 'fav-btn group';
+            btn.onclick = (e) => { e.stopPropagation(); toggleFav(sid); };
             const icon = document.createElement('span');
-            icon.className = 'material-symbols-rounded';
-            icon.innerText = 'add_circle';
-
+            icon.className = 'material-symbols-rounded transition-transform group-active:scale-75';
+            icon.innerText = 'bookmark';
             btn.appendChild(icon);
             container.appendChild(btn);
-
             card.style.position = 'relative';
             card.appendChild(container);
-
             card.dataset.transformed = "true";
-
             const savedIds = getStored().map(s => String(s.id));
-            if (savedIds.includes(sid)) {
-                btn.classList.add('active');
-                icon.innerText = 'check_circle';
-            }
+            if (savedIds.includes(sid)) { btn.classList.add('active'); }
         };
-
         listObserver = new MutationObserver((mutations) => {
-            mutations.forEach(m => {
-                m.addedNodes.forEach(node => {
-                    if (node.nodeType === 1) {
-                        transformCard(node);
-                    }
-                });
-            });
+            mutations.forEach(m => { m.addedNodes.forEach(node => { if (node.nodeType === 1) transformCard(node); }); });
         });
-
         listObserver.observe(listEl, { childList: true });
     }
 
-    // (Fix 3) Jump Logic with Auto Page Switch & Scroll
     window.jumpToItem = function(id) {
         const sid = String(id);
-
-        toggleModal('modalFavs', false);
         switchTab('home');
-
-        const index = allLawsData.findIndex(law => {
-            const lawId = getSafeId(law);
-            return lawId === sid;
-        });
-
+        const index = allLawsData.findIndex(law => getSafeId(law) === sid);
         if (index !== -1) {
             const targetPage = Math.floor(index / itemsPerPage) + 1;
-
-            if (currentPage !== targetPage) {
-                currentPage = targetPage;
-                renderPage();
-            }
-
+            if (currentPage !== targetPage) { currentPage = targetPage; renderPage(); }
             setTimeout(() => {
-                const safeId = sid; // No regex replacement
-                const targetEl = document.getElementById(`law-item-${safeId}`);
-
+                const targetEl = document.getElementById(`law-item-${sid}`);
                 if (targetEl) {
                     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
                     targetEl.classList.remove('target-highlight');
                     void targetEl.offsetWidth;
                     targetEl.classList.add('target-highlight');
@@ -646,59 +608,52 @@
         const container = document.getElementById('favContainer');
         const list = getStored();
         container.innerHTML = '';
-
         if(list.length === 0) {
-            container.innerHTML = `<div class="text-center py-20 text-slate-400">ยังไม่มีรายการที่บันทึกไว้</div>`;
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
+                    <span class="material-symbols-rounded text-6xl opacity-10">bookmark_add</span>
+                    <p class="text-sm font-bold">ไม่มีรายการที่บันทึกไว้</p>
+                </div>
+            `;
         } else {
             list.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center gap-3 animate-slide-up active:scale-95 transition-all cursor-pointer';
-                div.onclick = (e) => {
-                    if(!e.target.closest('.del-btn')) jumpToItem(item.id);
-                };
+                div.className = 'bg-white p-5 rounded-2xl border border-pink-100 shadow-sm flex justify-between items-center gap-3 active:scale-95 transition-all cursor-pointer hover:border-pink-300';
+                div.onclick = (e) => { if(!e.target.closest('.del-btn')) jumpToItem(item.id); };
                 div.innerHTML = `
                     <div class="flex-1 min-w-0 pointer-events-none">
-                        <div class="font-bold text-slate-800 text-sm mb-1 truncate">${item.title}</div>
-                        <div class="text-[10px] text-slate-400">บันทึกเมื่อ: ${item.time}</div>
+                        <div class="font-bold text-gray-900 text-[15px] mb-1.5 leading-snug truncate">${item.title}</div>
+                        <div class="text-[11px] text-gray-400 flex items-center gap-1.5">
+                            <i class="material-symbols-rounded" style="font-size:12px;">schedule</i> 
+                            บันทึกเมื่อ: ${item.time}
+                        </div>
                     </div>
-                    <button onclick="removeFav('${item.id}')" class="del-btn w-10 h-10 flex items-center justify-center text-slate-300 hover:text-red-500 rounded-full hover:bg-red-50 transition-colors">
+                    <button onclick="removeFav('${item.id}')" class="del-btn w-11 h-11 flex items-center justify-center text-gray-400 hover:text-white hover:bg-black rounded-xl transition-all">
                         <span class="material-symbols-rounded text-[22px]">delete</span>
                     </button>
                 `;
                 container.appendChild(div);
             });
         }
-        toggleModal('modalFavs', true);
+        switchTab('fav');
     };
 
-    window.removeFav = function(id) {
-        window.toggleFav(id);
-        window.openFavs();
-    };
+    window.removeFav = function(id) { window.toggleFav(id); window.openFavs(); };
 
     window.addEventListener('DOMContentLoaded', () => {
-        const openBtn = document.getElementById('btnOpenFavs');
-        if(openBtn) openBtn.onclick = () => window.openFavs();
-
-        document.getElementById('btnCloseFavs').onclick = () => toggleModal('modalFavs', false);
-        document.getElementById('fab-chat').onclick = () => toggleModal('modalChat', true);
-        document.getElementById('btnCloseChat').onclick = () => toggleModal('modalChat', false);
-
+        document.getElementById('fab-chat').onclick = () => document.getElementById('modalChat').classList.toggle('active', true);
+        document.getElementById('btnCloseChat').onclick = () => document.getElementById('modalChat').classList.toggle('active', false);
         initSlider();
         initChat();
-        startObserver(); // Initial observer start
+        startObserver(); 
     });
-
-    function toggleModal(id, show) {
-        const el = document.getElementById(id);
-        if(el) el.classList.toggle('active', show);
-    }
 
     function switchTab(tab) {
         document.getElementById('view-home').classList.toggle('hidden', tab !== 'home');
+        document.getElementById('view-fav').classList.toggle('hidden', tab !== 'fav');
         document.getElementById('view-community').classList.toggle('hidden', tab !== 'community');
-        document.getElementById('nav-home').classList.toggle('active', tab === 'home');
-        document.getElementById('nav-community').classList.toggle('active', tab === 'community');
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(`nav-${tab}`).classList.add('active');
     }
 
     function initChat() {
@@ -721,10 +676,10 @@
                 body: JSON.stringify({ message: text, history: chatHistory })
             });
             const data = await res.json();
-            const reply = data.reply || "ระบบ AI กำลังประมวลผลคำตอบให้ครับ...";
+            const reply = data.reply || "AI กำลังคิดคำตอบให้คุณ...";
             addMsg(reply, 'ai');
             chatHistory.push({ role: "assistant", content: reply });
-        } catch(e) { addMsg("ขออภัยครับ การเชื่อมต่อ AI ขัดข้อง", 'ai'); }
+        } catch(e) { addMsg("ขออภัย การเชื่อมต่อ AI ขัดข้อง", 'ai'); }
     }
 
     function addMsg(txt, type) {
@@ -747,6 +702,21 @@
             dots.forEach((d, i) => d.className = `dot ${i === cur ? 'active' : ''}`);
         }, 5000);
     }
+
+    function updateDateTime() {
+        const el = document.getElementById('live-datetime');
+        if(!el) return;
+        const now = new Date();
+        const day = now.getDate();
+        const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        const month = months[now.getMonth()];
+        const year = now.getFullYear();
+        const time = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        el.innerText = `อัพเดทล่าสุด ${day} ${month} ${year} เวลา ${time} น.`;
+    }
+    
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 </script>
 
 </body>
