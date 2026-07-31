@@ -49,7 +49,7 @@
             --glass-bg: rgba(255, 255, 255, 0.85);
             --bg-app: #f8fafc; 
             --text-main: #0f172a; 
-            --bottom-nav-height: 72px;
+            --bottom-nav-height: 68px;
         }
 
         html { scroll-behavior: smooth; }
@@ -58,7 +58,7 @@
             background-color: var(--bg-app);
             color: var(--text-main);
             font-family: "Sarabun", sans-serif;
-            padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 24px);
+            padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 16px);
             margin: 0;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
@@ -96,7 +96,8 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px; position: relative; }
+        /* Mobile First Wrap - Maximum usable width on small screens */
+        .wrap { max-width: 600px; margin: 0 auto; padding: 0 12px; position: relative; width: 100%; box-sizing: border-box; }
 
         /* Sidebar Styling */
         .sidebar-overlay {
@@ -108,7 +109,7 @@
         .sidebar-overlay.active { opacity: 1; visibility: visible; }
         
         .sidebar {
-            position: fixed; top: 0; left: -320px; width: 300px; height: 100%;
+            position: fixed; top: 0; left: -320px; width: 290px; height: 100%;
             background: white; z-index: 301; 
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 12px 0 35px rgba(0,0,0,0.15); 
@@ -117,10 +118,10 @@
         .sidebar.active { transform: translateX(320px); }
 
         .side-cat-btn {
-            display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 14px;
-            color: #475569; font-weight: 500; transition: all 0.2s; font-size: 15px;
+            display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-radius: 12px;
+            color: #475569; font-weight: 500; transition: all 0.2s; font-size: 14px;
             width: 100%; text-align: left; background: transparent; border: none; cursor: pointer;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         .side-cat-btn:hover { background: #f1f5f9; color: #1e3a8a; }
         .side-cat-btn.active { background: var(--primary-gradient); color: white; font-weight: 600; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25); }
@@ -129,8 +130,8 @@
         .cat-chips-bar {
             display: flex;
             overflow-x: auto;
-            gap: 10px;
-            padding: 8px 2px;
+            gap: 8px;
+            padding: 6px 2px;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
@@ -138,83 +139,85 @@
 
         .chip {
             white-space: nowrap;
-            padding: 8px 18px;
+            padding: 6px 14px;
             border-radius: 9999px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             background: white;
             color: #64748b;
             border: 1px solid #e2e8f0;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             cursor: pointer;
         }
         .chip.active {
             background: var(--primary-gradient);
             color: white;
             border-color: transparent;
-            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
             transform: translateY(-1px);
         }
 
         /* Fixed Bottom Navigation */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-height);
-            background: rgba(255, 255, 255, 0.92); display: flex; justify-content: space-around; align-items: center;
+            background: rgba(255, 255, 255, 0.94); display: flex; justify-content: space-around; align-items: center;
             border-top: 1px solid rgba(226, 232, 240, 0.8); z-index: 100;
-            padding: 0 8px; padding-bottom: env(safe-area-inset-bottom);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+            padding: 0 6px; padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
             backdrop-filter: blur(12px);
         }
         .nav-item { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
             color: #94a3b8; font-size: 11px; font-weight: 600; flex: 1; height: 100%;
             cursor: pointer; transition: all 0.2s ease;
             position: relative;
         }
         .nav-item.active { color: #6d28d9; }
-        .nav-item.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; transform: translateY(-2px); }
+        .nav-item.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; transform: translateY(-1px); }
         .nav-item .nav-indicator {
-            position: absolute; top: 0; width: 28px; height: 3px; background: #6d28d9; border-radius: 0 0 4px 4px; opacity: 0; transition: opacity 0.2s;
+            position: absolute; top: 0; width: 24px; height: 3px; background: #6d28d9; border-radius: 0 0 4px 4px; opacity: 0; transition: opacity 0.2s;
         }
         .nav-item.active .nav-indicator { opacity: 1; }
 
-        /* Search Container */
+        /* Search Container - Fit nicely on small mobile screens */
         .search-container {
-            background: white; border-radius: 20px; padding: 6px 14px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); display: flex; gap: 10px;
-            margin-top: -28px; position: relative; z-index: 20;
-            border: 1px solid #f1f5f9; align-items: center; height: 62px;
+            background: white; border-radius: 16px; padding: 4px 10px;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.08); display: flex; gap: 8px;
+            margin-top: -24px; position: relative; z-index: 20;
+            border: 1px solid #f1f5f9; align-items: center; height: 54px;
         }
-        .search-input { flex: 1; border: none; outline: none; font-size: 15px; background: transparent; color: var(--text-main); }
+        .search-input { flex: 1; border: none; outline: none; font-size: 14px; background: transparent; color: var(--text-main); min-width: 0; }
         .search-btn {
-            background: var(--primary-gradient); color: white; width: 44px; height: 44px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+            background: var(--primary-gradient); color: white; width: 40px; height: 40px; border-radius: 12px;
+            display: flex; items-center: center; justify-content: center; transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25); shrink: 0;
         }
         .search-btn:active { transform: scale(0.92); }
 
-        /* Law Card Item */
+        /* Law Card Item - Optimized for Mobile */
         .law-card {
-            border: 1px solid #f1f5f9; border-radius: 20px; overflow: hidden;
-            background: white; margin-bottom: 16px;
-            padding: 22px 20px; position: relative;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-            transition: all 0.25s ease;
+            border: 1px solid #f1f5f9; border-radius: 18px; overflow: hidden;
+            background: white; margin-bottom: 12px;
+            padding: 16px 14px; position: relative;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
-        .law-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05); border-color: #e2e8f0; }
+        .law-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04); border-color: #e2e8f0; }
 
         /* Favorite Floating Button inside Cards */
-        .fav-btn-container { position: absolute; top: 18px; right: 18px; z-index: 5; }
+        .fav-btn-container { position: absolute; top: 14px; right: 12px; z-index: 5; }
         .fav-btn { 
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; color: #94a3b8;
             background: #f8fafc; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; border: 1px solid #e2e8f0;
-            width: 42px; height: 42px;
+            width: 38px; height: 38px;
         }
         .fav-btn:hover { color: #f43f5e; background: #fff1f2; border-color: #fecdd3; }
-        .fav-btn.active { color: #ffffff !important; background: #f43f5e; border-color: #f43f5e; transform: scale(1.08); box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4); }
+        .fav-btn.active { color: #ffffff !important; background: #f43f5e; border-color: #f43f5e; transform: scale(1.05); box-shadow: 0 3px 10px rgba(244, 63, 94, 0.35); }
         .fav-btn.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
         /* Modal Overlay & Chat */
@@ -222,25 +225,27 @@
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
             z-index: 250; display: none; align-items: flex-end; justify-content: center; 
             backdrop-filter: blur(6px); opacity: 0; transition: opacity 0.3s ease;
+            padding: 0;
         }
         .modal-overlay.active { display: flex; opacity: 1; }
 
         @media (min-width: 640px) {
-            .modal-overlay { align-items: center; padding: 20px; }
+            .modal-overlay { align-items: center; padding: 16px; }
         }
 
-        .bubble { padding: 12px 16px; border-radius: 18px; font-size: 14px; max-width: 85%; margin-bottom: 8px; line-height: 1.6; word-wrap: break-word;}
-        .bubble-user { background: var(--primary-gradient); color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 3px 10px rgba(124, 58, 237, 0.25); }
-        .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.03);}
+        .bubble { padding: 10px 14px; border-radius: 16px; font-size: 13px; max-width: 88%; margin-bottom: 8px; line-height: 1.5; word-wrap: break-word;}
+        .bubble-user { background: var(--primary-gradient); color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 3px 10px rgba(124, 58, 237, 0.2); }
+        .bubble-ai { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.02);}
 
         .target-highlight { animation: highlight 1.8s ease-out; }
         @keyframes highlight { 0% { background: #fef08a; border-color: #fde047; } 100% { background: white; } }
 
         /* Quiz Game Styles */
         .option-btn {
-            display: flex; align-items: center; width: 100%; text-align: left; padding: 14px 18px;
-            border-radius: 16px; border: 2px solid #e2e8f0; background: white; font-weight: 500;
-            color: #334155; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 10px; cursor: pointer;
+            display: flex; align-items: center; width: 100%; text-align: left; padding: 11px 14px;
+            border-radius: 14px; border: 2px solid #e2e8f0; background: white; font-weight: 500;
+            color: #334155; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 8px; cursor: pointer;
+            font-size: 13px;
         }
         .option-btn:hover:not(:disabled) { border-color: #a855f7; background: #faf5ff; transform: translateX(2px); }
         .option-btn.correct { border-color: #10b981 !important; background: #ecfdf5 !important; color: #065f46 !important; font-weight: 700; }
@@ -251,7 +256,7 @@
             width: 100% !important;
             max-width: 100% !important;
             overflow: hidden !important;
-            border-radius: 16px;
+            border-radius: 14px;
         }
         .fb-page, .fb-page iframe, .fb-page span {
             width: 100% !important;
@@ -264,54 +269,54 @@
 <!-- Sidebar Menu -->
 <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
 <aside id="sidebarMenu" class="sidebar">
-    <div class="p-6 text-white flex justify-between items-center shrink-0 gradient-header">
-        <div class="flex items-center gap-3">
-            <span class="material-symbols-rounded text-2xl">category</span>
+    <div class="p-5 text-white flex justify-between items-center shrink-0 gradient-header">
+        <div class="flex items-center gap-2.5">
+            <span class="material-symbols-rounded text-xl">category</span>
             <div>
-                <span class="font-bold text-lg block leading-tight">หมวดหมู่กฎหมาย</span>
-                <span class="text-[11px] text-pink-200">เลือกดูหัวข้อที่สนใจ</span>
+                <span class="font-bold text-base block leading-tight">หมวดหมู่กฎหมาย</span>
+                <span class="text-[10px] text-pink-200">เลือกดูหัวข้อที่สนใจ</span>
             </div>
         </div>
         <button onclick="toggleSidebar(false)" class="text-white/80 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10">
-            <span class="material-symbols-rounded">close</span>
+            <span class="material-symbols-rounded text-xl">close</span>
         </button>
     </div>
-    <div id="sidebarList" class="flex flex-col p-4 gap-1 flex-1 overflow-y-auto bg-white">
+    <div id="sidebarList" class="flex flex-col p-3 gap-1 flex-1 overflow-y-auto bg-white">
         <button class="side-cat-btn side-all-btn active" onclick="filterCat('all', this); toggleSidebar(false)">
-            <span class="material-symbols-rounded">format_list_bulleted</span> กฎหมายทั้งหมด
+            <span class="material-symbols-rounded text-lg">format_list_bulleted</span> กฎหมายทั้งหมด
         </button>
         <div id="dynamicSidebarContainer"></div>
         
-        <div class="mt-auto pt-4 border-t border-slate-100 flex flex-col gap-1">
+        <div class="mt-auto pt-3 border-t border-slate-100 flex flex-col gap-1">
             <button onclick="openQuizModal()" class="side-cat-btn text-purple-700 bg-purple-50 hover:bg-purple-100 font-semibold">
-                <span class="material-symbols-rounded text-purple-600">sports_esports</span> ควิซกฎหมาย 1 ข้อ 🎮
+                <span class="material-symbols-rounded text-purple-600 text-lg">sports_esports</span> ควิซกฎหมาย 1 ข้อ 🎮
             </button>
             <a href="https://pdpa.pro/policies/view/th/4FM1QqDBTJkGBBva4fZvhvQ1" target="_blank" class="side-cat-btn text-slate-500" style="text-decoration: none;">
-                <span class="material-symbols-rounded">privacy_tip</span> นโยบายความเป็นส่วนตัว
+                <span class="material-symbols-rounded text-lg">privacy_tip</span> นโยบายความเป็นส่วนตัว
             </a>
         </div>
     </div>
 </aside>
 
 <!-- Top Header Bar -->
-<header class="gradient-header text-white pt-5 pb-11 px-4 rounded-b-[28px] shadow-lg relative z-10">
+<header class="gradient-header text-white pt-4 pb-10 px-3 sm:px-4 rounded-b-[24px] sm:rounded-b-[28px] shadow-lg relative z-10">
     <div class="wrap">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar(true)" class="w-11 h-11 flex items-center justify-center bg-white/15 border border-white/20 rounded-2xl hover:bg-white/25 transition-colors backdrop-blur-md active:scale-95 shadow-sm">
-                    <span class="material-symbols-rounded">menu</span>
+        <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                <button onclick="toggleSidebar(true)" class="w-10 h-10 flex items-center justify-center bg-white/15 border border-white/20 rounded-xl hover:bg-white/25 transition-colors backdrop-blur-md active:scale-95 shadow-sm shrink-0">
+                    <span class="material-symbols-rounded text-xl sm:text-2xl">menu</span>
                 </button>
-                <div class="flex items-center gap-3">
-                    <div class="bg-white/95 text-indigo-950 w-11 h-11 rounded-2xl shadow-md flex items-center justify-center font-bold">
-                        <span class="material-symbols-rounded text-2xl text-indigo-900">gavel</span>
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div class="bg-white/95 text-indigo-950 w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl shadow-md flex items-center justify-center font-bold shrink-0">
+                        <span class="material-symbols-rounded text-xl sm:text-2xl text-indigo-900">gavel</span>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                    <div class="min-w-0 flex-1">
+                        <h1 class="text-base sm:text-xl font-bold tracking-tight text-white flex items-center gap-1.5 truncate">
                             Thai Law
-                            <span class="bg-pink-500/80 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">2026</span>
+                            <span class="bg-pink-500/80 text-white text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wide shrink-0">2026</span>
                         </h1>
-                        <p id="live-datetime" class="text-[11px] text-pink-200 font-medium tracking-wide opacity-95 min-h-[14px] flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <p id="live-datetime" class="text-[10px] sm:text-[11px] text-pink-200 font-medium tracking-wide opacity-95 min-h-[14px] flex items-center gap-1 truncate">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
                             กำลังโหลดเวลา...
                         </p>
                     </div>
@@ -319,8 +324,8 @@
             </div>
 
             <!-- Quick Quiz Icon Button Header -->
-            <button onclick="openQuizModal()" class="flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-slate-900 px-3 py-2 rounded-2xl font-bold text-xs shadow-md transition-all active:scale-95">
-                <span class="material-symbols-rounded text-lg">sports_esports</span>
+            <button onclick="openQuizModal()" class="flex items-center gap-1 bg-amber-400 hover:bg-amber-300 text-slate-900 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl sm:rounded-2xl font-bold text-xs shadow-md transition-all active:scale-95 shrink-0">
+                <span class="material-symbols-rounded text-base sm:text-lg">sports_esports</span>
                 <span class="hidden sm:inline">ควิซกฎหมาย</span>
             </button>
         </div>
@@ -333,39 +338,39 @@
         <!-- Search Section -->
         <section class="relative z-20">
             <div class="search-container">
-                <span class="material-symbols-rounded text-slate-400 pl-2">search</span>
+                <span class="material-symbols-rounded text-slate-400 pl-1 text-xl">search</span>
                 <input id="q" class="search-input" type="search" placeholder="ค้นหาชื่อกฎหมาย, เลขมาตรา, คำสำคัญ..." enterkeyhint="search">
                 <button id="btnSearch" class="search-btn">
-                    <span class="material-symbols-rounded">arrow_forward</span>
+                    <span class="material-symbols-rounded text-xl">arrow_forward</span>
                 </button>
             </div>
         </section>
 
         <!-- Dynamic Announcement Carousel -->
-        <section class="mt-6">
-            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 relative overflow-hidden">
-                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
-                    <div class="flex items-center gap-2 text-pink-600 font-bold text-sm">
-                        <span class="material-symbols-rounded text-lg">campaign</span>
+        <section class="mt-4">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                    <div class="flex items-center gap-1.5 text-pink-600 font-bold text-xs sm:text-sm">
+                        <span class="material-symbols-rounded text-base">campaign</span>
                         ประกาศ & ข่าวสารล่าสุด
                     </div>
-                    <span id="updateBadge" class="text-[11px] text-purple-700 bg-purple-50 font-bold px-2.5 py-0.5 rounded-full border border-purple-100">
+                    <span id="updateBadge" class="text-[10px] sm:text-[11px] text-purple-700 bg-purple-50 font-bold px-2 py-0.5 rounded-full border border-purple-100">
                         อัปเดตวันนี้
                     </span>
                 </div>
                 
-                <div id="latestViewport" class="overflow-hidden relative min-h-[50px] flex items-center">
+                <div id="latestViewport" class="overflow-hidden relative min-h-[46px] flex items-center">
                     <div id="latestTrack" class="w-full">
-                        <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0">
-                            <span id="update-banner-1" class="text-[15px] font-bold text-slate-800 leading-relaxed">กำลังโหลดข้อมูลราชกิจจานุเบกษา...</span>
+                        <div class="w-full flex flex-col gap-1 items-center text-center px-1 shrink-0">
+                            <span id="update-banner-1" class="text-xs sm:text-sm font-bold text-slate-800 leading-snug break-words">กำลังโหลดข้อมูลราชกิจจานุเบกษา...</span>
                         </div>
-                        <div class="w-full flex flex-col gap-1 items-center text-center px-2 shrink-0 hidden">
-                            <span id="update-banner-2" class="text-[15px] font-bold text-purple-900 leading-relaxed">🤖 สอบถามปัญญาประดิษฐ์ AI ข้อกฎหมายได้ทันทีตลอด 24 ชม.</span>
+                        <div class="w-full flex flex-col gap-1 items-center text-center px-1 shrink-0 hidden">
+                            <span id="update-banner-2" class="text-xs sm:text-sm font-bold text-purple-900 leading-snug break-words">🤖 สอบถามปัญญาประดิษฐ์ AI ข้อกฎหมายได้ทันทีตลอด 24 ชม.</span>
                         </div>
                     </div>
                 </div>
 
-                <div id="dots" class="flex justify-center gap-1.5 mt-3">
+                <div id="dots" class="flex justify-center gap-1.5 mt-2.5">
                     <div class="w-2 h-2 rounded-full bg-pink-500 transition-all"></div>
                     <div class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
                 </div>
@@ -373,46 +378,46 @@
         </section>
 
         <!-- Interactive Law Game Challenge Banner -->
-        <section class="mt-4">
-            <div onclick="openQuizModal()" class="bg-gradient-to-r from-purple-900 via-indigo-900 to-pink-800 rounded-2xl p-4 text-white shadow-md flex items-center justify-between cursor-pointer hover:shadow-lg transition-all active:scale-[0.99] border border-white/10">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-white/15 rounded-2xl backdrop-blur-md flex items-center justify-center text-2xl border border-white/20">
+        <section class="mt-3">
+            <div onclick="openQuizModal()" class="bg-gradient-to-r from-purple-900 via-indigo-900 to-pink-800 rounded-2xl p-3.5 text-white shadow-md flex items-center justify-between cursor-pointer hover:shadow-lg transition-all active:scale-[0.99] border border-white/10">
+                <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                    <div class="w-10 h-10 bg-white/15 rounded-xl backdrop-blur-md flex items-center justify-center text-xl border border-white/20 shrink-0">
                         🧠
                     </div>
-                    <div>
-                        <div class="font-bold text-sm flex items-center gap-2">
-                            มินิเกมถาม-ตอบกฎหมายไทย (1 ข้อ)
-                            <span class="bg-amber-400 text-slate-900 text-[10px] font-extrabold px-2 py-0.5 rounded-md">QUICK</span>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-xs sm:text-sm flex items-center gap-1.5 truncate">
+                            มินิเกมถาม-ตอบกฎหมายไทย
+                            <span class="bg-amber-400 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded shrink-0">QUICK</span>
                         </div>
-                        <p class="text-xs text-pink-200 mt-0.5">ทดสอบความรู้กฎหมายสั้นๆ ในป๊อปอัปไดอะล็อก!</p>
+                        <p class="text-[11px] text-pink-200 mt-0.5 truncate">ทดสอบความรู้กฎหมายสั้นๆ ในไดอะล็อก!</p>
                     </div>
                 </div>
-                <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
-                    <span class="material-symbols-rounded">play_arrow</span>
+                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white shrink-0">
+                    <span class="material-symbols-rounded text-lg">play_arrow</span>
                 </div>
             </div>
         </section>
 
         <!-- Category Sliding Chips -->
-        <section class="mt-5">
+        <section class="mt-3">
             <div id="catChipsBar" class="cat-chips-bar">
                 <button class="chip active chip-all" onclick="filterCat('all', this)">ทั้งหมด 🏛️</button>
             </div>
         </section>
 
         <!-- Laws Feed Container -->
-        <section class="mt-5 pb-20">
-            <div class="flex items-center justify-between mb-4 px-1">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-1.5 h-6 rounded-full" style="background: var(--primary-gradient);"></span>
-                    <h2 id="panelTitle" class="font-bold text-slate-800 text-lg">รายการกฎหมายล่าสุด</h2>
+        <section class="mt-3 pb-16">
+            <div class="flex items-center justify-between mb-3 px-0.5">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-5 rounded-full" style="background: var(--primary-gradient);"></span>
+                    <h2 id="panelTitle" class="font-bold text-slate-800 text-base sm:text-lg">รายการกฎหมายล่าสุด</h2>
                 </div>
-                <span id="lawCountBadge" class="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-1 rounded-lg"></span>
+                <span id="lawCountBadge" class="text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md"></span>
             </div>
 
-            <div id="list" class="flex flex-col min-h-[250px]">
-                <div class="text-center py-16 text-slate-400 text-sm italic flex flex-col items-center justify-center gap-3">
-                    <div class="w-8 h-8 border-3 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            <div id="list" class="flex flex-col min-h-[220px]">
+                <div class="text-center py-12 text-slate-400 text-xs italic flex flex-col items-center justify-center gap-2.5">
+                    <div class="w-7 h-7 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
                     <span>กำลังดึงข้อมูลกฎหมายจากระบบ...</span>
                 </div>
             </div>
@@ -421,18 +426,18 @@
 
     <!-- VIEW: GAME / QUIZ CHALLENGE -->
     <div id="view-quiz" class="hidden">
-        <div class="pt-6 pb-24">
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+        <div class="pt-4 pb-20">
+            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <span class="text-2xl">🎮</span>
+                        <span class="text-xl">🎮</span>
                         <div>
-                            <h2 class="font-bold text-slate-900 text-lg">เกมควิซกฎหมายไทย</h2>
-                            <p class="text-xs text-slate-500">ตอบถูกสะสมคะแนนและความรู้!</p>
+                            <h2 class="font-bold text-slate-900 text-base">เกมควิซกฎหมายไทย</h2>
+                            <p class="text-[11px] text-slate-500">ตอบถูกสะสมคะแนนและความรู้!</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1">
+                        <div class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1">
                             <span class="material-symbols-rounded text-amber-500 text-sm">trophy</span>
                             คะแนน: <span id="quizScore">0</span>
                         </div>
@@ -440,31 +445,31 @@
                 </div>
 
                 <!-- Quiz Card Content -->
-                <div id="quizContent" class="space-y-4">
-                    <div class="flex items-center justify-between text-xs font-bold text-purple-700 bg-purple-50 px-3.5 py-2 rounded-xl">
+                <div id="quizContent" class="space-y-3">
+                    <div class="flex items-center justify-between text-[11px] font-bold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-lg">
                         <span id="quizNum">คำถามข้อที่ 1/4</span>
                         <span id="quizStreak">🔥 ต่อเนื่อง: 0</span>
                     </div>
 
-                    <h3 id="quizQuestion" class="text-base font-bold text-slate-800 leading-relaxed pt-2">
+                    <h3 id="quizQuestion" class="text-sm font-bold text-slate-800 leading-relaxed pt-1 break-words">
                         กำลังโหลดคำถามกฎหมาย...
                     </h3>
 
-                    <div id="quizOptions" class="pt-2 space-y-2.5">
+                    <div id="quizOptions" class="pt-1 space-y-2">
                         <!-- Options generated dynamically -->
                     </div>
 
                     <!-- Emoji & Answer Feedback Card -->
-                    <div id="quizFeedback" class="hidden p-4 rounded-2xl mt-4 transition-all animate-pop">
-                        <div class="flex items-start gap-3">
-                            <span id="feedbackEmoji" class="text-4xl shrink-0">🎉</span>
-                            <div>
-                                <h4 id="feedbackTitle" class="font-bold text-sm mb-1">ถูกต้องแล้ว!</h4>
-                                <p id="feedbackDesc" class="text-xs leading-relaxed opacity-90"></p>
+                    <div id="quizFeedback" class="hidden p-3.5 rounded-xl mt-3 transition-all animate-pop">
+                        <div class="flex items-start gap-2.5">
+                            <span id="feedbackEmoji" class="text-3xl shrink-0">🎉</span>
+                            <div class="min-w-0 flex-1">
+                                <h4 id="feedbackTitle" class="font-bold text-xs mb-0.5">ถูกต้องแล้ว!</h4>
+                                <p id="feedbackDesc" class="text-[11px] leading-relaxed opacity-90 break-words"></p>
                             </div>
                         </div>
-                        <button onclick="nextQuizQuestion()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-1">
-                            ข้อถัดไป <span class="material-symbols-rounded text-sm">arrow_forward</span>
+                        <button onclick="nextQuizQuestion()" class="mt-3 w-full bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-lg font-bold text-xs transition-colors flex items-center justify-center gap-1">
+                            ข้อถัดไป <span class="material-symbols-rounded text-xs">arrow_forward</span>
                         </button>
                     </div>
                 </div>
@@ -474,75 +479,74 @@
 
     <!-- VIEW: FAVORITES -->
     <div id="view-fav" class="hidden">
-        <div class="pt-6 pb-24">
-            <div class="flex items-center justify-between mb-5 px-1">
-                <div class="flex items-center gap-3">
-                    <span class="w-1.5 h-6 rounded-full bg-pink-500"></span>
-                    <h2 class="font-bold text-slate-800 text-lg">รายการโปรดที่บันทึกไว้</h2>
+        <div class="pt-4 pb-20">
+            <div class="flex items-center justify-between mb-4 px-0.5">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-5 rounded-full bg-pink-500"></span>
+                    <h2 class="font-bold text-slate-800 text-base sm:text-lg">รายการโปรดที่บันทึกไว้</h2>
                 </div>
-                <button onclick="clearAllFavs()" class="text-xs text-rose-500 hover:text-rose-700 font-bold bg-rose-50 px-2.5 py-1.5 rounded-lg transition-colors">
+                <button onclick="clearAllFavs()" class="text-[11px] text-rose-500 hover:text-rose-700 font-bold bg-rose-50 px-2 py-1 rounded-md transition-colors">
                     ล้างทั้งหมด
                 </button>
             </div>
-            <div id="favContainer" class="space-y-3"></div>
+            <div id="favContainer" class="space-y-2.5"></div>
         </div>
     </div>
 
     <!-- VIEW: COMMUNITY -->
     <div id="view-community" class="hidden">
-        <div class="pt-6 pb-24">
-            <div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
+        <div class="pt-4 pb-20">
+            <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
                 <!-- Header tab -->
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl text-white flex items-center justify-center shadow-md" style="background: var(--primary-gradient);">
-                            <span class="material-symbols-rounded text-xl">forum</span>
+                <div class="p-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl text-white flex items-center justify-center shadow-md shrink-0" style="background: var(--primary-gradient);">
+                            <span class="material-symbols-rounded text-lg">forum</span>
                         </div>
-                        <div>
-                            <span class="font-bold text-slate-900 text-base block leading-tight">ชุมชนกฎหมายน่ารู้</span>
-                            <span class="text-xs text-slate-500">พูดคุย แลกเปลี่ยนความรู้กฎหมายใกล้ตัว</span>
+                        <div class="min-w-0">
+                            <span class="font-bold text-slate-900 text-sm block leading-tight truncate">ชุมชนกฎหมายน่ารู้</span>
+                            <span class="text-[10px] text-slate-500 truncate block">พูดคุย แลกเปลี่ยนความรู้กฎหมายใกล้ตัว</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Community Discussion Feed -->
-                <div class="p-4 bg-slate-50/40 space-y-4">
+                <div class="p-3 bg-slate-50/40 space-y-3">
                     <!-- Interactive Share Box -->
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">
+                    <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs shrink-0">
                                 คุณ
                             </div>
-                            <input id="postInput" type="text" placeholder="ตั้งคำถาม หรือแชร์ข้อคิดเห็นกฎหมาย..." class="flex-1 bg-slate-100 text-xs px-4 py-2.5 rounded-xl outline-none focus:ring-2 ring-purple-400 text-slate-800">
-                            <button onclick="createPost()" class="bg-purple-600 text-white p-2.5 rounded-xl hover:bg-purple-700 transition-colors shadow-sm active:scale-95">
-                                <span class="material-symbols-rounded text-lg">send</span>
+                            <input id="postInput" type="text" placeholder="ตั้งคำถาม หรือแชร์ข้อคิดเห็น..." class="flex-1 bg-slate-100 text-xs px-3 py-2 rounded-lg outline-none focus:ring-2 ring-purple-400 text-slate-800 min-w-0">
+                            <button onclick="createPost()" class="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition-colors shadow-sm active:scale-95 shrink-0">
+                                <span class="material-symbols-rounded text-base">send</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Dynamic Post Cards List -->
-                    <div id="communityPostsList" class="space-y-3">
-                        <!-- Sample Real legal discussions -->
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                            <div class="flex items-center gap-3 mb-2.5">
-                                <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 font-bold flex items-center justify-center text-xs">
+                    <div id="communityPostsList" class="space-y-2.5">
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-7 h-7 rounded-full bg-pink-100 text-pink-600 font-bold flex items-center justify-center text-[11px] shrink-0">
                                     ทนาย
                                 </div>
                                 <div>
                                     <div class="font-bold text-xs text-slate-800">ทนายไขข้อข้องใจ</div>
-                                    <div class="text-[10px] text-slate-400">10 นาทีที่แล้ว • บทความกฎหมาย</div>
+                                    <div class="text-[9px] text-slate-400">10 นาทีที่แล้ว • บทความกฎหมาย</div>
                                 </div>
                             </div>
-                            <p class="text-xs text-slate-700 leading-relaxed mb-3">
+                            <p class="text-xs text-slate-700 leading-relaxed mb-2.5 break-words">
                                 📌 <strong>การถูกหลอกโอนเงินซื้อสินค้าออนไลน์:</strong> สามารถนำหลักฐานสลิปการโอนเงินและแชตการสนทนา เข้าแจ้งความกับตำรวจไซเบอร์ได้ภายใน 72 ชม. เพื่อทำการอายัดบัญชีม้าครับ!
                             </p>
-                            <div class="flex items-center gap-4 text-xs text-slate-400 pt-2 border-t border-slate-50">
-                                <button onclick="likePost(this)" class="flex items-center gap-1 hover:text-pink-500 transition-colors">
-                                    <span class="material-symbols-rounded text-base">favorite</span>
+                            <div class="flex items-center gap-3 text-xs text-slate-400 pt-1.5 border-t border-slate-50">
+                                <button onclick="likePost(this)" class="flex items-center gap-1 hover:text-pink-500 transition-colors text-[11px]">
+                                    <span class="material-symbols-rounded text-sm">favorite</span>
                                     <span>24</span>
                                 </button>
-                                <button class="flex items-center gap-1 hover:text-purple-600 transition-colors">
-                                    <span class="material-symbols-rounded text-base">chat_bubble</span>
+                                <button class="flex items-center gap-1 hover:text-purple-600 transition-colors text-[11px]">
+                                    <span class="material-symbols-rounded text-sm">chat_bubble</span>
                                     <span>5</span>
                                 </button>
                             </div>
@@ -550,19 +554,19 @@
                     </div>
 
                     <!-- Facebook Page Embed Section -->
-                    <div class="mt-6 pt-4 border-t border-slate-200">
-                        <div class="flex items-center gap-2 text-xs font-bold text-slate-600 mb-3">
+                    <div class="mt-4 pt-3 border-t border-slate-200">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600 mb-2">
                             <span class="material-symbols-rounded text-blue-600 text-base">public</span>
                             ฟีดข่าวสารจากเพจฎีกาน่าสนใจ
                         </div>
-                        <div class="fb-container-wrapper bg-white border border-slate-100 p-2 shadow-sm">
+                        <div class="fb-container-wrapper bg-white border border-slate-100 p-1.5 shadow-sm">
                             <div id="fb-root"></div>
                             <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0"></script>
                             <div class="fb-page" 
                                 data-href="https://www.facebook.com/interesting.deka/" 
                                 data-tabs="timeline" 
                                 data-width="500" 
-                                data-height="650" 
+                                data-height="600" 
                                 data-small-header="true" 
                                 data-adapt-container-width="true" 
                                 data-hide-cover="false" 
@@ -581,52 +585,52 @@
 <nav class="bottom-nav">
     <div id="nav-home" class="nav-item active" onclick="switchTab('home')">
         <div class="nav-indicator"></div>
-        <span class="material-symbols-rounded text-2xl">home</span>
+        <span class="material-symbols-rounded text-xl">home</span>
         <span>หน้าหลัก</span>
     </div>
     <div id="nav-fav" class="nav-item" onclick="openFavs()">
         <div class="nav-indicator"></div>
-        <span class="material-symbols-rounded text-2xl">bookmark</span>
+        <span class="material-symbols-rounded text-xl">bookmark</span>
         <span>รายการโปรด</span>
     </div>
     <div id="nav-community" class="nav-item" onclick="switchTab('community')">
         <div class="nav-indicator"></div>
-        <span class="material-symbols-rounded text-2xl">forum</span>
+        <span class="material-symbols-rounded text-xl">forum</span>
         <span>ชุมชน</span>
     </div>
 </nav>
 
 <!-- Floating Chatbot FAB -->
-<button id="fab-chat" class="fixed bottom-[88px] right-5 w-14 h-14 text-white rounded-2xl shadow-xl flex items-center justify-center z-50 active:scale-90 transition-all hover:scale-105" style="background: var(--primary-gradient); box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);">
-    <span class="material-symbols-rounded text-3xl">smart_toy</span>
+<button id="fab-chat" class="fixed bottom-[80px] right-4 w-12 h-12 text-white rounded-2xl shadow-xl flex items-center justify-center z-50 active:scale-90 transition-all hover:scale-105" style="background: var(--primary-gradient); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);">
+    <span class="material-symbols-rounded text-2xl">smart_toy</span>
 </button>
 
 <!-- AI Chatbot Drawer Modal -->
 <div id="modalChat" class="modal-overlay z-[250]">
-    <div class="bg-white w-full sm:max-w-[440px] h-[85vh] sm:h-[650px] rounded-t-[28px] sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl relative animate-slide-up">
-        <header class="p-4 px-5 flex justify-between items-center shrink-0 z-10 text-white gradient-header">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center text-white border border-white/20 backdrop-blur-md">
-                    <span class="material-symbols-rounded text-xl">smart_toy</span>
+    <div class="bg-white w-full sm:max-w-[440px] h-[88vh] sm:h-[620px] rounded-t-[24px] sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl relative animate-slide-up">
+        <header class="p-3.5 px-4 flex justify-between items-center shrink-0 z-10 text-white gradient-header">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white border border-white/20 backdrop-blur-md shrink-0">
+                    <span class="material-symbols-rounded text-lg">smart_toy</span>
                 </div>
                 <div>
-                    <span class="font-bold text-white block leading-tight">Thai Law AI Assistant</span>
-                    <span class="text-[10px] text-pink-200 font-semibold uppercase tracking-wider flex items-center gap-1">
+                    <span class="font-bold text-white text-sm block leading-tight">Thai Law AI Assistant</span>
+                    <span class="text-[9px] text-pink-200 font-semibold uppercase tracking-wider flex items-center gap-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> พร้อมตอบทุกคำถามกฎหมาย
                     </span>
                 </div>
             </div>
-            <button id="btnCloseChat" class="w-9 h-9 flex items-center justify-center text-white/80 hover:text-white rounded-xl hover:bg-white/10 transition-colors">
-                <span class="material-symbols-rounded">close</span>
+            <button id="btnCloseChat" class="w-8 h-8 flex items-center justify-center text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-colors">
+                <span class="material-symbols-rounded text-lg">close</span>
             </button>
         </header>
-        <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-50/60 gap-3">
+        <div id="chat-history" class="flex-1 overflow-y-auto p-3 flex flex-col bg-slate-50/60 gap-2.5">
             <div class="bubble bubble-ai">สวัสดีครับ! ผมคือ AI ผู้ช่วยตอบข้อสงสัยด้านกฎหมายไทย สามารถสอบถามเรื่องมาตรา กฎหมายจราจร PDPA หรือคดีทั่วไปได้เลยครับ ⚖️</div>
         </div>
-        <div class="p-3 bg-white border-t border-slate-100 flex gap-2 items-center">
-            <input id="chat-user-input" type="text" class="flex-1 bg-slate-100 border border-slate-200 rounded-2xl px-4 py-3 text-xs outline-none focus:ring-2 ring-purple-400 transition-all text-slate-800" placeholder="พิมพ์คำถามกฎหมายที่สงสัย..." autocomplete="off">
-            <button id="chat-send-btn" class="text-white w-11 h-11 rounded-2xl flex items-center justify-center active:scale-95 transition-transform shadow-md shrink-0" style="background: var(--primary-gradient);">
-                <span class="material-symbols-rounded text-xl">send</span>
+        <div class="p-2.5 bg-white border-t border-slate-100 flex gap-2 items-center">
+            <input id="chat-user-input" type="text" class="flex-1 bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:ring-2 ring-purple-400 transition-all text-slate-800" placeholder="พิมพ์คำถามกฎหมายที่สงสัย..." autocomplete="off">
+            <button id="chat-send-btn" class="text-white w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-md shrink-0" style="background: var(--primary-gradient);">
+                <span class="material-symbols-rounded text-lg">send</span>
             </button>
         </div>
     </div>
@@ -634,43 +638,43 @@
 
 <!-- Quick Quiz Welcome Dialog Modal (1 Question) -->
 <div id="welcomeModal" class="modal-overlay z-[300]">
-    <div class="bg-white w-[92%] max-w-[420px] p-5 rounded-3xl shadow-2xl space-y-3.5 animate-pop relative border border-purple-100">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-xl shadow-inner">
+    <div class="bg-white w-[94%] max-w-[400px] p-4.5 rounded-2xl shadow-2xl space-y-3 animate-pop relative border border-purple-100 mb-2 sm:mb-0">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-lg shadow-inner shrink-0">
                     🧠
                 </div>
                 <div>
-                    <h3 class="font-bold text-slate-900 text-base leading-tight">ควิซกฎหมายน่ารู้</h3>
-                    <p class="text-[11px] text-purple-600 font-semibold">ทายกฎหมาย 1 ข้อสั้นๆ</p>
+                    <h3 class="font-bold text-slate-900 text-sm leading-tight">ควิซกฎหมายน่ารู้</h3>
+                    <p class="text-[10px] text-purple-600 font-semibold">ทายกฎหมาย 1 ข้อสั้นๆ</p>
                 </div>
             </div>
-            <button onclick="closeWelcomeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors">
-                <span class="material-symbols-rounded text-lg">close</span>
+            <button onclick="closeWelcomeModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors">
+                <span class="material-symbols-rounded text-base">close</span>
             </button>
         </div>
 
         <div id="modalQuizContent">
-            <p id="modalQuizQuestion" class="text-xs sm:text-sm font-bold text-slate-800 leading-relaxed mb-3 pt-1">
+            <p id="modalQuizQuestion" class="text-xs font-bold text-slate-800 leading-relaxed mb-2.5 pt-0.5 break-words">
                 กำลังโหลดคำถาม...
             </p>
-            <div id="modalQuizOptions" class="space-y-2">
+            <div id="modalQuizOptions" class="space-y-1.5">
                 <!-- Options generated dynamically -->
             </div>
             
-            <div id="modalQuizFeedback" class="hidden p-3 rounded-2xl mt-3 animate-pop">
-                <div class="flex items-start gap-2.5">
+            <div id="modalQuizFeedback" class="hidden p-2.5 rounded-xl mt-2.5 animate-pop">
+                <div class="flex items-start gap-2">
                     <span id="modalFeedbackEmoji" class="text-2xl shrink-0">🎉</span>
-                    <div>
+                    <div class="min-w-0 flex-1">
                         <h4 id="modalFeedbackTitle" class="font-bold text-xs mb-0.5">ถูกต้องแล้ว!</h4>
-                        <p id="modalFeedbackDesc" class="text-[11px] leading-relaxed opacity-90"></p>
+                        <p id="modalFeedbackDesc" class="text-[10px] leading-relaxed opacity-90 break-words"></p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="pt-1">
-            <button onclick="closeWelcomeModal()" class="w-full text-white py-3 rounded-2xl font-bold text-xs shadow-md transition-all active:scale-95" style="background: var(--primary-gradient);">
+            <button onclick="closeWelcomeModal()" class="w-full text-white py-2.5 rounded-xl font-bold text-xs shadow-md transition-all active:scale-95" style="background: var(--primary-gradient);">
                 เข้าสู่หน้าหลัก Thai Law 🏛️
             </button>
         </div>
@@ -1000,8 +1004,8 @@
 
         if (allLawsData.length === 0) {
             listEl.innerHTML = `
-                <div class="text-center py-16 bg-white rounded-3xl border border-slate-100 text-slate-400 text-xs flex flex-col items-center gap-2">
-                    <span class="material-symbols-rounded text-4xl opacity-30">search_off</span>
+                <div class="text-center py-12 bg-white rounded-2xl border border-slate-100 text-slate-400 text-xs flex flex-col items-center gap-2">
+                    <span class="material-symbols-rounded text-3xl opacity-30">search_off</span>
                     <span>ไม่พบข้อมูลกฎหมายที่ตรงกับคำค้นหา</span>
                 </div>`;
             return;
@@ -1028,24 +1032,24 @@
             el.innerHTML = `
                 <div class="fav-btn-container">
                     <button onclick="toggleFav('${id}')" class="fav-btn ${isFav ? 'active' : ''}" title="บันทึกเป็นรายการโปรด">
-                        <span class="material-symbols-rounded text-xl">bookmark</span>
+                        <span class="material-symbols-rounded text-lg sm:text-xl">bookmark</span>
                     </button>
                 </div>
-                <div class="font-bold text-slate-900 text-base mb-2 leading-snug pr-12">
+                <div class="font-bold text-slate-900 text-sm sm:text-base mb-2 leading-snug pr-10 break-words">
                     ${title}
                 </div>
-                <div class="flex flex-wrap items-center gap-2 mb-3">
-                    <span class="bg-indigo-50 text-indigo-700 text-[11px] px-2.5 py-0.5 rounded-lg font-bold border border-indigo-100">
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2.5 text-xs">
+                    <span class="bg-indigo-50 text-indigo-700 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-md sm:rounded-lg font-bold border border-indigo-100">
                         ${cat}
                     </span>
-                    ${vol ? `<span class="bg-purple-50 text-purple-700 text-[11px] px-2.5 py-0.5 rounded-lg font-bold border border-purple-100">เล่ม: ${vol}</span>` : ''}
-                    <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                    ${vol ? `<span class="bg-purple-50 text-purple-700 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-md sm:rounded-lg font-bold border border-purple-100">เล่ม: ${vol}</span>` : ''}
+                    <span class="text-[10px] sm:text-[11px] text-slate-400 flex items-center gap-1">
                         <span class="material-symbols-rounded text-xs">calendar_today</span>
                         ${date}
                     </span>
                 </div>
                 ${pdfUrl ? `
-                    <a href="${pdfUrl}" target="_blank" class="inline-flex items-center gap-1.5 text-pink-600 text-xs font-bold hover:text-pink-700 transition-colors pt-1">
+                    <a href="${pdfUrl}" target="_blank" class="inline-flex items-center gap-1 text-pink-600 text-xs font-bold hover:text-pink-700 transition-colors pt-0.5">
                         <span class="material-symbols-rounded text-base">picture_as_pdf</span>
                         อ่านเอกสารฉบับเต็ม (PDF)
                     </a>
