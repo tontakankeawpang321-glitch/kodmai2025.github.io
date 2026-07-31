@@ -251,16 +251,20 @@
         .option-btn.correct { border-color: #10b981 !important; background: #ecfdf5 !important; color: #065f46 !important; font-weight: 700; }
         .option-btn.wrong { border-color: #f43f5e !important; background: #fff1f2 !important; color: #9f1239 !important; }
 
-        /* FB Embed Responsive Container Fix */
+        /* FB Embed Responsive Container Fix for Mobile */
         .fb-container-wrapper {
             width: 100% !important;
             max-width: 100% !important;
             overflow: hidden !important;
             border-radius: 14px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
         }
         .fb-page, .fb-page iframe, .fb-page span {
             width: 100% !important;
             max-width: 100% !important;
+            box-sizing: border-box !important;
         }
     </style>
 </head>
@@ -518,8 +522,8 @@
                             <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs shrink-0">
                                 คุณ
                             </div>
-                            <input id="postInput" type="text" placeholder="ตั้งคำถาม หรือแชร์ข้อคิดเห็น..." class="flex-1 bg-slate-100 text-xs px-3 py-2 rounded-lg outline-none focus:ring-2 ring-purple-400 text-slate-800 min-w-0">
-                            <button onclick="createPost()" class="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition-colors shadow-sm active:scale-95 shrink-0">
+                            <input id="postInput" type="text" placeholder="ตั้งคำถาม หรือแชร์ข้อคิดเห็นลง Google Sheet..." class="flex-1 bg-slate-100 text-xs px-3 py-2 rounded-lg outline-none focus:ring-2 ring-purple-400 text-slate-800 min-w-0">
+                            <button onclick="createPost()" class="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition-colors shadow-sm active:scale-95 shrink-0" title="โพสต์ลงชุมชน">
                                 <span class="material-symbols-rounded text-base">send</span>
                             </button>
                         </div>
@@ -527,15 +531,20 @@
 
                     <!-- Dynamic Post Cards List -->
                     <div id="communityPostsList" class="space-y-2.5">
-                        <div class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="w-7 h-7 rounded-full bg-pink-100 text-pink-600 font-bold flex items-center justify-center text-[11px] shrink-0">
-                                    ทนาย
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm relative group" id="post-preset-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-pink-100 text-pink-600 font-bold flex items-center justify-center text-[11px] shrink-0">
+                                        ทนาย
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-xs text-slate-800">ทนายไขข้อข้องใจ</div>
+                                        <div class="text-[9px] text-slate-400">10 นาทีที่แล้ว • บทความกฎหมาย</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="font-bold text-xs text-slate-800">ทนายไขข้อข้องใจ</div>
-                                    <div class="text-[9px] text-slate-400">10 นาทีที่แล้ว • บทความกฎหมาย</div>
-                                </div>
+                                <button onclick="deletePost(this)" class="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-rose-50 transition-colors" title="ลบข้อความนี้">
+                                    <span class="material-symbols-rounded text-base">delete</span>
+                                </button>
                             </div>
                             <p class="text-xs text-slate-700 leading-relaxed mb-2.5 break-words">
                                 📌 <strong>การถูกหลอกโอนเงินซื้อสินค้าออนไลน์:</strong> สามารถนำหลักฐานสลิปการโอนเงินและแชตการสนทนา เข้าแจ้งความกับตำรวจไซเบอร์ได้ภายใน 72 ชม. เพื่อทำการอายัดบัญชีม้าครับ!
@@ -545,28 +554,24 @@
                                     <span class="material-symbols-rounded text-sm">favorite</span>
                                     <span>24</span>
                                 </button>
-                                <button class="flex items-center gap-1 hover:text-purple-600 transition-colors text-[11px]">
-                                    <span class="material-symbols-rounded text-sm">chat_bubble</span>
-                                    <span>5</span>
-                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Facebook Page Embed Section -->
+                    <!-- Facebook Page Embed Section Optimized for Mobile -->
                     <div class="mt-4 pt-3 border-t border-slate-200">
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600 mb-2">
                             <span class="material-symbols-rounded text-blue-600 text-base">public</span>
                             ฟีดข่าวสารจากเพจฎีกาน่าสนใจ
                         </div>
-                        <div class="fb-container-wrapper bg-white border border-slate-100 p-1.5 shadow-sm">
+                        <div class="fb-container-wrapper bg-white border border-slate-100 p-1 shadow-sm rounded-xl">
                             <div id="fb-root"></div>
                             <script async defer crossorigin="anonymous" src="https://connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v19.0"></script>
                             <div class="fb-page" 
                                 data-href="https://www.facebook.com/interesting.deka/" 
                                 data-tabs="timeline" 
-                                data-width="500" 
-                                data-height="600" 
+                                data-width="340" 
+                                data-height="550" 
                                 data-small-header="true" 
                                 data-adapt-container-width="true" 
                                 data-hide-cover="false" 
@@ -686,6 +691,10 @@
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS-0uk2O6y9VxyIReWBrN9mBNeYE7Mjh7Fgbbn8RzpBXSzUMmqUQlIUyFdsHtYj9Q/pub?output=csv';
     const BACKEND_URL = 'https://polished-sunset-f33e.tontakankeawpang321.workers.dev';
     
+    // Optional Google Apps Script URL for Community Sheet Integration
+    // Deploy your Apps Script as Web App (Anyone) to save/load posts live!
+    const APPSCRIPT_COMMUNITY_URL = 'https://script.google.com/macros/s/AKfycbwnfVd0vHdkFnpfELDGjIGrIqBUQ8Fa97KyNB5E13Jde9ITEsPcUQQf9mVkodKX7Y6s7Q/exec';
+
     let masterData = []; 
     let allLawsData = []; 
     let chatHistoryData = [];
@@ -1134,167 +1143,213 @@
         saveStoredFavs(stored);
     };
 
+    window.switchTab = function(tab) {
+        const views = ['home', 'quiz', 'fav', 'community'];
+        views.forEach(v => {
+            const el = document.getElementById(`view-${v}`);
+            if (el) {
+                if (v === tab) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            }
+        });
+
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        const nav = document.getElementById(`nav-${tab}`);
+        if (nav) nav.classList.add('active');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     window.openFavs = function() {
-        switchTab('fav');
+        window.switchTab('fav');
         const container = document.getElementById('favContainer');
+        if (!container) return;
         const list = getStoredFavs();
         container.innerHTML = '';
-        if(list.length === 0) {
+        if (list.length === 0) {
             container.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-20 text-slate-400 gap-3 bg-white rounded-3xl border border-slate-100">
-                    <span class="material-symbols-rounded text-6xl opacity-20">bookmark_add</span>
-                    <p class="text-xs font-bold">ยังไม่มีรายการที่บันทึกไว้</p>
+                <div class="flex flex-col items-center justify-center py-16 text-slate-400 gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm text-center p-4">
+                    <span class="material-symbols-rounded text-5xl opacity-30 text-pink-500">bookmark_add</span>
+                    <p class="text-xs font-bold text-slate-600">ยังไม่มีรายการโปรดที่บันทึกไว้</p>
+                    <p class="text-[11px] text-slate-400">กดไอคอนบุ๊กมาร์กที่การ์ดกฎหมายในหน้าหลักเพื่อบันทึกไว้ดูภายหลัง</p>
                 </div>`;
             return;
         }
         list.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center gap-3 active:scale-98 transition-transform cursor-pointer relative animate-slide-up';
-            div.onclick = (e) => { if(!e.target.closest('.del-btn')) jumpToItem(item.id); };
+            div.className = 'bg-white p-3.5 sm:p-4 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center gap-3 active:scale-98 transition-transform cursor-pointer relative animate-slide-up mb-2.5';
+            div.onclick = (e) => { if (!e.target.closest('.del-btn')) window.jumpToItem(item.id); };
             div.innerHTML = `
                 <div class="flex-1 min-w-0 pr-10">
-                    <div class="font-bold text-slate-900 text-sm mb-1 leading-snug truncate">${item.title}</div>
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm mb-1 leading-snug break-words">${item.title}</div>
                     <div class="text-[10px] text-slate-400 flex items-center gap-1">
                         <span class="material-symbols-rounded text-xs">schedule</span>
                         บันทึกเมื่อ ${item.time}
                     </div>
                 </div>
-                <button onclick="removeFav(event, '${item.id}')" class="del-btn w-9 h-9 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-xl hover:bg-rose-50 transition-colors absolute top-3 right-3">
-                    <span class="material-symbols-rounded text-xl">delete</span>
+                <button onclick="window.removeFav(event, '${item.id}')" class="del-btn w-9 h-9 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-xl hover:bg-rose-50 transition-colors absolute top-3 right-3 shrink-0" title="ลบรายการนี้">
+                    <span class="material-symbols-rounded text-lg">delete</span>
                 </button>`;
             container.appendChild(div);
         });
     };
 
-    window.clearAllFavs = () => {
-        if(confirm('ต้องการลบรายการโปรดทั้งหมดหรือไม่?')) {
-            saveStoredFavs([]);
-            openFavs();
-        }
+    window.removeFav = function(e, id) {
+        if (e) e.stopPropagation();
+        window.toggleFav(id);
+        window.openFavs();
     };
 
-    window.removeFav = (e, id) => { e.stopPropagation(); toggleFav(id); openFavs(); };
-
-    function jumpToItem(id) {
-        switchTab('home');
-        allLawsData = masterData; 
+    window.jumpToItem = function(id) {
+        window.switchTab('home');
+        allLawsData = masterData;
         renderPage();
         setTimeout(() => {
             const target = document.getElementById(`law-item-${id}`);
-            if (target) { 
-                target.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-                target.classList.add('target-highlight'); 
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.classList.add('target-highlight');
             }
         }, 300);
-    }
+    };
 
-    function switchTab(tab) {
-        document.getElementById('view-home').classList.toggle('hidden', tab !== 'home');
-        document.getElementById('view-quiz').classList.toggle('hidden', tab !== 'quiz');
-        document.getElementById('view-fav').classList.toggle('hidden', tab !== 'fav');
-        document.getElementById('view-community').classList.toggle('hidden', tab !== 'community');
-        
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        const nav = document.getElementById(`nav-${tab}`);
-        if(nav) nav.classList.add('active');
-
-        if(tab === 'quiz') loadQuizQuestion();
-        window.scrollTo(0,0);
-    }
-
-    function loadQuizQuestion() {
-        const item = lawQuizData[currentQuizIdx];
-        document.getElementById('quizNum').innerText = `คำถามข้อที่ ${currentQuizIdx + 1}/${lawQuizData.length}`;
-        document.getElementById('quizStreak').innerText = `🔥 ต่อเนื่อง: ${quizStreak}`;
-        document.getElementById('quizScore').innerText = quizScore;
-        document.getElementById('quizQuestion').innerText = item.q;
-
-        const optionsContainer = document.getElementById('quizOptions');
-        optionsContainer.innerHTML = '';
-        document.getElementById('quizFeedback').classList.add('hidden');
-
-        item.options.forEach((optText, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerHTML = `<span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-xs font-bold flex items-center justify-center mr-3 shrink-0">${String.fromCharCode(65 + i)}</span> <span>${optText}</span>`;
-            btn.onclick = () => checkQuizAnswer(i, btn);
-            optionsContainer.appendChild(btn);
-        });
-    }
-
-    function checkQuizAnswer(selectedIdx, btnEl) {
-        const item = lawQuizData[currentQuizIdx];
-        const allBtns = document.querySelectorAll('#quizOptions .option-btn');
-        allBtns.forEach(b => b.disabled = true);
-
-        const feedbackBox = document.getElementById('quizFeedback');
-        const feedbackEmoji = document.getElementById('feedbackEmoji');
-        const feedbackTitle = document.getElementById('feedbackTitle');
-        const feedbackDesc = document.getElementById('feedbackDesc');
-
-        feedbackBox.classList.remove('hidden', 'bg-emerald-500/10', 'bg-rose-500/10', 'border-emerald-200', 'border-rose-200');
-
-        if (selectedIdx === item.answer) {
-            playSound('correct');
-            btnEl.classList.add('correct');
-            quizScore += 10 + (quizStreak * 2);
-            quizStreak++;
-            
-            feedbackEmoji.innerText = ['🎉', '🥳', '✅', '🎯', '🌟'][Math.floor(Math.random() * 5)];
-            feedbackTitle.innerText = "ถูกต้องแล้ว! 👏 (+10 คะแนน)";
-            feedbackTitle.className = "font-bold text-sm mb-1 text-emerald-800";
-            feedbackBox.classList.add('bg-emerald-50', 'border', 'border-emerald-200', 'text-emerald-900');
-        } else {
-            playSound('wrong');
-            btnEl.classList.add('wrong');
-            if (allBtns[item.answer]) allBtns[item.answer].classList.add('correct');
-            quizStreak = 0;
-
-            feedbackEmoji.innerText = ['❌', '😅', '😢', '🙈'][Math.floor(Math.random() * 4)];
-            feedbackTitle.innerText = "ยังไม่ถูกต้อง!";
-            feedbackTitle.className = "font-bold text-sm mb-1 text-rose-800";
-            feedbackBox.classList.add('bg-rose-50', 'border', 'border-rose-200', 'text-rose-900');
+    window.clearAllFavs = () => {
+        if(confirm('ต้องการลบรายการโปรดทั้งหมดหรือไม่?')) {
+            saveStoredFavs([]);
+            window.openFavs();
         }
-
-        document.getElementById('quizScore').innerText = quizScore;
-        document.getElementById('quizStreak').innerText = `🔥 ต่อเนื่อง: ${quizStreak}`;
-        feedbackDesc.innerText = item.explain;
-    }
-
-    function nextQuizQuestion() {
-        currentQuizIdx = (currentQuizIdx + 1) % lawQuizData.length;
-        loadQuizQuestion();
-    }
-
-    // Community post creation
-    function createPost() {
+    };
+    // Community post creation & deletion with Google Sheets AppScript integration
+    async function createPost() {
         const input = document.getElementById('postInput');
         const val = input.value.trim();
         if(!val) return;
 
+        const postId = 'post-' + Date.now();
+        const nowStr = 'เมื่อสักครู่นี้';
+
         const list = document.getElementById('communityPostsList');
         const newCard = document.createElement('div');
-        newCard.className = 'bg-white p-4 rounded-2xl border border-slate-100 shadow-sm animate-pop';
+        newCard.id = postId;
+        newCard.className = 'bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm animate-pop relative group';
         newCard.innerHTML = `
-            <div class="flex items-center gap-3 mb-2.5">
-                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-xs">
-                    คุณ
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-[11px] shrink-0">
+                        คุณ
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs text-slate-800">สมาชิก Thai Law</div>
+                        <div class="text-[9px] text-slate-400">${nowStr}</div>
+                    </div>
                 </div>
-                <div>
-                    <div class="font-bold text-xs text-slate-800">สมาชิก Thai Law</div>
-                    <div class="text-[10px] text-slate-400">เมื่อสักครู่นี้</div>
-                </div>
+                <button onclick="deletePost(this, '${postId}')" class="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-rose-50 transition-colors" title="ลบข้อความนี้">
+                    <span class="material-symbols-rounded text-base">delete</span>
+                </button>
             </div>
-            <p class="text-xs text-slate-700 leading-relaxed mb-3">${val}</p>
-            <div class="flex items-center gap-4 text-xs text-slate-400 pt-2 border-t border-slate-50">
-                <button onclick="likePost(this)" class="flex items-center gap-1 hover:text-pink-500 transition-colors">
-                    <span class="material-symbols-rounded text-base">favorite</span>
+            <p class="text-xs text-slate-700 leading-relaxed mb-2.5 break-words">${val}</p>
+            <div class="flex items-center gap-3 text-xs text-slate-400 pt-1.5 border-t border-slate-50">
+                <button onclick="likePost(this)" class="flex items-center gap-1 hover:text-pink-500 transition-colors text-[11px]">
+                    <span class="material-symbols-rounded text-sm">favorite</span>
                     <span>0</span>
                 </button>
             </div>
         `;
         list.prepend(newCard);
         input.value = '';
+
+        // Submit to Google Apps Script / Sheet if configured
+        if (APPSCRIPT_COMMUNITY_URL && !APPSCRIPT_COMMUNITY_URL.includes('YOUR_APPSCRIPT_ID')) {
+            try {
+                await fetch(APPSCRIPT_COMMUNITY_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'create', id: postId, message: val, author: 'สมาชิก Thai Law', timestamp: new Date().toISOString() })
+                });
+            } catch(e) {
+                console.warn("AppsScript submit notice:", e);
+            }
+        }
+    }
+
+    // Delete post from UI and Google Sheet
+    async function deletePost(btn, postId) {
+        const postCard = btn.closest('.bg-white');
+        if (!postCard) return;
+
+        // Smooth exit animation
+        postCard.style.transition = 'all 0.25s ease';
+        postCard.style.opacity = '0';
+        postCard.style.transform = 'scale(0.95)';
+        setTimeout(() => postCard.remove(), 250);
+
+        // Delete from AppsScript if endpoint is set
+        if (postId && APPSCRIPT_COMMUNITY_URL && !APPSCRIPT_COMMUNITY_URL.includes('YOUR_APPSCRIPT_ID')) {
+            try {
+                await fetch(APPSCRIPT_COMMUNITY_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'delete', id: postId })
+                });
+            } catch(e) {
+                console.warn("AppsScript delete notice:", e);
+            }
+        }
+    }
+
+    // Load posts from Google Apps Script / Sheet on startup
+    async function loadCommunityPostsFromSheet() {
+        if (!APPSCRIPT_COMMUNITY_URL || APPSCRIPT_COMMUNITY_URL.includes('YOUR_APPSCRIPT_ID')) return;
+        try {
+            // ดึงข้อมูลโดยตรงจาก Web App URL
+            const res = await fetch(APPSCRIPT_COMMUNITY_URL);
+            if (res.ok) {
+                const posts = await res.json();
+                if (Array.isArray(posts) && posts.length > 0) {
+                    const list = document.getElementById('communityPostsList');
+                    
+                    // ล้างข้อความตัวอย่างเดิมออกก่อนโหลดข้อความจริงจาก Sheet
+                    list.innerHTML = ''; 
+
+                    posts.forEach(p => {
+                        const card = document.createElement('div');
+                        card.id = p.id || ('post-' + Math.random());
+                        card.className = 'bg-white p-3.5 rounded-xl border border-slate-100 shadow-sm animate-pop relative group mb-2.5';
+                        card.innerHTML = `
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-[11px] shrink-0">
+                                        ${p.author ? p.author.substring(0,2) : 'สมาชิก'}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-xs text-slate-800">${p.author || 'สมาชิก Thai Law'}</div>
+                                        <div class="text-[9px] text-slate-400">${p.timestamp ? new Date(p.timestamp).toLocaleDateString('th-TH') : 'เมื่อสักครู่นี้'}</div>
+                                    </div>
+                                </div>
+                                <button onclick="deletePost(this, '${card.id}')" class="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-rose-50 transition-colors" title="ลบข้อความนี้">
+                                    <span class="material-symbols-rounded text-base">delete</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-slate-700 leading-relaxed mb-2.5 break-words">${p.message}</p>
+                            <div class="flex items-center gap-3 text-xs text-slate-400 pt-1.5 border-t border-slate-50">
+                                <button onclick="likePost(this)" class="flex items-center gap-1 hover:text-pink-500 transition-colors text-[11px]">
+                                    <span class="material-symbols-rounded text-sm">favorite</span>
+                                    <span>${p.likes || 0}</span>
+                                </button>
+                            </div>
+                        `;
+                        list.prepend(card); // เอาโพสต์ใหม่อยู่บนสุด
+                    });
+                }
+            }
+        } catch(e) {
+            console.warn("Google Sheet Community fetch skipped:", e);
+        }
     }
 
     function likePost(btn) {
@@ -1379,7 +1434,7 @@
         initAppUpdates();
         loadDataFromCSV();
         checkFirstVisit();
-
+        loadCommunityPostsFromSheet();
         // Chatbot Controls
         const fabChat = document.getElementById('fab-chat');
         const btnCloseChat = document.getElementById('btnCloseChat');
